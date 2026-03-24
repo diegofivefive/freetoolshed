@@ -25,7 +25,9 @@
       "Bash(export PATH=\"/c/Program Files/nodejs:$PATH\")",
       "Bash(rm -f components.json)",
       "Bash(npx shadcn@latest init --defaults)",
-      "Bash(npx -y shadcn@latest init --defaults)"
+      "Bash(npx -y shadcn@latest init --defaults)",
+      "Bash(npx -y shadcn@latest add separator sheet dropdown-menu tooltip card input badge --overwrite)",
+      "Bash(npx next build)"
     ]
   }
 }
