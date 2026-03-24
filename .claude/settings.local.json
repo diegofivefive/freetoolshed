@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm add next-themes lucide-react)",
+      "Bash(dmesg)",
+      "Bash(ls /media/paulatreides/freefixDEV/freetoolshed/*.lock)",
+      "Bash(mount)",
+      "Bash(pnpm install)",
+      "Bash(cp -r /media/paulatreides/freefixDEV/freetoolshed \"/media/paulatreides/SSD RED/freetoolshed\")",
+      "Read(//media/paulatreides/SSD RED/**)",
+      "Bash(pnpm dlx shadcn@latest init -d)",
+      "Bash(export PATH=\"$PATH:/c/Users/jimbo/AppData/Local/pnpm:/c/Users/jimbo/AppData/Roaming/npm:/c/Program Files/nodejs\")",
+      "Bash(where pnpm)",
+      "Bash(npm --version)",
+      "Bash(node --version)",
+      "Bash(npx --version)",
+      "Bash(corepack list)",
+      "Read(//c/Users/jimbo/AppData/Local/**)",
+      "Read(//c/Users/jimbo/AppData/Roaming/npm/node_modules/**)",
+      "Bash(corepack enable pnpm)",
+      "Bash(corepack use pnpm@latest)",
+      "Bash(npm install -g pnpm)",
+      "Bash(pnpm --version)",
+      "Bash(pnpm dlx shadcn@latest init --defaults)",
+      "Bash(export PATH=\"/c/Program Files/nodejs:$PATH\")",
+      "Bash(rm -f components.json)",
+      "Bash(npx shadcn@latest init --defaults)",
+      "Bash(npx -y shadcn@latest init --defaults)"
+    ]
+  }
+}
