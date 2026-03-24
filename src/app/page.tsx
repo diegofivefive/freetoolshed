@@ -45,7 +45,7 @@ export default function HomePage() {
       ) : (
         <section className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border py-20 text-center">
           <Wrench className="mb-4 size-10 text-muted-foreground" />
-          <h2 className="text-xl font-semibold">Tools Coming Soon</h2>
+          <h2 className="text-xl font-semibold">Tools Coming Soon!</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             We&apos;re building free alternatives to expensive software. Check back soon.
           </p>
