@@ -27,7 +27,10 @@
       "Bash(npx shadcn@latest init --defaults)",
       "Bash(npx -y shadcn@latest init --defaults)",
       "Bash(npx -y shadcn@latest add separator sheet dropdown-menu tooltip card input badge --overwrite)",
-      "Bash(npx next build)"
+      "Bash(npx next build)",
+      "Bash(pnpm add -D @cloudflare/next-on-pages)",
+      "Bash(pnpm remove @cloudflare/next-on-pages)",
+      "Bash(pnpm add -D @opennextjs/cloudflare)"
     ]
   }
 }
