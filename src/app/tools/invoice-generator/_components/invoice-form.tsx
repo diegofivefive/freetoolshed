@@ -39,6 +39,7 @@ interface InvoiceFormProps {
   onNewInvoice: () => void;
   showPreview: boolean;
   onTogglePreview: () => void;
+  compact: boolean;
 }
 
 export function InvoiceForm({
@@ -48,6 +49,7 @@ export function InvoiceForm({
   onNewInvoice,
   showPreview,
   onTogglePreview,
+  compact,
 }: InvoiceFormProps) {
   const [pdfLoading, setPdfLoading] = useState(false);
   const [pdfErrors, setPdfErrors] = useState<string[]>([]);
@@ -127,7 +129,7 @@ export function InvoiceForm({
               lineItemTotals={calculations.lineItemTotals}
               currency={state.settings.currency}
               dispatch={dispatch}
-              compact={showPreview}
+              compact={compact}
             />
             <InvoiceSummary
               settings={state.settings}

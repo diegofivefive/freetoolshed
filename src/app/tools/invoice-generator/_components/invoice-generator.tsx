@@ -3,6 +3,7 @@
 import { useReducer, useMemo, useEffect, useRef, useCallback, useState } from "react";
 import { InvoiceForm } from "./invoice-form";
 import { InvoicePreview } from "./invoice-preview";
+import { useContainerWidth } from "./use-container-width";
 import type {
   InvoiceData,
   InvoiceAction,
@@ -91,7 +92,10 @@ function invoiceReducer(
 }
 
 export function InvoiceGenerator() {
+  const [containerRef, containerWidth] = useContainerWidth();
   const [showPreview, setShowPreview] = useState(true);
+  // Use card layout when preview is on, OR when container is too narrow for table
+  const useCompactItems = showPreview || containerWidth < 768;
   const [state, dispatch] = useReducer(
     invoiceReducer,
     null,
@@ -138,29 +142,32 @@ export function InvoiceGenerator() {
   }, []);
 
   return (
-    <div className="flex gap-6">
-      {/* Form — left side */}
-      <div className="min-w-0 flex-1">
-        <InvoiceForm
-          state={state}
-          calculations={calculations}
-          dispatch={dispatch}
-          onNewInvoice={handleNewInvoice}
-          showPreview={showPreview}
-          onTogglePreview={() => setShowPreview((p) => !p)}
-        />
-      </div>
+    <div ref={containerRef} className="overflow-x-auto">
+      <div className={showPreview ? "flex min-w-[880px] gap-6" : "flex gap-6"}>
+        {/* Form — left side */}
+        <div className={showPreview ? "min-w-[340px] flex-1" : "min-w-0 flex-1"}>
+          <InvoiceForm
+            state={state}
+            calculations={calculations}
+            dispatch={dispatch}
+            onNewInvoice={handleNewInvoice}
+            showPreview={showPreview}
+            onTogglePreview={() => setShowPreview((p) => !p)}
+            compact={useCompactItems}
+          />
+        </div>
 
-      {/* Preview — right side */}
-      {showPreview && (
-        <div className="w-[520px] shrink-0">
-          <div className="sticky top-20">
-            <div className="overflow-hidden rounded-lg border border-border bg-white shadow-sm">
-              <InvoicePreview state={state} calculations={calculations} />
+        {/* Preview — right side */}
+        {showPreview && (
+          <div className="w-[520px] shrink-0">
+            <div className="sticky top-20">
+              <div className="overflow-hidden rounded-lg border border-border bg-white shadow-sm">
+                <InvoicePreview state={state} calculations={calculations} />
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
