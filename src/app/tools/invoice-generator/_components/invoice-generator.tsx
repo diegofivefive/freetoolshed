@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useMemo, useEffect, useRef, useCallback } from "react";
+import { useReducer, useMemo, useEffect, useRef, useCallback, useState } from "react";
 import { InvoiceForm } from "./invoice-form";
 import { InvoicePreview } from "./invoice-preview";
 import type {
@@ -91,6 +91,7 @@ function invoiceReducer(
 }
 
 export function InvoiceGenerator() {
+  const [showPreview, setShowPreview] = useState(true);
   const [state, dispatch] = useReducer(
     invoiceReducer,
     null,
@@ -145,17 +146,21 @@ export function InvoiceGenerator() {
           calculations={calculations}
           dispatch={dispatch}
           onNewInvoice={handleNewInvoice}
+          showPreview={showPreview}
+          onTogglePreview={() => setShowPreview((p) => !p)}
         />
       </div>
 
       {/* Preview — right side */}
-      <div className="hidden w-[520px] shrink-0 xl:block">
-        <div className="sticky top-20">
-          <div className="overflow-hidden rounded-lg border border-border bg-white shadow-sm">
-            <InvoicePreview state={state} calculations={calculations} />
+      {showPreview && (
+        <div className="w-[520px] shrink-0">
+          <div className="sticky top-20">
+            <div className="overflow-hidden rounded-lg border border-border bg-white shadow-sm">
+              <InvoicePreview state={state} calculations={calculations} />
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

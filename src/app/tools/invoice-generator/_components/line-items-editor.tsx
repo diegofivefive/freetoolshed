@@ -16,6 +16,7 @@ interface LineItemsEditorProps {
   lineItemTotals: LineItemTotal[];
   currency: CurrencyCode;
   dispatch: Dispatch<InvoiceAction>;
+  compact: boolean;
 }
 
 export function LineItemsEditor({
@@ -23,6 +24,7 @@ export function LineItemsEditor({
   lineItemTotals,
   currency,
   dispatch,
+  compact,
 }: LineItemsEditorProps) {
   const canDelete = lineItems.length > 1;
 
@@ -30,36 +32,58 @@ export function LineItemsEditor({
     <div className="space-y-3">
       <h3 className="text-sm font-semibold">Line Items</h3>
 
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-border text-left text-xs font-medium text-muted-foreground">
-              <th className="pb-2 pr-2">Description</th>
-              <th className="w-24 px-2 pb-2 text-right">Qty</th>
-              <th className="w-20 px-2 pb-2 text-center">Unit</th>
-              <th className="w-32 px-2 pb-2 text-right">Unit Price</th>
-              <th className="w-16 px-2 pb-2 text-center">Tax</th>
-              <th className="w-32 px-2 pb-2 text-right">Amount</th>
-              <th className="w-10 pb-2 pl-2" />
-            </tr>
-          </thead>
-          <tbody>
-            {lineItems.map((item) => {
-              const total = lineItemTotals.find((t) => t.id === item.id);
-              return (
-                <LineItemRow
-                  key={item.id}
-                  item={item}
-                  currency={currency}
-                  lineAmount={total?.amount ?? 0}
-                  canDelete={canDelete}
-                  dispatch={dispatch}
-                />
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+      {compact ? (
+        /* ── Card layout (preview ON) ── */
+        <div className="space-y-3">
+          {lineItems.map((item) => {
+            const total = lineItemTotals.find((t) => t.id === item.id);
+            return (
+              <LineItemRow
+                key={item.id}
+                item={item}
+                currency={currency}
+                lineAmount={total?.amount ?? 0}
+                canDelete={canDelete}
+                dispatch={dispatch}
+                compact
+              />
+            );
+          })}
+        </div>
+      ) : (
+        /* ── Table layout (preview OFF) ── */
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-border text-left text-xs font-medium text-muted-foreground">
+                <th className="pb-2 pr-2">Description</th>
+                <th className="w-24 px-2 pb-2 text-right">Qty</th>
+                <th className="w-20 px-2 pb-2 text-center">Unit</th>
+                <th className="w-32 px-2 pb-2 text-right">Unit Price</th>
+                <th className="w-16 px-2 pb-2 text-center">Tax</th>
+                <th className="w-32 px-2 pb-2 text-right">Amount</th>
+                <th className="w-10 pb-2 pl-2" />
+              </tr>
+            </thead>
+            <tbody>
+              {lineItems.map((item) => {
+                const total = lineItemTotals.find((t) => t.id === item.id);
+                return (
+                  <LineItemRow
+                    key={item.id}
+                    item={item}
+                    currency={currency}
+                    lineAmount={total?.amount ?? 0}
+                    canDelete={canDelete}
+                    dispatch={dispatch}
+                    compact={false}
+                  />
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       <Button
         variant="outline"

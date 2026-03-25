@@ -12,7 +12,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { Printer, FilePlus, Loader2, CircleAlert, X } from "lucide-react";
+import { Printer, FilePlus, Loader2, CircleAlert, X, Eye, EyeOff } from "lucide-react";
 import { STATUS_OPTIONS } from "@/lib/invoice/constants";
 import { InvoiceSettingsFields } from "./invoice-settings";
 import { CompanyFields } from "./company-fields";
@@ -37,6 +37,8 @@ interface InvoiceFormProps {
   calculations: InvoiceCalculations;
   dispatch: Dispatch<InvoiceAction>;
   onNewInvoice: () => void;
+  showPreview: boolean;
+  onTogglePreview: () => void;
 }
 
 export function InvoiceForm({
@@ -44,6 +46,8 @@ export function InvoiceForm({
   calculations,
   dispatch,
   onNewInvoice,
+  showPreview,
+  onTogglePreview,
 }: InvoiceFormProps) {
   const [pdfLoading, setPdfLoading] = useState(false);
   const [pdfErrors, setPdfErrors] = useState<string[]>([]);
@@ -81,12 +85,27 @@ export function InvoiceForm({
   return (
     <div className="space-y-4">
       <Tabs defaultValue="details">
-        <TabsList>
-          <TabsTrigger value="details">Details</TabsTrigger>
-          <TabsTrigger value="items">Items</TabsTrigger>
-          <TabsTrigger value="notes">Notes</TabsTrigger>
-          <TabsTrigger value="style">Style</TabsTrigger>
-        </TabsList>
+        <div className="flex items-center gap-3">
+          <TabsList>
+            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="items">Items</TabsTrigger>
+            <TabsTrigger value="notes">Notes</TabsTrigger>
+            <TabsTrigger value="style">Style</TabsTrigger>
+          </TabsList>
+          <Button
+            variant={showPreview ? "default" : "outline"}
+            size="sm"
+            onClick={onTogglePreview}
+            className="ml-auto gap-1.5"
+          >
+            {showPreview ? (
+              <Eye className="size-4" />
+            ) : (
+              <EyeOff className="size-4" />
+            )}
+            Preview
+          </Button>
+        </div>
 
         <TabsContent value="details">
           <div className="space-y-6 py-4">
@@ -108,6 +127,7 @@ export function InvoiceForm({
               lineItemTotals={calculations.lineItemTotals}
               currency={state.settings.currency}
               dispatch={dispatch}
+              compact={showPreview}
             />
             <InvoiceSummary
               settings={state.settings}
@@ -152,13 +172,13 @@ export function InvoiceForm({
       {/* Toolbar */}
       <Separator />
       {pdfErrors.length > 0 && (
-        <div className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3">
-          <CircleAlert className="mt-0.5 size-4 shrink-0 text-destructive" />
+        <div className="flex items-start gap-3 rounded-lg border border-pink-400/30 bg-pink-500/5 px-4 py-3">
+          <CircleAlert className="mt-0.5 size-4 shrink-0 text-pink-400" />
           <div className="flex-1 space-y-1">
-            <p className="text-sm font-medium text-destructive">
-              Please fix the following before exporting:
+            <p className="text-sm font-medium text-pink-400">
+              Please fix before exporting:
             </p>
-            <ul className="list-inside list-disc text-sm text-destructive/80">
+            <ul className="list-inside list-disc text-sm text-pink-400/80">
               {pdfErrors.map((err) => (
                 <li key={err}>{err}</li>
               ))}
@@ -167,7 +187,7 @@ export function InvoiceForm({
           <button
             type="button"
             onClick={() => setPdfErrors([])}
-            className="shrink-0 rounded p-0.5 text-destructive/60 hover:text-destructive"
+            className="shrink-0 rounded p-0.5 text-pink-400/60 hover:text-pink-400"
           >
             <X className="size-4" />
           </button>
