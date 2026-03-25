@@ -37,7 +37,10 @@
       "Bash(npx shadcn@latest add select label textarea tabs -y)",
       "Bash(npx tsc --noEmit --pretty)",
       "mcp__Claude_Preview__preview_start",
-      "Bash(where node)"
+      "Bash(where node)",
+      "Bash(pnpm build)",
+      "Bash(git add CLAUDE.md src/app/layout.tsx src/app/page.tsx src/app/sitemap.ts src/app/not-found.tsx src/app/tools/invoice-generator/page.tsx src/components/layout/ad-slot.tsx)",
+      "Bash(git commit:*)"
     ]
   }
 }
