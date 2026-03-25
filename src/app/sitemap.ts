@@ -11,8 +11,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE_URL}/terms`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.3 },
   ];
 
-  // Tool pages will be added here as tools are built
-  const toolPages: MetadataRoute.Sitemap = [];
+  const toolPages: MetadataRoute.Sitemap = [
+    {
+      url: `${BASE_URL}/tools/invoice-generator`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    },
+  ];
 
   return [...staticPages, ...toolPages];
 }

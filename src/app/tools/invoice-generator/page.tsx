@@ -1,6 +1,7 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
 import { SeoContent } from "./_components/seo-content";
 import { InvoiceGeneratorLoader } from "./_components/invoice-generator-loader";
+import { AdSlot } from "@/components/layout/ad-slot";
 
 const toolConfig = {
   name: "Invoice Generator",
@@ -106,6 +107,10 @@ export default function InvoiceGeneratorPage() {
 
       <div className="mt-6">
         <InvoiceGeneratorLoader />
+      </div>
+
+      <div className="my-8 flex justify-center">
+        <AdSlot slot="mid-content" />
       </div>
 
       <SeoContent />

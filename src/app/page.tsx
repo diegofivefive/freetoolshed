@@ -5,7 +5,15 @@ import { Badge } from "@/components/ui/badge";
 import type { Tool } from "@/types";
 
 const TOOLS: Tool[] = [
-  // Tools will be added here as they are built
+  {
+    name: "Invoice Generator",
+    slug: "invoice-generator",
+    description:
+      "Create professional invoices with custom templates, tax calculations, and instant PDF export.",
+    category: "Business",
+    icon: "FileText",
+    paidAlternative: "FreshBooks",
+  },
 ];
 
 export default function HomePage() {

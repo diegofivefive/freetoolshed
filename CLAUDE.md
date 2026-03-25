@@ -94,15 +94,17 @@ Every tool page MUST include:
 7. Auto-generated `sitemap.xml` and `robots.txt` via Next.js config
 
 ## Ad Placements
-1. **Top leaderboard** (728x90) — below site nav, above tool workspace
-2. **Right sidebar** (300x250) — outside tool workspace, desktop only
-3. **In-feed** — homepage tool directory only
+1. **Top leaderboard** (728x90) — in root `layout.tsx`, below site nav, above content. Desktop only (`hidden lg:flex`).
+2. **Right sidebar** (300x250) — in `tools/layout.tsx`, sticky, outside tool workspace. Desktop only (`hidden lg:block`).
+3. **Mid-content** (728x90) — in each tool's `page.tsx`, between tool workspace and SEO content below.
+4. **In-feed** — homepage tool directory only (future).
 
 Rules:
 - Tool workspace area is always ad-free
 - No interstitials, popups, overlays, or auto-play video ads
 - Ad containers use fixed dimensions to prevent layout shift
-- Placeholder divs render server-side
+- Use `<AdSlot slot="..." />` from `@/components/layout/ad-slot`
+- Placeholder divs render server-side with dashed border + "Ad" label for dev visibility
 
 ## Code Standards
 - TypeScript strict mode — no `any` types
@@ -113,8 +115,63 @@ Rules:
 - Prefer server components; only use `"use client"` when needed
 - Keep tool-specific code inside the tool's `_components/` folder
 
+## New Tool Build Template
+
+Every new tool MUST follow this structure and checklist:
+
+### File Structure
+```
+src/app/tools/[tool-slug]/
+├── page.tsx                → SEO shell: metadata, JSON-LD, tool loader, mid-content ad, SEO content
+└── _components/
+    ├── [tool-name].tsx         → Main "use client" tool component (state, logic, UI)
+    ├── [tool-name]-loader.tsx  → Dynamic import wrapper (ssr: false if WASM)
+    ├── seo-content.tsx         → Below-fold: intro, features, how-to, comparison table, FAQ
+    └── ...                     → Tool-specific sub-components
+```
+
+### page.tsx Template
+```tsx
+import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
+import { SeoContent } from "./_components/seo-content";
+import { ToolNameLoader } from "./_components/tool-name-loader";
+import { AdSlot } from "@/components/layout/ad-slot";
+
+const toolConfig = {
+  name: "Tool Name",
+  description: "Short description.",
+  slug: "tool-slug",
+  paidAlternative: "Paid App",
+};
+
+export const metadata = generateToolMetadata(toolConfig);
+
+export default function ToolNamePage() {
+  const jsonLd = generateToolJsonLd(toolConfig);
+  // Optional: add FAQPage JSON-LD
+
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <h1 className="text-3xl font-bold tracking-tight">Free Tool Name</h1>
+      <p className="mt-2 text-muted-foreground">Description. No sign-up required.</p>
+      <div className="mt-6"><ToolNameLoader /></div>
+      <div className="my-8 flex justify-center"><AdSlot slot="mid-content" /></div>
+      <SeoContent />
+    </>
+  );
+}
+```
+
+### Integration Checklist (after building the tool)
+1. Add entry to `TOOLS` array in `src/app/page.tsx` (name, slug, description, category, icon, paidAlternative)
+2. Add entry to `toolPages` in `src/app/sitemap.ts` (priority 0.8, weekly)
+3. Ensure `page.tsx` includes mid-content `<AdSlot>` between tool and SEO content
+4. Ensure `seo-content.tsx` has: intro paragraph, feature list, how-to steps, comparison table, FAQ
+5. Run `pnpm build` — must pass with zero errors
+6. Verify in dev preview: tool loads, ad placeholders visible, no console errors
+
 ## Deployment
 - **Branch strategy**: `main` = production, feature branches for each tool
 - **Preview deployments**: every PR gets a Cloudflare preview URL
 - **Scaling path**: free tier → Workers paid ($5/mo) → add VPS if needed
--
