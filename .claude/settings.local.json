@@ -30,7 +30,14 @@
       "Bash(npx next build)",
       "Bash(pnpm add -D @cloudflare/next-on-pages)",
       "Bash(pnpm remove @cloudflare/next-on-pages)",
-      "Bash(pnpm add -D @opennextjs/cloudflare)"
+      "Bash(pnpm add -D @opennextjs/cloudflare)",
+      "WebSearch",
+      "Bash(pnpm add jspdf jspdf-autotable zod)",
+      "Bash(pnpm dlx shadcn@latest add select label textarea tabs -y)",
+      "Bash(npx shadcn@latest add select label textarea tabs -y)",
+      "Bash(npx tsc --noEmit --pretty)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(where node)"
     ]
   }
 }
