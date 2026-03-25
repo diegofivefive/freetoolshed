@@ -36,6 +36,7 @@ export function LineItemsEditor({
             <tr className="border-b border-border text-left text-xs font-medium text-muted-foreground">
               <th className="pb-2 pr-2">Description</th>
               <th className="w-24 px-2 pb-2 text-right">Qty</th>
+              <th className="w-20 px-2 pb-2 text-center">Unit</th>
               <th className="w-32 px-2 pb-2 text-right">Unit Price</th>
               <th className="w-16 px-2 pb-2 text-center">Tax</th>
               <th className="w-32 px-2 pb-2 text-right">Amount</th>

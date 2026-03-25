@@ -72,7 +72,15 @@ export default function InvoiceGeneratorPage() {
         name: "Can I save my invoices?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Your current invoice is automatically saved as a draft in your browser. You can also download a PDF copy at any time. Invoice numbers auto-increment for your convenience.",
+          text: "Yes. Your current draft auto-saves as you type. You can also save invoices to your history for later access, duplicate them, or export all invoices as JSON for backup.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Can I track invoice status?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Yes. Mark each invoice as Draft, Sent, Paid, or Overdue. The status appears as a watermark on the PDF and in your invoice history.",
         },
       },
       {
@@ -129,10 +137,11 @@ export default function InvoiceGeneratorPage() {
           </p>
         </div>
         <div className="rounded-lg border border-border bg-card p-4">
-          <h2 className="text-sm font-semibold">Auto-Save &amp; Tax Calculations</h2>
+          <h2 className="text-sm font-semibold">Invoice History &amp; Status Tracking</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Your draft saves automatically as you type. Add per-item or global
-            tax rates, flat or percentage discounts, and flexible payment terms.
+            Save invoices to your local history, track them as Draft, Sent,
+            Paid, or Overdue, and export/import JSON backups. Auto-save keeps
+            your current draft safe.
           </p>
         </div>
       </div>

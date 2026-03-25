@@ -25,14 +25,20 @@ export function SeoContent() {
         <ul className="mt-4 grid max-w-3xl gap-3 sm:grid-cols-2">
           {[
             "3 professional PDF templates (Modern, Classic, Compact)",
+            "Invoice history — save, load, duplicate, and manage invoices",
+            "Status tracking — mark invoices as Draft, Sent, Paid, or Overdue",
+            "Export and import invoices as JSON for backup and migration",
             "Automatic tax calculations with per-item tax rates",
             "20 currencies with proper symbol and decimal formatting",
             "Company logo upload — appears on invoice and PDF",
             "Flexible payment terms (Net 15, 30, 60 or custom)",
+            "Unit types for line items (hour, day, item, unit, service)",
+            "4 date format options (Month D YYYY, MM/DD, DD/MM, YYYY-MM-DD)",
+            "Payment link field — include a payment URL on your invoice",
+            "Save company defaults for faster invoice creation",
             "Percentage or flat-rate discounts",
             "Auto-incrementing invoice numbers",
-            "Auto-saved drafts — pick up where you left off",
-            "Live preview updates as you type",
+            "Live preview with real-time updates as you type",
             "Custom accent color to match your brand",
           ].map((feature) => (
             <li key={feature} className="flex items-start gap-2">
@@ -60,15 +66,15 @@ export function SeoContent() {
             },
             {
               title: "Add line items",
-              desc: "Enter each product or service with a description, quantity, and unit price. Enable per-item taxes if needed.",
+              desc: "Enter each product or service with a description, quantity, unit type, and unit price. Enable per-item taxes if needed.",
             },
             {
               title: "Choose a template and customize",
-              desc: "Pick from Modern, Classic, or Compact templates. Set your brand accent color and review the live preview.",
+              desc: "Pick from Modern, Classic, or Compact templates. Set your brand accent color, date format, and invoice status.",
             },
             {
-              title: "Download your PDF",
-              desc: "Click Download PDF to save a print-ready invoice, or use the Print button to send it directly to your printer.",
+              title: "Download or save your invoice",
+              desc: "Download a print-ready PDF, save to your invoice history for later, or export as JSON for backup.",
             },
           ].map((step, i) => (
             <li key={step.title} className="flex gap-4">
@@ -112,6 +118,9 @@ export function SeoContent() {
                 ["Custom Templates", "3 included", "Yes", "Yes", "Limited"],
                 ["Logo Upload", "Yes", "Yes", "Yes", "Yes"],
                 ["Multi-Currency", "20 currencies", "Yes", "Yes", "Limited"],
+                ["Invoice History", "Yes (local)", "Yes", "Yes", "Yes"],
+                ["Status Tracking", "Yes", "Yes", "Yes", "Limited"],
+                ["Export/Import JSON", "Yes", "No", "No", "No"],
                 ["Client-Side Privacy", "Yes", "No", "No", "No"],
                 ["Tax Calculations", "Yes", "Yes", "Yes", "Yes"],
                 ["Recurring Invoices", "No", "Yes", "Yes", "Yes"],
@@ -167,7 +176,11 @@ export function SeoContent() {
             },
             {
               q: "Can I save my invoices?",
-              a: "Your current invoice is automatically saved as a draft in your browser. You can also download a PDF copy at any time. Invoice numbers auto-increment for your convenience.",
+              a: "Yes. Your current draft auto-saves as you type. You can also save invoices to your history for later access, duplicate them, or export all invoices as JSON for backup.",
+            },
+            {
+              q: "Can I track invoice status?",
+              a: "Yes. Mark each invoice as Draft, Sent, Paid, or Overdue. The status appears as a watermark on the PDF and in your invoice history.",
             },
             {
               q: "How do I print my invoice?",

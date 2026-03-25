@@ -10,8 +10,8 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import type { InvoiceSettings, InvoiceAction, CurrencyCode, PaymentTerms } from "@/lib/invoice/types";
-import { CURRENCIES, PAYMENT_TERMS_OPTIONS, calculateDueDate } from "@/lib/invoice/constants";
+import type { InvoiceSettings, InvoiceAction, CurrencyCode, PaymentTerms, DateFormatPreference } from "@/lib/invoice/types";
+import { CURRENCIES, PAYMENT_TERMS_OPTIONS, DATE_FORMAT_OPTIONS, calculateDueDate } from "@/lib/invoice/constants";
 
 interface InvoiceSettingsProps {
   settings: InvoiceSettings;
@@ -160,6 +160,31 @@ export function InvoiceSettingsFields({
               {CURRENCIES.map((c) => (
                 <SelectItem key={c.code} value={c.code}>
                   {c.symbol} — {c.name} ({c.code})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Date Format */}
+        <div className="col-span-2 space-y-1.5">
+          <Label>Date Format</Label>
+          <Select
+            value={settings.dateFormat}
+            onValueChange={(val) =>
+              dispatch({
+                type: "SET_SETTINGS",
+                payload: { dateFormat: val as DateFormatPreference },
+              })
+            }
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {DATE_FORMAT_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
                 </SelectItem>
               ))}
             </SelectContent>

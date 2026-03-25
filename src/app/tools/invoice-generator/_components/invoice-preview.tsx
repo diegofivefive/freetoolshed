@@ -1,7 +1,8 @@
 "use client";
 
 import type { InvoiceData, InvoiceCalculations } from "@/lib/invoice/types";
-import { formatCurrency, formatDate } from "@/lib/invoice/format";
+import { formatCurrency, formatDate, formatQuantityWithUnit } from "@/lib/invoice/format";
+import { STATUS_OPTIONS } from "@/lib/invoice/constants";
 
 interface InvoicePreviewProps {
   state: InvoiceData;
@@ -11,7 +12,7 @@ interface InvoicePreviewProps {
 const SCALE = 520 / 595;
 
 export function InvoicePreview({ state, calculations }: InvoicePreviewProps) {
-  const { company, client, lineItems, settings, notes, terms } = state;
+  const { company, client, lineItems, settings, notes, terms, status, paymentLink } = state;
   const { lineItemTotals, subtotal, totalTax, discountAmount, grandTotal } =
     calculations;
   const accent = settings.accentColor;
@@ -53,6 +54,7 @@ export function InvoicePreview({ state, calculations }: InvoicePreviewProps) {
             grandTotal={grandTotal}
             notes={notes}
             terms={terms}
+            paymentLink={paymentLink}
             accent={accent}
             cur={cur}
           />
@@ -70,6 +72,7 @@ export function InvoicePreview({ state, calculations }: InvoicePreviewProps) {
             grandTotal={grandTotal}
             notes={notes}
             terms={terms}
+            paymentLink={paymentLink}
             accent={accent}
             cur={cur}
           />
@@ -87,10 +90,31 @@ export function InvoicePreview({ state, calculations }: InvoicePreviewProps) {
             grandTotal={grandTotal}
             notes={notes}
             terms={terms}
+            paymentLink={paymentLink}
             accent={accent}
             cur={cur}
           />
         )}
+        {/* Status watermark */}
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%) rotate(-30deg)",
+            fontSize: 72,
+            fontWeight: 900,
+            color: STATUS_OPTIONS.find((o) => o.value === status)?.color ?? "#a1a1aa",
+            opacity: 0.1,
+            textTransform: "uppercase",
+            letterSpacing: 8,
+            pointerEvents: "none",
+            whiteSpace: "nowrap",
+            userSelect: "none",
+          }}
+        >
+          {STATUS_OPTIONS.find((o) => o.value === status)?.label ?? status}
+        </div>
       </div>
     </div>
   );
@@ -109,6 +133,7 @@ interface LayoutProps {
   grandTotal: number;
   notes: string;
   terms: string;
+  paymentLink: string;
   accent: string;
   cur: InvoiceData["settings"]["currency"];
 }
@@ -126,6 +151,7 @@ function ModernLayout({
   grandTotal,
   notes,
   terms,
+  paymentLink,
   accent,
   cur,
 }: LayoutProps) {
@@ -181,10 +207,10 @@ function ModernLayout({
               </span>
             </div>
             <div style={{ color: "#666", marginTop: 4 }}>
-              Date: {formatDate(settings.invoiceDate)}
+              Date: {formatDate(settings.invoiceDate, settings.dateFormat)}
             </div>
             <div style={{ color: "#666" }}>
-              Due: {formatDate(settings.dueDate)}
+              Due: {formatDate(settings.dueDate, settings.dateFormat)}
             </div>
           </div>
         </div>
@@ -241,7 +267,9 @@ function ModernLayout({
                 <td style={tdStyle}>
                   {item.description || "—"}
                 </td>
-                <td style={{ ...tdStyle, textAlign: "right" }}>{item.quantity}</td>
+                <td style={{ ...tdStyle, textAlign: "right" }}>
+                  {formatQuantityWithUnit(item.quantity, item.unitType)}
+                </td>
                 <td style={{ ...tdStyle, textAlign: "right" }}>
                   {formatCurrency(item.unitPrice, cur)}
                 </td>
@@ -291,7 +319,7 @@ function ModernLayout({
       </div>
 
       {/* Notes & Terms */}
-      <NotesBlock notes={notes} terms={terms} accent={accent} />
+      <NotesBlock notes={notes} terms={terms} accent={accent} paymentLink={paymentLink} />
     </>
   );
 }
@@ -309,6 +337,7 @@ function ClassicLayout({
   grandTotal,
   notes,
   terms,
+  paymentLink,
   accent,
   cur,
 }: LayoutProps) {
@@ -373,8 +402,8 @@ function ClassicLayout({
             Invoice Details
           </div>
           <div><span style={{ fontWeight: 600 }}>Number:</span> {settings.invoiceNumber}</div>
-          <div><span style={{ fontWeight: 600 }}>Date:</span> {formatDate(settings.invoiceDate)}</div>
-          <div><span style={{ fontWeight: 600 }}>Due:</span> {formatDate(settings.dueDate)}</div>
+          <div><span style={{ fontWeight: 600 }}>Date:</span> {formatDate(settings.invoiceDate, settings.dateFormat)}</div>
+          <div><span style={{ fontWeight: 600 }}>Due:</span> {formatDate(settings.dueDate, settings.dateFormat)}</div>
         </div>
       </div>
 
@@ -415,7 +444,7 @@ function ClassicLayout({
                   {item.description || "—"}
                 </td>
                 <td style={{ ...tdStyle, textAlign: "right", borderRight: "1px solid #e0e0e0" }}>
-                  {item.quantity}
+                  {formatQuantityWithUnit(item.quantity, item.unitType)}
                 </td>
                 <td style={{ ...tdStyle, textAlign: "right", borderRight: "1px solid #e0e0e0" }}>
                   {formatCurrency(item.unitPrice, cur)}
@@ -458,7 +487,7 @@ function ClassicLayout({
         </div>
       </div>
 
-      <NotesBlock notes={notes} terms={terms} accent={accent} />
+      <NotesBlock notes={notes} terms={terms} accent={accent} paymentLink={paymentLink} />
     </>
   );
 }
@@ -476,6 +505,7 @@ function CompactLayout({
   grandTotal,
   notes,
   terms,
+  paymentLink,
   accent,
   cur,
 }: LayoutProps) {
@@ -527,11 +557,11 @@ function CompactLayout({
         </span>
         <span>
           <span style={{ fontWeight: 600 }}>Date:</span>{" "}
-          {formatDate(settings.invoiceDate)}
+          {formatDate(settings.invoiceDate, settings.dateFormat)}
         </span>
         <span>
           <span style={{ fontWeight: 600 }}>Due:</span>{" "}
-          {formatDate(settings.dueDate)}
+          {formatDate(settings.dueDate, settings.dateFormat)}
         </span>
       </div>
 
@@ -551,7 +581,9 @@ function CompactLayout({
             return (
               <tr key={item.id} style={{ borderBottom: "1px solid #f0f0f0" }}>
                 <td style={tdStyleCompact}>{item.description || "—"}</td>
-                <td style={{ ...tdStyleCompact, textAlign: "right" }}>{item.quantity}</td>
+                <td style={{ ...tdStyleCompact, textAlign: "right" }}>
+                  {formatQuantityWithUnit(item.quantity, item.unitType)}
+                </td>
                 <td style={{ ...tdStyleCompact, textAlign: "right" }}>
                   {formatCurrency(item.unitPrice, cur)}
                 </td>
@@ -591,7 +623,7 @@ function CompactLayout({
         </div>
       </div>
 
-      <NotesBlock notes={notes} terms={terms} accent={accent} compact />
+      <NotesBlock notes={notes} terms={terms} accent={accent} compact paymentLink={paymentLink} />
     </>
   );
 }
@@ -628,13 +660,15 @@ function NotesBlock({
   terms,
   accent,
   compact,
+  paymentLink,
 }: {
   notes: string;
   terms: string;
   accent: string;
   compact?: boolean;
+  paymentLink?: string;
 }) {
-  if (!notes && !terms) return null;
+  if (!notes && !terms && !paymentLink) return null;
   const fs = compact ? 8 : 9;
   return (
     <div style={{ fontSize: fs, color: "#666" }}>
@@ -647,11 +681,21 @@ function NotesBlock({
         </div>
       )}
       {terms && (
-        <div>
+        <div style={{ marginBottom: paymentLink ? 8 : 0 }}>
           <div style={{ fontWeight: 600, color: accent, marginBottom: 2 }}>
             Terms &amp; Conditions
           </div>
           <div style={{ whiteSpace: "pre-wrap" }}>{terms}</div>
+        </div>
+      )}
+      {paymentLink && (
+        <div>
+          <div style={{ fontWeight: 600, color: accent, marginBottom: 2 }}>
+            Payment Link
+          </div>
+          <div style={{ color: accent, wordBreak: "break-all" }}>
+            {paymentLink}
+          </div>
         </div>
       )}
     </div>

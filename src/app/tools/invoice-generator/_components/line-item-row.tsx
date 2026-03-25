@@ -1,11 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import type { Dispatch } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { Trash2 } from "lucide-react";
 import type { LineItem, InvoiceAction, CurrencyCode } from "@/lib/invoice/types";
 import { formatCurrency } from "@/lib/invoice/format";
+import { UNIT_TYPES } from "@/lib/invoice/constants";
 
 interface LineItemRowProps {
   item: LineItem;
@@ -13,6 +22,61 @@ interface LineItemRowProps {
   lineAmount: number;
   canDelete: boolean;
   dispatch: Dispatch<InvoiceAction>;
+}
+
+const PRESET_VALUES: string[] = UNIT_TYPES.map((u) => u.value);
+
+function UnitTypeCell({
+  unitType,
+  onChange,
+}: {
+  unitType: string;
+  onChange: (value: string) => void;
+}) {
+  const isPreset = PRESET_VALUES.includes(unitType);
+  const [isCustom, setIsCustom] = useState(!isPreset);
+
+  const selectValue = isCustom ? "__custom__" : unitType;
+
+  return isCustom ? (
+    <Input
+      value={unitType === "item" ? "" : unitType}
+      placeholder="Custom"
+      onChange={(e) => onChange(e.target.value)}
+      onBlur={() => {
+        if (!unitType || PRESET_VALUES.includes(unitType)) {
+          setIsCustom(false);
+        }
+      }}
+      className="h-9 text-xs"
+      autoFocus
+    />
+  ) : (
+    <Select
+      value={selectValue}
+      onValueChange={(val) => {
+        if (!val) return;
+        if (val === "__custom__") {
+          setIsCustom(true);
+          onChange("");
+        } else {
+          onChange(val);
+        }
+      }}
+    >
+      <SelectTrigger className="h-9 text-xs">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {UNIT_TYPES.map((u) => (
+          <SelectItem key={u.value} value={u.value}>
+            {u.label}
+          </SelectItem>
+        ))}
+        <SelectItem value="__custom__">Custom…</SelectItem>
+      </SelectContent>
+    </Select>
+  );
 }
 
 export function LineItemRow({
@@ -50,6 +114,11 @@ export function LineItemRow({
           onChange={(e) => update({ quantity: Number(e.target.value) })}
           className="h-9 text-right"
         />
+      </td>
+
+      {/* Unit Type */}
+      <td className="w-20 px-2 py-2">
+        <UnitTypeCell unitType={item.unitType} onChange={(v) => update({ unitType: v })} />
       </td>
 
       {/* Unit Price */}

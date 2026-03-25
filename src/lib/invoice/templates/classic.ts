@@ -1,7 +1,7 @@
 import type { jsPDF } from "jspdf";
 import type { InvoiceData, InvoiceCalculations } from "../types";
-import { formatCurrency, formatDate } from "../format";
-import { hexToRgb, renderNotesAndTerms, importAutoTable } from "./modern";
+import { formatCurrency, formatDate, formatQuantityWithUnit } from "../format";
+import { hexToRgb, renderNotesAndTerms, importAutoTable, renderStatusWatermark } from "./modern";
 
 export async function renderClassicTemplate(
   doc: jsPDF,
@@ -87,12 +87,12 @@ export async function renderClassicTemplate(
   doc.setFont("helvetica", "bold");
   doc.text("Date:", detailsX + 4, detY);
   doc.setFont("helvetica", "normal");
-  doc.text(formatDate(settings.invoiceDate), detailsX + 24, detY);
+  doc.text(formatDate(settings.invoiceDate, settings.dateFormat), detailsX + 24, detY);
   detY += 4;
   doc.setFont("helvetica", "bold");
   doc.text("Due:", detailsX + 4, detY);
   doc.setFont("helvetica", "normal");
-  doc.text(formatDate(settings.dueDate), detailsX + 24, detY);
+  doc.text(formatDate(settings.dueDate, settings.dateFormat), detailsX + 24, detY);
 
   y += boxHeight + 8;
 
@@ -124,7 +124,7 @@ export async function renderClassicTemplate(
     const total = lineItemTotals[i];
     return [
       item.description || "—",
-      String(item.quantity),
+      formatQuantityWithUnit(item.quantity, item.unitType),
       formatCurrency(item.unitPrice, cur),
       formatCurrency(total?.amount ?? 0, cur),
     ];
@@ -208,5 +208,8 @@ export async function renderClassicTemplate(
   y += 18;
 
   // ── Notes & Terms ──
-  renderNotesAndTerms(doc, notes, terms, accent, margin, y, contentWidth);
+  renderNotesAndTerms(doc, notes, terms, accent, margin, y, contentWidth, data.paymentLink);
+
+  // ── Status Watermark ──
+  renderStatusWatermark(doc, data.status);
 }

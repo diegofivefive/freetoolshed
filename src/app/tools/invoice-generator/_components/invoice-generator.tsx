@@ -10,7 +10,7 @@ import type {
 } from "@/lib/invoice/types";
 import { createDefaultInvoiceData } from "@/lib/invoice/constants";
 import { calculateInvoice } from "@/lib/invoice/calculations";
-import { saveDraft, loadDraft, getNextInvoiceNumber } from "@/lib/invoice/storage";
+import { saveDraft, loadDraft, getNextInvoiceNumber, loadDefaults } from "@/lib/invoice/storage";
 
 function invoiceReducer(
   state: InvoiceData,
@@ -69,11 +69,20 @@ function invoiceReducer(
         ...state,
         company: { ...state.company, logoUrl: action.payload },
       };
+    case "SET_STATUS":
+      return { ...state, status: action.payload };
+    case "SET_PAYMENT_LINK":
+      return { ...state, paymentLink: action.payload };
     case "LOAD_DRAFT":
       return action.payload;
     case "RESET": {
       const fresh = createDefaultInvoiceData();
       fresh.settings.invoiceNumber = getNextInvoiceNumber();
+      const defaults = loadDefaults();
+      if (defaults) {
+        fresh.company = { ...fresh.company, ...defaults.company };
+        fresh.settings = { ...fresh.settings, ...defaults.settings };
+      }
       return fresh;
     }
     default:
@@ -90,6 +99,11 @@ export function InvoiceGenerator() {
       if (draft) return draft;
       const fresh = createDefaultInvoiceData();
       fresh.settings.invoiceNumber = getNextInvoiceNumber();
+      const defaults = loadDefaults();
+      if (defaults) {
+        fresh.company = { ...fresh.company, ...defaults.company };
+        fresh.settings = { ...fresh.settings, ...defaults.settings };
+      }
       return fresh;
     }
   );

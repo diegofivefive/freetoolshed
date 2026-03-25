@@ -1,6 +1,6 @@
 import type { jsPDF } from "jspdf";
 import type { InvoiceData, InvoiceCalculations } from "../types";
-import { formatCurrency, formatDate } from "../format";
+import { formatCurrency, formatDate, formatQuantityWithUnit } from "../format";
 
 export async function renderModernTemplate(
   doc: jsPDF,
@@ -68,11 +68,11 @@ export async function renderModernTemplate(
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(100, 100, 100);
-  doc.text(`Date: ${formatDate(settings.invoiceDate)}`, pageWidth - margin, rightY, {
+  doc.text(`Date: ${formatDate(settings.invoiceDate, settings.dateFormat)}`, pageWidth - margin, rightY, {
     align: "right",
   });
   rightY += 4;
-  doc.text(`Due: ${formatDate(settings.dueDate)}`, pageWidth - margin, rightY, {
+  doc.text(`Due: ${formatDate(settings.dueDate, settings.dateFormat)}`, pageWidth - margin, rightY, {
     align: "right",
   });
 
@@ -106,7 +106,7 @@ export async function renderModernTemplate(
     const total = lineItemTotals[i];
     return [
       item.description || "—",
-      String(item.quantity),
+      formatQuantityWithUnit(item.quantity, item.unitType),
       formatCurrency(item.unitPrice, cur),
       formatCurrency(total?.amount ?? 0, cur),
     ];
@@ -189,7 +189,10 @@ export async function renderModernTemplate(
   y += 16;
 
   // ── Notes & Terms ──
-  renderNotesAndTerms(doc, notes, terms, accent, margin, y, contentWidth);
+  renderNotesAndTerms(doc, notes, terms, accent, margin, y, contentWidth, data.paymentLink);
+
+  // ── Status Watermark ──
+  renderStatusWatermark(doc, data.status);
 }
 
 // ── Helpers ──
@@ -214,7 +217,8 @@ function renderNotesAndTerms(
   accent: { r: number; g: number; b: number },
   margin: number,
   startY: number,
-  contentWidth: number
+  contentWidth: number,
+  paymentLink?: string,
 ): void {
   let y = startY;
 
@@ -243,7 +247,52 @@ function renderNotesAndTerms(
     doc.setTextColor(100, 100, 100);
     const termLines = doc.splitTextToSize(terms, contentWidth);
     doc.text(termLines, margin, y);
+    y += termLines.length * 4 + 6;
+  }
+
+  if (paymentLink) {
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(accent.r, accent.g, accent.b);
+    doc.text("Payment Link", margin, y);
+    y += 4;
+
+    doc.setFont("helvetica", "normal");
+    const linkLines = doc.splitTextToSize(paymentLink, contentWidth);
+    doc.text(linkLines, margin, y);
   }
 }
 
-export { hexToRgb, renderNotesAndTerms, importAutoTable };
+function renderStatusWatermark(
+  doc: jsPDF,
+  status: string,
+): void {
+  const statusConfig: Record<string, { label: string; color: string }> = {
+    draft: { label: "DRAFT", color: "#a1a1aa" },
+    sent: { label: "SENT", color: "#3b82f6" },
+    paid: { label: "PAID", color: "#10b981" },
+    overdue: { label: "OVERDUE", color: "#ef4444" },
+  };
+
+  const config = statusConfig[status];
+  if (!config) return;
+
+  const color = hexToRgb(config.color);
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+
+  // Very light tint (~12% opacity)
+  const r = Math.round(color.r + (255 - color.r) * 0.88);
+  const g = Math.round(color.g + (255 - color.g) * 0.88);
+  const b = Math.round(color.b + (255 - color.b) * 0.88);
+
+  doc.setTextColor(r, g, b);
+  doc.setFontSize(60);
+  doc.setFont("helvetica", "bold");
+  doc.text(config.label, pageWidth / 2, pageHeight / 2, {
+    align: "center",
+    angle: 30,
+  });
+}
+
+export { hexToRgb, renderNotesAndTerms, importAutoTable, renderStatusWatermark };

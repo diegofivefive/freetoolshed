@@ -5,7 +5,15 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ExportButton } from "@/components/shared/export-button";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { Printer, FilePlus, Loader2, CircleAlert, X } from "lucide-react";
+import { STATUS_OPTIONS } from "@/lib/invoice/constants";
 import { InvoiceSettingsFields } from "./invoice-settings";
 import { CompanyFields } from "./company-fields";
 import { ClientFields } from "./client-fields";
@@ -15,11 +23,13 @@ import { NotesFields } from "./notes-fields";
 import { TemplateSelector } from "./template-selector";
 import { ColorPicker } from "./color-picker";
 import { LogoUpload } from "./logo-upload";
+import { InvoiceHistory } from "./invoice-history";
 import { generateInvoicePdf, printInvoicePdf } from "./pdf-export";
 import type {
   InvoiceData,
   InvoiceAction,
   InvoiceCalculations,
+  InvoiceStatus,
 } from "@/lib/invoice/types";
 
 interface InvoiceFormProps {
@@ -112,6 +122,7 @@ export function InvoiceForm({
             <NotesFields
               notes={state.notes}
               terms={state.terms}
+              paymentLink={state.paymentLink}
               dispatch={dispatch}
             />
           </div>
@@ -162,7 +173,7 @@ export function InvoiceForm({
           </button>
         </div>
       )}
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <ExportButton
           onClick={handleDownloadPdf}
           label={pdfLoading ? "Generating…" : "Download PDF"}
@@ -176,8 +187,43 @@ export function InvoiceForm({
           )}
           Print
         </Button>
+        <InvoiceHistory
+          currentState={state}
+          onLoad={(data) => dispatch({ type: "LOAD_DRAFT", payload: data })}
+        />
         <div className="flex-1" />
-        <Button variant="ghost" onClick={onNewInvoice}>
+        <Select
+          value={state.status}
+          onValueChange={(val) => {
+            if (val) dispatch({ type: "SET_STATUS", payload: val as InvoiceStatus });
+          }}
+        >
+          <SelectTrigger className="w-32">
+            <span
+              className="mr-1.5 inline-block size-2 rounded-full"
+              style={{
+                backgroundColor:
+                  STATUS_OPTIONS.find((o) => o.value === state.status)?.color ??
+                  "#a1a1aa",
+              }}
+            />
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {STATUS_OPTIONS.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                <span className="flex items-center gap-2">
+                  <span
+                    className="inline-block size-2 rounded-full"
+                    style={{ backgroundColor: opt.color }}
+                  />
+                  {opt.label}
+                </span>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Button variant="outline" onClick={onNewInvoice}>
           <FilePlus className="size-4" data-icon="inline-start" />
           New Invoice
         </Button>
