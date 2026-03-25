@@ -22,6 +22,7 @@ export interface LineItem {
   unitPrice: number;
   taxEnabled: boolean;
   taxRate: number;
+  unitType: string;
 }
 
 export type PaymentTerms =
@@ -48,6 +49,14 @@ export type DiscountType = "percentage" | "flat";
 
 export type TemplateName = "modern" | "classic" | "compact";
 
+export type InvoiceStatus = "draft" | "sent" | "paid" | "overdue";
+
+export type DateFormatPreference =
+  | "MM/DD/YYYY"
+  | "DD/MM/YYYY"
+  | "YYYY-MM-DD"
+  | "Month D, YYYY";
+
 export interface InvoiceSettings {
   invoiceNumber: string;
   invoiceDate: string;
@@ -60,6 +69,7 @@ export interface InvoiceSettings {
   discountValue: number;
   template: TemplateName;
   accentColor: string;
+  dateFormat: DateFormatPreference;
 }
 
 export interface InvoiceData {
@@ -69,6 +79,30 @@ export interface InvoiceData {
   settings: InvoiceSettings;
   notes: string;
   terms: string;
+  status: InvoiceStatus;
+  paymentLink: string;
+}
+
+export interface SavedInvoice {
+  id: string;
+  data: InvoiceData;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface InvoiceDefaults {
+  company: CompanyInfo;
+  settings: Pick<
+    InvoiceSettings,
+    "currency" | "taxRate" | "template" | "accentColor" | "dateFormat"
+  >;
+}
+
+export interface ExportEnvelope {
+  tool: "freetoolshed-invoice-generator";
+  version: 1;
+  exportedAt: string;
+  invoices: SavedInvoice[];
 }
 
 export type InvoiceAction =
@@ -82,6 +116,8 @@ export type InvoiceAction =
   | { type: "UPDATE_LINE_ITEM"; payload: { id: string } & Partial<LineItem> }
   | { type: "REORDER_LINE_ITEMS"; payload: LineItem[] }
   | { type: "SET_LOGO"; payload: string | null }
+  | { type: "SET_STATUS"; payload: InvoiceStatus }
+  | { type: "SET_PAYMENT_LINK"; payload: string }
   | { type: "LOAD_DRAFT"; payload: InvoiceData }
   | { type: "RESET" };
 

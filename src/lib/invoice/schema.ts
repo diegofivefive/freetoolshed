@@ -7,6 +7,7 @@ export const lineItemSchema = z.object({
   unitPrice: z.number().min(0, "Unit price cannot be negative"),
   taxEnabled: z.boolean(),
   taxRate: z.number().min(0).max(100),
+  unitType: z.string().default("item"),
 });
 
 export const companySchema = z.object({
@@ -44,6 +45,9 @@ export const settingsSchema = z.object({
   discountValue: z.number().min(0),
   template: z.enum(["modern", "classic", "compact"]),
   accentColor: z.string(),
+  dateFormat: z
+    .enum(["MM/DD/YYYY", "DD/MM/YYYY", "YYYY-MM-DD", "Month D, YYYY"])
+    .default("Month D, YYYY"),
 });
 
 export const invoiceSchema = z.object({
@@ -53,6 +57,22 @@ export const invoiceSchema = z.object({
   settings: settingsSchema,
   notes: z.string(),
   terms: z.string(),
+  status: z.enum(["draft", "sent", "paid", "overdue"]).default("draft"),
+  paymentLink: z.string().default(""),
+});
+
+export const savedInvoiceSchema = z.object({
+  id: z.string(),
+  data: invoiceSchema,
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+export const exportEnvelopeSchema = z.object({
+  tool: z.literal("freetoolshed-invoice-generator"),
+  version: z.literal(1),
+  exportedAt: z.string(),
+  invoices: z.array(savedInvoiceSchema),
 });
 
 export type InvoiceValidationError = {

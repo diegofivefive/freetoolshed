@@ -1,4 +1,11 @@
-import type { Currency, CurrencyCode, InvoiceData, PaymentTerms } from "./types";
+import type {
+  Currency,
+  CurrencyCode,
+  DateFormatPreference,
+  InvoiceData,
+  InvoiceStatus,
+  PaymentTerms,
+} from "./types";
 
 export const CURRENCIES: Currency[] = [
   { code: "USD", name: "US Dollar", symbol: "$", decimals: 2 },
@@ -33,6 +40,35 @@ export const PAYMENT_TERMS_OPTIONS: { label: string; value: PaymentTerms }[] = [
 
 export const DEFAULT_TAX_RATES = [0, 5, 7.5, 10, 13, 15, 20, 21, 25];
 
+export const UNIT_TYPES = [
+  { label: "Item", value: "item" },
+  { label: "Hour", value: "hour" },
+  { label: "Day", value: "day" },
+  { label: "Unit", value: "unit" },
+  { label: "Service", value: "service" },
+] as const;
+
+export const STATUS_OPTIONS: {
+  label: string;
+  value: InvoiceStatus;
+  color: string;
+}[] = [
+  { label: "Draft", value: "draft", color: "#a1a1aa" },
+  { label: "Sent", value: "sent", color: "#3b82f6" },
+  { label: "Paid", value: "paid", color: "#10b981" },
+  { label: "Overdue", value: "overdue", color: "#ef4444" },
+];
+
+export const DATE_FORMAT_OPTIONS: {
+  label: string;
+  value: DateFormatPreference;
+}[] = [
+  { label: "Month D, YYYY", value: "Month D, YYYY" },
+  { label: "MM/DD/YYYY", value: "MM/DD/YYYY" },
+  { label: "DD/MM/YYYY", value: "DD/MM/YYYY" },
+  { label: "YYYY-MM-DD", value: "YYYY-MM-DD" },
+];
+
 export const ACCENT_PRESETS = [
   { name: "Emerald", hex: "#10b981" },
   { name: "Blue", hex: "#3b82f6" },
@@ -44,7 +80,7 @@ export const ACCENT_PRESETS = [
   { name: "Slate", hex: "#64748b" },
 ];
 
-function todayISO(): string {
+export function todayISO(): string {
   return new Date().toISOString().split("T")[0];
 }
 
@@ -103,6 +139,7 @@ export function createDefaultInvoiceData(): InvoiceData {
         unitPrice: 0,
         taxEnabled: false,
         taxRate: 0,
+        unitType: "item",
       },
     ],
     settings: {
@@ -117,8 +154,11 @@ export function createDefaultInvoiceData(): InvoiceData {
       discountValue: 0,
       template: "modern",
       accentColor: "#10b981",
+      dateFormat: "Month D, YYYY",
     },
     notes: "",
     terms: "",
+    status: "draft",
+    paymentLink: "",
   };
 }

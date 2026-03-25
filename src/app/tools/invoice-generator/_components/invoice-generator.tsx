@@ -42,6 +42,7 @@ function invoiceReducer(
             unitPrice: 0,
             taxEnabled: false,
             taxRate: 0,
+            unitType: "item",
           },
         ],
       };
