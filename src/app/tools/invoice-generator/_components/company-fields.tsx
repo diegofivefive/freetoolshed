@@ -3,6 +3,13 @@
 import type { Dispatch } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 import type { CompanyInfo, InvoiceAction } from "@/lib/invoice/types";
 
 interface CompanyFieldsProps {
@@ -71,7 +78,21 @@ export function CompanyFields({ company, dispatch }: CompanyFieldsProps) {
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="company-taxid">Tax ID / Registration #</Label>
+          <div className="flex items-center gap-1.5">
+            <Label htmlFor="company-taxid">Tax ID #</Label>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger className="inline-flex rounded text-muted-foreground hover:text-foreground">
+                  <Info className="size-3.5" />
+                </TooltipTrigger>
+                <TooltipContent side="top" className="max-w-64">
+                  Your EIN, VAT number, GST number, or business registration
+                  number. This is optional — leave it blank if you don&apos;t
+                  have one or don&apos;t need it on your invoice.
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
           <Input
             id="company-taxid"
             placeholder="XX-XXXXXXX"

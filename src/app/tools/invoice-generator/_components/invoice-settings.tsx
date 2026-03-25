@@ -61,7 +61,7 @@ export function InvoiceSettingsFields({
   return (
     <div className="space-y-4">
       <h3 className="text-sm font-semibold">Invoice Details</h3>
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4">
         {/* Invoice Number */}
         <div className="space-y-1.5">
           <Label htmlFor="invoice-number">Invoice #</Label>
@@ -123,48 +123,48 @@ export function InvoiceSettingsFields({
             }
           />
         </div>
-      </div>
 
-      {/* Custom days row */}
-      {settings.paymentTerms === "custom" && (
-        <div className="flex items-center gap-2">
-          <Label htmlFor="custom-days" className="shrink-0">
-            Custom days:
-          </Label>
-          <Input
-            id="custom-days"
-            type="number"
-            min={1}
-            className="w-24"
-            value={settings.customTermsDays ?? 30}
-            onChange={(e) => handleCustomDaysChange(Number(e.target.value))}
-          />
+        {/* Custom days (spans both columns when visible) */}
+        {settings.paymentTerms === "custom" && (
+          <div className="col-span-2 flex items-center gap-2">
+            <Label htmlFor="custom-days" className="shrink-0">
+              Custom days:
+            </Label>
+            <Input
+              id="custom-days"
+              type="number"
+              min={1}
+              className="w-24"
+              value={settings.customTermsDays ?? 30}
+              onChange={(e) => handleCustomDaysChange(Number(e.target.value))}
+            />
+          </div>
+        )}
+
+        {/* Currency */}
+        <div className="col-span-2 space-y-1.5">
+          <Label>Currency</Label>
+          <Select
+            value={settings.currency}
+            onValueChange={(val) =>
+              dispatch({
+                type: "SET_SETTINGS",
+                payload: { currency: val as CurrencyCode },
+              })
+            }
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {CURRENCIES.map((c) => (
+                <SelectItem key={c.code} value={c.code}>
+                  {c.symbol} — {c.name} ({c.code})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-      )}
-
-      {/* Currency */}
-      <div className="space-y-1.5">
-        <Label>Currency</Label>
-        <Select
-          value={settings.currency}
-          onValueChange={(val) =>
-            dispatch({
-              type: "SET_SETTINGS",
-              payload: { currency: val as CurrencyCode },
-            })
-          }
-        >
-          <SelectTrigger className="w-full max-w-xs">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {CURRENCIES.map((c) => (
-              <SelectItem key={c.code} value={c.code}>
-                {c.symbol} — {c.name} ({c.code})
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
     </div>
   );

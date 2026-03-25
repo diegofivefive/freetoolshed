@@ -5,7 +5,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ExportButton } from "@/components/shared/export-button";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Printer, FilePlus, Loader2 } from "lucide-react";
+import { Printer, FilePlus, Loader2, CircleAlert, X } from "lucide-react";
 import { InvoiceSettingsFields } from "./invoice-settings";
 import { CompanyFields } from "./company-fields";
 import { ClientFields } from "./client-fields";
@@ -36,18 +36,18 @@ export function InvoiceForm({
   onNewInvoice,
 }: InvoiceFormProps) {
   const [pdfLoading, setPdfLoading] = useState(false);
-  const [pdfError, setPdfError] = useState<string | null>(null);
+  const [pdfErrors, setPdfErrors] = useState<string[]>([]);
 
   const handleDownloadPdf = useCallback(async () => {
     setPdfLoading(true);
-    setPdfError(null);
+    setPdfErrors([]);
     try {
       const result = await generateInvoicePdf(state, calculations);
       if (!result.success) {
-        setPdfError(result.errors.join("; "));
+        setPdfErrors(result.errors);
       }
     } catch {
-      setPdfError("Failed to generate PDF. Please try again.");
+      setPdfErrors(["Failed to generate PDF. Please try again."]);
     } finally {
       setPdfLoading(false);
     }
@@ -55,14 +55,14 @@ export function InvoiceForm({
 
   const handlePrint = useCallback(async () => {
     setPdfLoading(true);
-    setPdfError(null);
+    setPdfErrors([]);
     try {
       const result = await printInvoicePdf(state, calculations);
       if (!result.success) {
-        setPdfError(result.errors.join("; "));
+        setPdfErrors(result.errors);
       }
     } catch {
-      setPdfError("Failed to generate printable PDF. Please try again.");
+      setPdfErrors(["Failed to generate printable PDF. Please try again."]);
     } finally {
       setPdfLoading(false);
     }
@@ -140,8 +140,27 @@ export function InvoiceForm({
 
       {/* Toolbar */}
       <Separator />
-      {pdfError && (
-        <p className="text-sm text-destructive">{pdfError}</p>
+      {pdfErrors.length > 0 && (
+        <div className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3">
+          <CircleAlert className="mt-0.5 size-4 shrink-0 text-destructive" />
+          <div className="flex-1 space-y-1">
+            <p className="text-sm font-medium text-destructive">
+              Please fix the following before exporting:
+            </p>
+            <ul className="list-inside list-disc text-sm text-destructive/80">
+              {pdfErrors.map((err) => (
+                <li key={err}>{err}</li>
+              ))}
+            </ul>
+          </div>
+          <button
+            type="button"
+            onClick={() => setPdfErrors([])}
+            className="shrink-0 rounded p-0.5 text-destructive/60 hover:text-destructive"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
       )}
       <div className="flex items-center gap-3">
         <ExportButton

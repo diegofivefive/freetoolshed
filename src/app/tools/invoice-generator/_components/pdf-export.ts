@@ -1,4 +1,5 @@
 import type { InvoiceData, InvoiceCalculations } from "@/lib/invoice/types";
+import type { InvoiceValidationError } from "@/lib/invoice/schema";
 import { validateInvoice } from "@/lib/invoice/schema";
 import { saveInvoiceNumber } from "@/lib/invoice/storage";
 
@@ -11,6 +12,33 @@ export interface PdfExportError {
   errors: string[];
 }
 
+const FIELD_LABELS: Record<string, string> = {
+  "company.name": "Company Name",
+  "client.name": "Client Name",
+  "settings.invoiceNumber": "Invoice Number",
+  "settings.invoiceDate": "Invoice Date",
+  "settings.dueDate": "Due Date",
+  lineItems: "Line Items",
+};
+
+function humanizeErrors(errors: InvoiceValidationError[]): string[] {
+  return errors.map((e) => {
+    // Match line item field paths like "lineItems.0.description"
+    const lineItemMatch = e.field.match(/^lineItems\.(\d+)\.(.+)$/);
+    if (lineItemMatch) {
+      const row = Number(lineItemMatch[1]) + 1;
+      return `Line item ${row}: ${e.message}`;
+    }
+
+    const label = FIELD_LABELS[e.field];
+    if (label) {
+      return `${label} — ${e.message}`;
+    }
+
+    return e.message;
+  });
+}
+
 export async function generateInvoicePdf(
   data: InvoiceData,
   calculations: InvoiceCalculations
@@ -20,7 +48,7 @@ export async function generateInvoicePdf(
   if (!validation.success) {
     return {
       success: false,
-      errors: validation.errors.map((e) => `${e.field}: ${e.message}`),
+      errors: humanizeErrors(validation.errors),
     };
   }
 
@@ -78,7 +106,7 @@ export async function printInvoicePdf(
   if (!validation.success) {
     return {
       success: false,
-      errors: validation.errors.map((e) => `${e.field}: ${e.message}`),
+      errors: humanizeErrors(validation.errors),
     };
   }
 
