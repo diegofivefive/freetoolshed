@@ -10,17 +10,13 @@ export default function NotFound() {
         This page doesn&apos;t exist. It may have been moved or removed.
       </p>
       <div className="mt-8 flex gap-3">
-        <Button asChild>
-          <Link href="/">
-            <Home className="size-4" data-icon="inline-start" />
-            Home
-          </Link>
+        <Button render={<Link href="/" />}>
+          <Home className="size-4" data-icon="inline-start" />
+          Home
         </Button>
-        <Button variant="outline" asChild>
-          <Link href="/tools/invoice-generator">
-            <Wrench className="size-4" data-icon="inline-start" />
-            Invoice Generator
-          </Link>
+        <Button variant="outline" render={<Link href="/tools/invoice-generator" />}>
+          <Wrench className="size-4" data-icon="inline-start" />
+          Invoice Generator
         </Button>
       </div>
     </main>

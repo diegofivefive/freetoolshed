@@ -100,12 +100,44 @@ export default function InvoiceGeneratorPage() {
       <h1 className="text-3xl font-bold tracking-tight">
         Free Invoice Generator
       </h1>
-      <p className="mt-2 text-muted-foreground">
+      <p className="mt-2 text-lg text-muted-foreground">
         Create professional invoices with custom templates, automatic tax
-        calculations, and instant PDF download. No sign-up required.
+        calculations, and instant PDF download — a free alternative to
+        FreshBooks, QuickBooks, and Wave. No sign-up required.
       </p>
 
-      <div className="mt-6">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <div className="rounded-lg border border-border bg-card p-4">
+          <h2 className="text-sm font-semibold">3 Professional Templates</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Choose from Modern, Classic, or Compact layouts. Each template is
+            fully customizable with your brand colors and company logo.
+          </p>
+        </div>
+        <div className="rounded-lg border border-border bg-card p-4">
+          <h2 className="text-sm font-semibold">Instant PDF Export</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Download print-ready PDF invoices in one click. Your data never
+            leaves your browser — everything is processed locally on your device.
+          </p>
+        </div>
+        <div className="rounded-lg border border-border bg-card p-4">
+          <h2 className="text-sm font-semibold">20 Currencies Supported</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Invoice clients worldwide with automatic currency formatting for
+            USD, EUR, GBP, JPY, CAD, AUD, INR, and 13 more.
+          </p>
+        </div>
+        <div className="rounded-lg border border-border bg-card p-4">
+          <h2 className="text-sm font-semibold">Auto-Save &amp; Tax Calculations</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Your draft saves automatically as you type. Add per-item or global
+            tax rates, flat or percentage discounts, and flexible payment terms.
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-8">
         <InvoiceGeneratorLoader />
       </div>
 

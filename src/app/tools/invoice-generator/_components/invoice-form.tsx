@@ -1,11 +1,11 @@
 "use client";
 
-import type { Dispatch } from "react";
+import { type Dispatch, useState, useCallback } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ExportButton } from "@/components/shared/export-button";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Printer, FilePlus } from "lucide-react";
+import { Printer, FilePlus, Loader2 } from "lucide-react";
 import { InvoiceSettingsFields } from "./invoice-settings";
 import { CompanyFields } from "./company-fields";
 import { ClientFields } from "./client-fields";
@@ -15,6 +15,7 @@ import { NotesFields } from "./notes-fields";
 import { TemplateSelector } from "./template-selector";
 import { ColorPicker } from "./color-picker";
 import { LogoUpload } from "./logo-upload";
+import { generateInvoicePdf, printInvoicePdf } from "./pdf-export";
 import type {
   InvoiceData,
   InvoiceAction,
@@ -34,13 +35,38 @@ export function InvoiceForm({
   dispatch,
   onNewInvoice,
 }: InvoiceFormProps) {
-  const handleDownloadPdf = () => {
-    // Wired in Stage 8
-  };
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [pdfError, setPdfError] = useState<string | null>(null);
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const handleDownloadPdf = useCallback(async () => {
+    setPdfLoading(true);
+    setPdfError(null);
+    try {
+      const result = await generateInvoicePdf(state, calculations);
+      if (!result.success) {
+        setPdfError(result.errors.join("; "));
+      }
+    } catch {
+      setPdfError("Failed to generate PDF. Please try again.");
+    } finally {
+      setPdfLoading(false);
+    }
+  }, [state, calculations]);
+
+  const handlePrint = useCallback(async () => {
+    setPdfLoading(true);
+    setPdfError(null);
+    try {
+      const result = await printInvoicePdf(state, calculations);
+      if (!result.success) {
+        setPdfError(result.errors.join("; "));
+      }
+    } catch {
+      setPdfError("Failed to generate printable PDF. Please try again.");
+    } finally {
+      setPdfLoading(false);
+    }
+  }, [state, calculations]);
 
   return (
     <div className="space-y-4">
@@ -114,14 +140,21 @@ export function InvoiceForm({
 
       {/* Toolbar */}
       <Separator />
+      {pdfError && (
+        <p className="text-sm text-destructive">{pdfError}</p>
+      )}
       <div className="flex items-center gap-3">
         <ExportButton
           onClick={handleDownloadPdf}
-          label="Download PDF"
-          disabled={!state.company.name && !state.client.name}
+          label={pdfLoading ? "Generating…" : "Download PDF"}
+          disabled={pdfLoading || (!state.company.name && !state.client.name)}
         />
-        <Button variant="outline" onClick={handlePrint}>
-          <Printer className="size-4" data-icon="inline-start" />
+        <Button variant="outline" onClick={handlePrint} disabled={pdfLoading}>
+          {pdfLoading ? (
+            <Loader2 className="size-4 animate-spin" data-icon="inline-start" />
+          ) : (
+            <Printer className="size-4" data-icon="inline-start" />
+          )}
           Print
         </Button>
         <div className="flex-1" />
