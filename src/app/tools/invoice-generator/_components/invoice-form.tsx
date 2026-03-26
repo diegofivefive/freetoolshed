@@ -39,7 +39,6 @@ interface InvoiceFormProps {
   onNewInvoice: () => void;
   showPreview: boolean;
   onTogglePreview: () => void;
-  compact: boolean;
 }
 
 export function InvoiceForm({
@@ -49,7 +48,6 @@ export function InvoiceForm({
   onNewInvoice,
   showPreview,
   onTogglePreview,
-  compact,
 }: InvoiceFormProps) {
   const [pdfLoading, setPdfLoading] = useState(false);
   const [pdfErrors, setPdfErrors] = useState<string[]>([]);
@@ -129,7 +127,6 @@ export function InvoiceForm({
               lineItemTotals={calculations.lineItemTotals}
               currency={state.settings.currency}
               dispatch={dispatch}
-              compact={compact}
             />
             <InvoiceSummary
               settings={state.settings}
@@ -198,7 +195,7 @@ export function InvoiceForm({
       <div className="flex flex-wrap items-center gap-3">
         <ExportButton
           onClick={handleDownloadPdf}
-          label={pdfLoading ? "Generating…" : "Download PDF"}
+          label={pdfLoading ? "Generating..." : "Download PDF"}
           disabled={pdfLoading || (!state.company.name && !state.client.name)}
         />
         <Button variant="outline" onClick={handlePrint} disabled={pdfLoading}>
