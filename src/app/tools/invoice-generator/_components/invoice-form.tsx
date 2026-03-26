@@ -85,18 +85,18 @@ export function InvoiceForm({
   return (
     <div className="space-y-4">
       <Tabs defaultValue="details">
-        <div className="flex items-center gap-3">
-          <TabsList>
-            <TabsTrigger value="details">Details</TabsTrigger>
-            <TabsTrigger value="items">Items</TabsTrigger>
-            <TabsTrigger value="notes">Notes</TabsTrigger>
-            <TabsTrigger value="style">Style</TabsTrigger>
-          </TabsList>
+        <TabsList>
+          <TabsTrigger value="details">Details</TabsTrigger>
+          <TabsTrigger value="items">Items</TabsTrigger>
+          <TabsTrigger value="notes">Notes</TabsTrigger>
+          <TabsTrigger value="style">Style</TabsTrigger>
+        </TabsList>
+        <div className="mt-2">
           <Button
             variant={showPreview ? "default" : "outline"}
             size="sm"
             onClick={onTogglePreview}
-            className="ml-auto gap-1.5"
+            className="gap-1.5"
           >
             {showPreview ? (
               <Eye className="size-4" />
