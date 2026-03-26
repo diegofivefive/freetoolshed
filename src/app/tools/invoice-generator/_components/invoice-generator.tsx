@@ -142,8 +142,8 @@ export function InvoiceGenerator() {
   }, []);
 
   return (
-    <div ref={containerRef} className="overflow-x-auto">
-      <div className={showPreview ? "flex min-w-[880px] gap-6" : "flex gap-6"}>
+    <div ref={containerRef} className={showPreview ? "overflow-x-auto [transform:scaleY(-1)]" : ""}>
+      <div className={showPreview ? "flex min-w-[880px] gap-6 [transform:scaleY(-1)]" : "flex gap-6"}>
         {/* Form — left side */}
         <div className={showPreview ? "min-w-[340px] flex-1" : "min-w-0 flex-1"}>
           <InvoiceForm
