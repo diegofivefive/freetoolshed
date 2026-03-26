@@ -21,7 +21,7 @@ const SLOT_FORMAT: Record<AdSlotProps["slot"], string> = {
   "mid-content": "horizontal",
 };
 
-const CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+const CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || "ca-pub-7700405385978151";
 
 export function AdSlot({ slot, className }: AdSlotProps) {
   const { width, height } = SLOT_DIMENSIONS[slot];
