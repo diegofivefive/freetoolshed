@@ -188,7 +188,19 @@ export type ResumeSection =
   | ReferencesSection;
 
 // ── Settings ─────────────────────────────────────────────────
-export type ResumeTemplateName = "modern" | "classic" | "professional" | "minimal";
+export type ResumeTemplateName =
+  | "modern"
+  | "classic"
+  | "professional"
+  | "minimal"
+  | "executive"
+  | "creative"
+  | "compact"
+  | "elegant"
+  | "bold"
+  | "technical"
+  | "columns"
+  | "timeline";
 
 export type ResumeFontFamily = "helvetica" | "times" | "courier";
 
