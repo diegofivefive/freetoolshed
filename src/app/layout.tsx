@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/layout/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SiteNav } from "@/components/layout/site-nav";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { AdSenseScript } from "@/components/layout/adsense-script";
 import { AdSlot } from "@/components/layout/ad-slot";
 import "./globals.css";
 
@@ -61,6 +62,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full`}
     >
       <body className="flex min-h-full flex-col antialiased">
+        <AdSenseScript />
         <ThemeProvider>
           <TooltipProvider>
             <SiteNav />
