@@ -320,7 +320,7 @@ export function TemplateSelector({ template, accentColor, dispatch }: TemplateSe
   return (
     <div className="space-y-3">
       <Label>Template</Label>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         {TEMPLATES.map((t) => (
           <button
             key={t.value}

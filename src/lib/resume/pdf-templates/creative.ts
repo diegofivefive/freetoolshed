@@ -2,6 +2,7 @@ import type { jsPDF } from "jspdf";
 import type { ResumeData, ResumeSection } from "../types";
 import { SECTION_TYPE_LABELS, FONT_SIZE_OPTIONS } from "../constants";
 import { formatDateRange, languageProficiencyLabel } from "../format";
+import { renderSectionContent as sharedRenderSectionContent } from "./shared";
 
 function hexToRgb(hex: string) {
   const h = hex.replace("#", "");
@@ -214,9 +215,7 @@ export async function renderCreativeTemplate(
         break;
       }
       default: {
-        // Use a inline version for remaining types since we can't call shared (width differs)
-        const { renderSectionContent } = await import("./shared");
-        y = renderSectionContent(doc, section, margin, y, mainW, font, sizes.body, accent, settings.dateFormat, pageH, margin);
+        y = sharedRenderSectionContent(doc, section, margin, y, mainW, font, sizes.body, accent, settings.dateFormat, pageH, margin);
         break;
       }
     }

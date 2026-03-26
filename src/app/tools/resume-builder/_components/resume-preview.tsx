@@ -378,9 +378,379 @@ function MinimalLayout({ state }: { state: ResumeData }) {
   );
 }
 
+// ── Executive layout ──────────────────────────────────────────
+
+function ExecutiveLayout({ state }: { state: ResumeData }) {
+  const accent = state.settings.accentColor;
+  const sizes = SIZE_MAP[state.settings.fontSize];
+  const font = FONT_MAP[state.settings.fontFamily];
+  const sections = getVisibleSections(state.sections);
+
+  return (
+    <div style={{ fontFamily: font }}>
+      {/* Dark accent header */}
+      <div style={{ background: accent, padding: "20px 28px 16px", color: "#fff" }}>
+        <div style={{ fontSize: sizes.name + 2, fontWeight: 700 }}>{state.personalInfo.name || "Your Name"}</div>
+        {state.personalInfo.title && <div style={{ fontSize: sizes.heading, marginTop: 2, opacity: 0.9 }}>{state.personalInfo.title}</div>}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "2px 12px", marginTop: 6 }}>
+          {[state.personalInfo.email, state.personalInfo.phone, state.personalInfo.location, state.personalInfo.website, state.personalInfo.linkedin]
+            .filter(Boolean).map((p, i) => (
+              <span key={i} style={{ fontSize: sizes.body - 1, opacity: 0.85 }}>{p}</span>
+            ))}
+        </div>
+      </div>
+      <div style={{ padding: "14px 28px 28px" }}>
+        {sections.map((section) => (
+          <div key={section.id} style={{ marginTop: 14 }}>
+            <div style={{ fontSize: sizes.heading, fontWeight: 700, color: accent, borderBottom: `2px solid ${accent}30`, paddingBottom: 3, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
+              {SECTION_TYPE_LABELS[section.type]}
+            </div>
+            <SectionContent section={section} accent={accent} fontSize={sizes.body} dateFormat={state.settings.dateFormat} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Creative layout (right sidebar) ─────────────────────────
+
+function CreativeLayout({ state }: { state: ResumeData }) {
+  const accent = state.settings.accentColor;
+  const sizes = SIZE_MAP[state.settings.fontSize];
+  const font = FONT_MAP[state.settings.fontFamily];
+  const sections = getVisibleSections(state.sections);
+  const sidebarSections = sections.filter((s) => ["skills", "languages", "certifications"].includes(s.type));
+  const mainSections = sections.filter((s) => !["skills", "languages", "certifications"].includes(s.type));
+
+  return (
+    <div style={{ display: "flex", height: "100%", fontFamily: font }}>
+      {/* Main left */}
+      <div style={{ flex: 1, padding: 20, boxSizing: "border-box" }}>
+        <div style={{ fontSize: sizes.name, fontWeight: 700, color: "#1a1a1a" }}>{state.personalInfo.name || "Your Name"}</div>
+        {state.personalInfo.title && <div style={{ fontSize: sizes.heading, color: accent, marginTop: 2 }}>{state.personalInfo.title}</div>}
+        {mainSections.map((section) => (
+          <div key={section.id} style={{ marginTop: 14 }}>
+            <div style={{ fontSize: sizes.heading, fontWeight: 700, color: accent, borderBottom: `1.5px solid ${accent}40`, paddingBottom: 3, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
+              {SECTION_TYPE_LABELS[section.type]}
+            </div>
+            <SectionContent section={section} accent={accent} fontSize={sizes.body} dateFormat={state.settings.dateFormat} />
+          </div>
+        ))}
+      </div>
+      {/* Right sidebar */}
+      <div style={{ width: "32%", background: accent + "12", padding: 20, boxSizing: "border-box" }}>
+        {state.personalInfo.photoUrl && (
+          <img src={state.personalInfo.photoUrl} alt="" style={{ width: 70, height: 70, borderRadius: "50%", objectFit: "cover", marginBottom: 12 }} />
+        )}
+        <div style={{ display: "flex", flexDirection: "column", gap: "4px 0" }}>
+          {state.personalInfo.email && <div style={{ fontSize: sizes.body - 1, color: "#555" }}>{state.personalInfo.email}</div>}
+          {state.personalInfo.phone && <div style={{ fontSize: sizes.body - 1, color: "#555" }}>{state.personalInfo.phone}</div>}
+          {state.personalInfo.location && <div style={{ fontSize: sizes.body - 1, color: "#555" }}>{state.personalInfo.location}</div>}
+          {state.personalInfo.website && <div style={{ fontSize: sizes.body - 1, color: accent }}>{state.personalInfo.website}</div>}
+          {state.personalInfo.linkedin && <div style={{ fontSize: sizes.body - 1, color: accent }}>{state.personalInfo.linkedin}</div>}
+        </div>
+        {sidebarSections.map((section) => (
+          <div key={section.id} style={{ marginTop: 16 }}>
+            <div style={{ fontSize: sizes.heading - 2, fontWeight: 700, color: accent, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
+              {SECTION_TYPE_LABELS[section.type]}
+            </div>
+            <SectionContent section={section} accent={accent} fontSize={sizes.body} dateFormat={state.settings.dateFormat} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Compact layout ───────────────────────────────────────────
+
+function CompactLayout({ state }: { state: ResumeData }) {
+  const accent = state.settings.accentColor;
+  const sizes = SIZE_MAP[state.settings.fontSize];
+  const font = FONT_MAP[state.settings.fontFamily];
+  const sections = getVisibleSections(state.sections);
+
+  return (
+    <div style={{ padding: 20, fontFamily: font, boxSizing: "border-box" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+        <div>
+          <div style={{ fontSize: sizes.name - 2, fontWeight: 700, color: accent }}>{state.personalInfo.name || "Your Name"}</div>
+          {state.personalInfo.title && <div style={{ fontSize: sizes.body, color: "#666", marginTop: 1 }}>{state.personalInfo.title}</div>}
+        </div>
+        <div style={{ textAlign: "right", display: "flex", flexDirection: "column", gap: 1 }}>
+          {state.personalInfo.email && <div style={{ fontSize: sizes.body - 2, color: "#888" }}>{state.personalInfo.email}</div>}
+          {state.personalInfo.phone && <div style={{ fontSize: sizes.body - 2, color: "#888" }}>{state.personalInfo.phone}</div>}
+          {state.personalInfo.location && <div style={{ fontSize: sizes.body - 2, color: "#888" }}>{state.personalInfo.location}</div>}
+          {state.personalInfo.website && <div style={{ fontSize: sizes.body - 2, color: "#888" }}>{state.personalInfo.website}</div>}
+        </div>
+      </div>
+      <div style={{ height: 1, background: accent, margin: "6px 0" }} />
+      {sections.map((section) => (
+        <div key={section.id} style={{ marginTop: 8 }}>
+          <div style={{ fontSize: sizes.body, fontWeight: 700, color: accent, textTransform: "uppercase", letterSpacing: 0.5, borderBottom: "1px solid #e5e5e5", paddingBottom: 1, marginBottom: 4 }}>
+            {SECTION_TYPE_LABELS[section.type]}
+          </div>
+          <SectionContent section={section} accent={accent} fontSize={sizes.body - 1} dateFormat={state.settings.dateFormat} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Elegant layout ───────────────────────────────────────────
+
+function ElegantLayout({ state }: { state: ResumeData }) {
+  const accent = state.settings.accentColor;
+  const sizes = SIZE_MAP[state.settings.fontSize];
+  const font = FONT_MAP[state.settings.fontFamily];
+  const sections = getVisibleSections(state.sections);
+
+  return (
+    <div style={{ padding: 36, fontFamily: font, boxSizing: "border-box" }}>
+      {/* Top decorative border */}
+      <div style={{ borderTop: `2px solid ${accent}`, paddingTop: 2, borderBottom: `0.5px solid ${accent}40`, marginBottom: 8 }}>
+        <div style={{ height: 1 }} />
+      </div>
+      <div style={{ textAlign: "center", marginBottom: 8 }}>
+        <div style={{ fontSize: sizes.name, fontWeight: 700 }}>{state.personalInfo.name || "Your Name"}</div>
+        {state.personalInfo.title && <div style={{ fontSize: sizes.heading, color: accent, marginTop: 2 }}>{state.personalInfo.title}</div>}
+        <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "2px 8px", marginTop: 4 }}>
+          {[state.personalInfo.email, state.personalInfo.phone, state.personalInfo.location, state.personalInfo.website, state.personalInfo.linkedin]
+            .filter(Boolean).map((p, i) => (
+              <span key={i} style={{ fontSize: sizes.body - 1, color: "#888" }}>
+                {i > 0 && <span style={{ color: accent, margin: "0 4px" }}>{"\u2666"}</span>}
+                {p}
+              </span>
+            ))}
+        </div>
+      </div>
+      {/* Bottom decorative border */}
+      <div style={{ borderTop: `0.5px solid ${accent}40`, paddingTop: 2, borderBottom: `2px solid ${accent}`, marginBottom: 12 }}>
+        <div style={{ height: 1 }} />
+      </div>
+      {sections.map((section) => (
+        <div key={section.id} style={{ marginTop: 14 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+            <div style={{ flex: 1, height: 1, background: `${accent}30` }} />
+            <div style={{ fontSize: sizes.heading, fontWeight: 700, color: accent, textTransform: "uppercase", letterSpacing: 1 }}>
+              {SECTION_TYPE_LABELS[section.type]}
+            </div>
+            <div style={{ flex: 1, height: 1, background: `${accent}30` }} />
+          </div>
+          <SectionContent section={section} accent={accent} fontSize={sizes.body} dateFormat={state.settings.dateFormat} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Bold layout ──────────────────────────────────────────────
+
+function BoldLayout({ state }: { state: ResumeData }) {
+  const accent = state.settings.accentColor;
+  const sizes = SIZE_MAP[state.settings.fontSize];
+  const font = FONT_MAP[state.settings.fontFamily];
+  const sections = getVisibleSections(state.sections);
+
+  return (
+    <div style={{ padding: 28, fontFamily: font, boxSizing: "border-box" }}>
+      <div style={{ fontSize: sizes.name + 4, fontWeight: 700, textTransform: "uppercase", letterSpacing: 2, color: "#1a1a1a" }}>
+        {state.personalInfo.name || "Your Name"}
+      </div>
+      <div style={{ height: 4, background: accent, margin: "6px 0 8px" }} />
+      {state.personalInfo.title && (
+        <div style={{ fontSize: sizes.heading + 1, fontWeight: 700, textTransform: "uppercase", color: "#555", letterSpacing: 1 }}>{state.personalInfo.title}</div>
+      )}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "2px 12px", marginTop: 4 }}>
+        {[state.personalInfo.email, state.personalInfo.phone, state.personalInfo.location, state.personalInfo.website, state.personalInfo.linkedin]
+          .filter(Boolean).map((p, i) => (
+            <span key={i} style={{ fontSize: sizes.body - 1, color: "#888" }}>{p}</span>
+          ))}
+      </div>
+      {sections.map((section) => (
+        <div key={section.id} style={{ marginTop: 14 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+            <div style={{ width: 4, height: 16, background: accent, borderRadius: 1 }} />
+            <div style={{ fontSize: sizes.heading, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>
+              {SECTION_TYPE_LABELS[section.type]}
+            </div>
+          </div>
+          <div style={{ borderTop: "2px solid #e5e5e5", paddingTop: 6 }}>
+            <SectionContent section={section} accent={accent} fontSize={sizes.body} dateFormat={state.settings.dateFormat} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Technical layout ─────────────────────────────────────────
+
+function TechnicalLayout({ state }: { state: ResumeData }) {
+  const accent = state.settings.accentColor;
+  const sizes = SIZE_MAP[state.settings.fontSize];
+  const font = FONT_MAP[state.settings.fontFamily];
+  const sections = getVisibleSections(state.sections);
+
+  return (
+    <div style={{ padding: 24, fontFamily: font, boxSizing: "border-box" }}>
+      <div style={{ marginBottom: 8 }}>
+        <div style={{ fontSize: sizes.name, fontWeight: 700 }}>{state.personalInfo.name || "Your Name"}</div>
+        {state.personalInfo.title && <div style={{ fontSize: sizes.heading, color: accent, marginTop: 2 }}>{state.personalInfo.title}</div>}
+        <div style={{ fontSize: sizes.body - 1, color: "#888", marginTop: 4 }}>
+          {[
+            state.personalInfo.email && `Email: ${state.personalInfo.email}`,
+            state.personalInfo.phone && `Phone: ${state.personalInfo.phone}`,
+            state.personalInfo.location && `Location: ${state.personalInfo.location}`,
+          ].filter(Boolean).join("  |  ")}
+        </div>
+        {(state.personalInfo.website || state.personalInfo.linkedin) && (
+          <div style={{ fontSize: sizes.body - 1, color: "#888", marginTop: 1 }}>
+            {[
+              state.personalInfo.website && `Web: ${state.personalInfo.website}`,
+              state.personalInfo.linkedin && `LinkedIn: ${state.personalInfo.linkedin}`,
+            ].filter(Boolean).join("  |  ")}
+          </div>
+        )}
+      </div>
+      <div style={{ height: 1, background: accent, margin: "6px 0 10px" }} />
+      {sections.map((section) => (
+        <div key={section.id} style={{ display: "flex", gap: 12, marginTop: 10, minHeight: 30 }}>
+          {/* Left gutter label */}
+          <div style={{ width: 90, flexShrink: 0, paddingTop: 1 }}>
+            <div style={{ fontSize: sizes.body - 1, fontWeight: 700, color: accent, textTransform: "uppercase", letterSpacing: 0.5 }}>
+              {SECTION_TYPE_LABELS[section.type]}
+            </div>
+          </div>
+          {/* Vertical gutter line */}
+          <div style={{ width: 1, background: "#e5e5e5", flexShrink: 0 }} />
+          {/* Content */}
+          <div style={{ flex: 1 }}>
+            <SectionContent section={section} accent={accent} fontSize={sizes.body} dateFormat={state.settings.dateFormat} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Columns layout ───────────────────────────────────────────
+
+function ColumnsLayout({ state }: { state: ResumeData }) {
+  const accent = state.settings.accentColor;
+  const sizes = SIZE_MAP[state.settings.fontSize];
+  const font = FONT_MAP[state.settings.fontFamily];
+  const sections = getVisibleSections(state.sections);
+  const leftSections = sections.filter((_, i) => i % 2 === 0);
+  const rightSections = sections.filter((_, i) => i % 2 === 1);
+
+  return (
+    <div style={{ fontFamily: font, boxSizing: "border-box" }}>
+      <div style={{ textAlign: "center", padding: "24px 28px 12px" }}>
+        <div style={{ fontSize: sizes.name, fontWeight: 700, color: accent }}>{state.personalInfo.name || "Your Name"}</div>
+        {state.personalInfo.title && <div style={{ fontSize: sizes.heading, color: "#555", marginTop: 2 }}>{state.personalInfo.title}</div>}
+        <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "2px 10px", marginTop: 4 }}>
+          {[state.personalInfo.email, state.personalInfo.phone, state.personalInfo.location, state.personalInfo.website, state.personalInfo.linkedin]
+            .filter(Boolean).map((p, i) => (
+              <span key={i} style={{ fontSize: sizes.body - 1, color: "#888" }}>{p}</span>
+            ))}
+        </div>
+      </div>
+      <div style={{ height: 2, background: accent, margin: "0 24px 12px" }} />
+      <div style={{ display: "flex", gap: 16, padding: "0 24px 24px" }}>
+        <div style={{ flex: 1 }}>
+          {leftSections.map((section) => (
+            <div key={section.id} style={{ marginTop: 10 }}>
+              <div style={{ fontSize: sizes.heading - 1, fontWeight: 700, color: accent, borderBottom: `1.5px solid ${accent}30`, paddingBottom: 2, marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                {SECTION_TYPE_LABELS[section.type]}
+              </div>
+              <SectionContent section={section} accent={accent} fontSize={sizes.body - 0.5} dateFormat={state.settings.dateFormat} />
+            </div>
+          ))}
+        </div>
+        <div style={{ flex: 1 }}>
+          {rightSections.map((section) => (
+            <div key={section.id} style={{ marginTop: 10 }}>
+              <div style={{ fontSize: sizes.heading - 1, fontWeight: 700, color: accent, borderBottom: `1.5px solid ${accent}30`, paddingBottom: 2, marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                {SECTION_TYPE_LABELS[section.type]}
+              </div>
+              <SectionContent section={section} accent={accent} fontSize={sizes.body - 0.5} dateFormat={state.settings.dateFormat} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Timeline layout ──────────────────────────────────────────
+
+function TimelineLayout({ state }: { state: ResumeData }) {
+  const accent = state.settings.accentColor;
+  const sizes = SIZE_MAP[state.settings.fontSize];
+  const font = FONT_MAP[state.settings.fontFamily];
+  const sections = getVisibleSections(state.sections);
+
+  return (
+    <div style={{ padding: 28, fontFamily: font, boxSizing: "border-box" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+        <div>
+          <div style={{ fontSize: sizes.name, fontWeight: 700 }}>{state.personalInfo.name || "Your Name"}</div>
+          {state.personalInfo.title && <div style={{ fontSize: sizes.heading, color: accent, marginTop: 2 }}>{state.personalInfo.title}</div>}
+          {(state.personalInfo.website || state.personalInfo.linkedin) && (
+            <div style={{ fontSize: sizes.body - 1, color: accent, marginTop: 2 }}>
+              {[state.personalInfo.website, state.personalInfo.linkedin].filter(Boolean).join("  |  ")}
+            </div>
+          )}
+        </div>
+        <div style={{ textAlign: "right" }}>
+          {state.personalInfo.email && <div style={{ fontSize: sizes.body - 1, color: "#888" }}>{state.personalInfo.email}</div>}
+          {state.personalInfo.phone && <div style={{ fontSize: sizes.body - 1, color: "#888" }}>{state.personalInfo.phone}</div>}
+          {state.personalInfo.location && <div style={{ fontSize: sizes.body - 1, color: "#888" }}>{state.personalInfo.location}</div>}
+        </div>
+      </div>
+      <div style={{ height: 1.5, background: accent, marginBottom: 14 }} />
+      {sections.map((section) => (
+        <div key={section.id} style={{ display: "flex", gap: 12, marginTop: 10 }}>
+          {/* Timeline dot + line */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 12, flexShrink: 0, paddingTop: 2 }}>
+            <div style={{ width: 8, height: 8, borderRadius: "50%", background: accent, flexShrink: 0 }} />
+            <div style={{ width: 1.5, flex: 1, background: `${accent}40`, marginTop: 2 }} />
+          </div>
+          {/* Content */}
+          <div style={{ flex: 1, paddingBottom: 6 }}>
+            <div style={{ fontSize: sizes.heading, fontWeight: 700, color: accent, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 5 }}>
+              {SECTION_TYPE_LABELS[section.type]}
+            </div>
+            <SectionContent section={section} accent={accent} fontSize={sizes.body} dateFormat={state.settings.dateFormat} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ── Main preview ─────────────────────────────────────────────
 
+const LAYOUT_MAP: Record<string, React.ComponentType<{ state: ResumeData }>> = {
+  modern: ModernLayout,
+  classic: ClassicLayout,
+  professional: ProfessionalLayout,
+  minimal: MinimalLayout,
+  executive: ExecutiveLayout,
+  creative: CreativeLayout,
+  compact: CompactLayout,
+  elegant: ElegantLayout,
+  bold: BoldLayout,
+  technical: TechnicalLayout,
+  columns: ColumnsLayout,
+  timeline: TimelineLayout,
+};
+
 export function ResumePreview({ state }: ResumePreviewProps) {
+  const Layout = LAYOUT_MAP[state.settings.template] ?? ModernLayout;
+
   return (
     <div
       className="origin-top-left"
@@ -402,10 +772,7 @@ export function ResumePreview({ state }: ResumePreviewProps) {
           overflow: "hidden",
         }}
       >
-        {state.settings.template === "modern" && <ModernLayout state={state} />}
-        {state.settings.template === "classic" && <ClassicLayout state={state} />}
-        {state.settings.template === "professional" && <ProfessionalLayout state={state} />}
-        {state.settings.template === "minimal" && <MinimalLayout state={state} />}
+        <Layout state={state} />
       </div>
     </div>
   );
