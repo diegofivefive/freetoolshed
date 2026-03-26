@@ -3,7 +3,7 @@ import type { ResumeData, ResumeSection } from "../types";
 import { SECTION_TYPE_LABELS, FONT_SIZE_OPTIONS } from "../constants";
 import { formatDateRange, languageProficiencyLabel } from "../format";
 import { renderRichLine } from "../rich-text";
-import { renderSectionContent as sharedRenderSectionContent } from "./shared";
+import { renderSectionContent as sharedRenderSectionContent, getSpacingScales, applyMargin } from "./shared";
 
 function hexToRgb(hex: string) {
   const h = hex.replace("#", "");
@@ -31,9 +31,10 @@ export async function renderCreativeTemplate(
   const accent = hexToRgb(settings.accentColor);
   const font = settings.fontFamily;
   const sizes = getFontSizes(settings.fontSize);
+  const scales = getSpacingScales(settings);
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
-  const margin = 15;
+  const margin = applyMargin(15, scales.marginScale);
   const sidebarW = 62;
   const sidebarX = pageW - sidebarW;
   const mainW = sidebarX - margin - 8;
@@ -130,7 +131,7 @@ export async function renderCreativeTemplate(
   mainSections.forEach((section) => {
     if (y > pageH - margin - 15) { doc.addPage(); y = margin; }
 
-    y += 4;
+    y += 4 * scales.sectionScale;
     doc.setFont(font, "bold");
     doc.setFontSize(sizes.heading);
     doc.setTextColor(accent.r, accent.g, accent.b);
@@ -219,7 +220,7 @@ export async function renderCreativeTemplate(
         break;
       }
       default: {
-        y = sharedRenderSectionContent(doc, section, margin, y, mainW, font, sizes.body, accent, settings.dateFormat, pageH, margin);
+        y = sharedRenderSectionContent(doc, section, margin, y, mainW, font, sizes.body, accent, settings.dateFormat, pageH, margin, scales.lineScale);
         break;
       }
     }

@@ -208,12 +208,19 @@ export type ResumeDateFormat = "MM/YYYY" | "Month YYYY" | "YYYY";
 
 export type ResumeFontSize = "compact" | "standard" | "spacious";
 
+export type ResumeMarginSize = "narrow" | "normal" | "wide";
+export type ResumeSectionSpacing = "compact" | "normal" | "relaxed";
+export type ResumeLineSpacing = "tight" | "normal" | "relaxed";
+
 export interface ResumeSettings {
   template: ResumeTemplateName;
   accentColor: string;
   fontFamily: ResumeFontFamily;
   dateFormat: ResumeDateFormat;
   fontSize: ResumeFontSize;
+  marginSize: ResumeMarginSize;
+  sectionSpacing: ResumeSectionSpacing;
+  lineSpacing: ResumeLineSpacing;
 }
 
 // ── Top-level resume data ────────────────────────────────────

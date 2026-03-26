@@ -1,7 +1,7 @@
 import type { jsPDF } from "jspdf";
 import type { ResumeData } from "../types";
 import { SECTION_TYPE_LABELS } from "../constants";
-import { getVisibleSections, getFontSizes, hexToRgb, renderSectionContent, renderSectionHeading } from "./shared";
+import { getVisibleSections, getFontSizes, hexToRgb, getSpacingScales, applyMargin, renderSectionContent, renderSectionHeading } from "./shared";
 
 export async function renderColumnsTemplate(
   doc: jsPDF,
@@ -11,9 +11,10 @@ export async function renderColumnsTemplate(
   const accent = hexToRgb(settings.accentColor);
   const font = settings.fontFamily;
   const sizes = getFontSizes(settings.fontSize);
+  const scales = getSpacingScales(settings);
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
-  const margin = 16;
+  const margin = applyMargin(16, scales.marginScale);
   const fullW = pageW - margin * 2;
   const colGap = 8;
   const colW = (fullW - colGap) / 2;
@@ -67,8 +68,8 @@ export async function renderColumnsTemplate(
   leftSections.forEach((section) => {
     if (ly > pageH - margin - 15) return; // skip overflow for simplicity
     ly = renderSectionHeading(doc, SECTION_TYPE_LABELS[section.type], leftX, ly, colW, font, sizes.heading - 1, accent, "underline");
-    ly = renderSectionContent(doc, section, leftX, ly, colW, font, sizes.body - 0.5, accent, settings.dateFormat, pageH, margin);
-    ly += 5;
+    ly = renderSectionContent(doc, section, leftX, ly, colW, font, sizes.body - 0.5, accent, settings.dateFormat, pageH, margin, scales.lineScale);
+    ly += 5 * scales.sectionScale;
   });
 
   // Render right column
@@ -76,7 +77,7 @@ export async function renderColumnsTemplate(
   rightSections.forEach((section) => {
     if (ry > pageH - margin - 15) return;
     ry = renderSectionHeading(doc, SECTION_TYPE_LABELS[section.type], rightX, ry, colW, font, sizes.heading - 1, accent, "underline");
-    ry = renderSectionContent(doc, section, rightX, ry, colW, font, sizes.body - 0.5, accent, settings.dateFormat, pageH, margin);
-    ry += 5;
+    ry = renderSectionContent(doc, section, rightX, ry, colW, font, sizes.body - 0.5, accent, settings.dateFormat, pageH, margin, scales.lineScale);
+    ry += 5 * scales.sectionScale;
   });
 }

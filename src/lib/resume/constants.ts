@@ -7,6 +7,9 @@ import type {
   ResumeFontFamily,
   ResumeFontSize,
   ResumeDateFormat,
+  ResumeMarginSize,
+  ResumeSectionSpacing,
+  ResumeLineSpacing,
 } from "./types";
 
 // ── Section metadata ─────────────────────────────────────────
@@ -116,6 +119,37 @@ export const DATE_FORMAT_OPTIONS: {
   { label: "2024", value: "YYYY" },
 ];
 
+// ── Spacing options ─────────────────────────────────────────
+export const MARGIN_OPTIONS: {
+  label: string;
+  value: ResumeMarginSize;
+  scale: number;
+}[] = [
+  { label: "Narrow", value: "narrow", scale: 0.65 },
+  { label: "Normal", value: "normal", scale: 1.0 },
+  { label: "Wide", value: "wide", scale: 1.35 },
+];
+
+export const SECTION_SPACING_OPTIONS: {
+  label: string;
+  value: ResumeSectionSpacing;
+  scale: number;
+}[] = [
+  { label: "Compact", value: "compact", scale: 0.5 },
+  { label: "Normal", value: "normal", scale: 1.0 },
+  { label: "Relaxed", value: "relaxed", scale: 1.6 },
+];
+
+export const LINE_SPACING_OPTIONS: {
+  label: string;
+  value: ResumeLineSpacing;
+  scale: number;
+}[] = [
+  { label: "Tight", value: "tight", scale: 0.85 },
+  { label: "Normal", value: "normal", scale: 1.0 },
+  { label: "Relaxed", value: "relaxed", scale: 1.2 },
+];
+
 // ── Defaults ─────────────────────────────────────────────────
 export const DEFAULT_SETTINGS: ResumeSettings = {
   template: "modern",
@@ -123,6 +157,9 @@ export const DEFAULT_SETTINGS: ResumeSettings = {
   fontFamily: "helvetica",
   dateFormat: "Month YYYY",
   fontSize: "standard",
+  marginSize: "normal",
+  sectionSpacing: "normal",
+  lineSpacing: "normal",
 };
 
 export function createDefaultResumeData(): ResumeData {

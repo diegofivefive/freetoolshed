@@ -1,7 +1,7 @@
 import type { jsPDF } from "jspdf";
 import type { ResumeData } from "../types";
 import { SECTION_TYPE_LABELS } from "../constants";
-import { getVisibleSections, getFontSizes, hexToRgb, renderSectionContent } from "./shared";
+import { getVisibleSections, getFontSizes, hexToRgb, getSpacingScales, applyMargin, renderSectionContent } from "./shared";
 
 export async function renderElegantTemplate(
   doc: jsPDF,
@@ -11,9 +11,10 @@ export async function renderElegantTemplate(
   const accent = hexToRgb(settings.accentColor);
   const font = settings.fontFamily;
   const sizes = getFontSizes(settings.fontSize);
+  const scales = getSpacingScales(settings);
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
-  const margin = 24;
+  const margin = applyMargin(24, scales.marginScale);
   const w = pageW - margin * 2;
 
   let y = margin + 4;
@@ -85,7 +86,7 @@ export async function renderElegantTemplate(
     doc.line(pageW / 2 + labelW / 2 + gap, lineY, pageW - margin, lineY);
     y += 5;
 
-    y = renderSectionContent(doc, section, margin, y, w, font, sizes.body, accent, settings.dateFormat, pageH, margin);
-    y += 6;
+    y = renderSectionContent(doc, section, margin, y, w, font, sizes.body, accent, settings.dateFormat, pageH, margin, scales.lineScale);
+    y += 6 * scales.sectionScale;
   });
 }

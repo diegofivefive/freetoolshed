@@ -22,6 +22,7 @@ import { SectionManager } from "./section-manager";
 import { TemplateSelector } from "./template-selector";
 import { ColorPicker } from "./color-picker";
 import { FontSelector } from "./font-selector";
+import { SpacingControls } from "./spacing-controls";
 import { ResumeHistory } from "./resume-history";
 import { AtsChecker } from "./ats-checker";
 import { generateResumePdf, printResumePdf } from "./pdf-export";
@@ -192,6 +193,13 @@ export function ResumeForm({
               fontFamily={state.settings.fontFamily}
               fontSize={state.settings.fontSize}
               dateFormat={state.settings.dateFormat}
+              dispatch={dispatch}
+            />
+            <Separator />
+            <SpacingControls
+              marginSize={state.settings.marginSize}
+              sectionSpacing={state.settings.sectionSpacing}
+              lineSpacing={state.settings.lineSpacing}
               dispatch={dispatch}
             />
           </div>

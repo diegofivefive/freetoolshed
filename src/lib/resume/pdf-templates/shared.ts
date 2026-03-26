@@ -1,6 +1,6 @@
 import type { jsPDF } from "jspdf";
-import type { ResumeSection } from "../types";
-import { SECTION_TYPE_LABELS, FONT_SIZE_OPTIONS } from "../constants";
+import type { ResumeSection, ResumeSettings } from "../types";
+import { SECTION_TYPE_LABELS, FONT_SIZE_OPTIONS, MARGIN_OPTIONS, SECTION_SPACING_OPTIONS, LINE_SPACING_OPTIONS } from "../constants";
 import { formatDateRange, languageProficiencyLabel } from "../format";
 import { renderRichLine, stripHtml } from "../rich-text";
 
@@ -22,6 +22,17 @@ export function getFontSizes(fontSize: string) {
   return { body: opt.bodyPt, heading: opt.headingPt };
 }
 
+export function getSpacingScales(settings: ResumeSettings) {
+  const marginScale = MARGIN_OPTIONS.find((o) => o.value === settings.marginSize)?.scale ?? 1;
+  const sectionScale = SECTION_SPACING_OPTIONS.find((o) => o.value === settings.sectionSpacing)?.scale ?? 1;
+  const lineScale = LINE_SPACING_OPTIONS.find((o) => o.value === settings.lineSpacing)?.scale ?? 1;
+  return { marginScale, sectionScale, lineScale };
+}
+
+export function applyMargin(baseMargin: number, marginScale: number): number {
+  return Math.round(baseMargin * marginScale * 10) / 10;
+}
+
 export function renderSectionContent(
   doc: jsPDF,
   section: ResumeSection,
@@ -33,10 +44,11 @@ export function renderSectionContent(
   accentRgb: { r: number; g: number; b: number },
   dateFormat: string,
   pageH: number,
-  margin: number
+  margin: number,
+  lineScale: number = 1
 ): number {
   let y = startY;
-  const lineH = bodyPt * 0.4;
+  const lineH = bodyPt * 0.4 * lineScale;
 
   const pageBreak = () => {
     if (y > pageH - margin - 10) {

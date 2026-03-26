@@ -1,7 +1,7 @@
 import type { jsPDF } from "jspdf";
 import type { ResumeData } from "../types";
 import { SECTION_TYPE_LABELS } from "../constants";
-import { getVisibleSections, getFontSizes, hexToRgb, renderSectionContent } from "./shared";
+import { getVisibleSections, getFontSizes, hexToRgb, getSpacingScales, applyMargin, renderSectionContent } from "./shared";
 
 export async function renderTechnicalTemplate(
   doc: jsPDF,
@@ -11,9 +11,10 @@ export async function renderTechnicalTemplate(
   const accent = hexToRgb(settings.accentColor);
   const font = settings.fontFamily;
   const sizes = getFontSizes(settings.fontSize);
+  const scales = getSpacingScales(settings);
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
-  const margin = 16;
+  const margin = applyMargin(16, scales.marginScale);
   const gutterW = 42;
   const contentX = margin + gutterW + 4;
   const contentW = pageW - contentX - margin;
@@ -83,11 +84,11 @@ export async function renderTechnicalTemplate(
     const gutterLineX = margin + gutterW;
 
     // Content
-    y = renderSectionContent(doc, section, contentX, y, contentW, font, sizes.body, accent, settings.dateFormat, pageH, margin);
+    y = renderSectionContent(doc, section, contentX, y, contentW, font, sizes.body, accent, settings.dateFormat, pageH, margin, scales.lineScale);
 
     // Draw gutter line from section start to section end
     doc.line(gutterLineX, sectionStartY - 2, gutterLineX, y + 1);
 
-    y += 5;
+    y += 5 * scales.sectionScale;
   });
 }

@@ -1,7 +1,7 @@
 import type { jsPDF } from "jspdf";
 import type { ResumeData } from "../types";
 import { SECTION_TYPE_LABELS } from "../constants";
-import { getVisibleSections, getFontSizes, hexToRgb, renderSectionContent, renderSectionHeading } from "./shared";
+import { getVisibleSections, getFontSizes, hexToRgb, getSpacingScales, applyMargin, renderSectionContent, renderSectionHeading } from "./shared";
 
 export async function renderExecutiveTemplate(
   doc: jsPDF,
@@ -11,9 +11,10 @@ export async function renderExecutiveTemplate(
   const accent = hexToRgb(settings.accentColor);
   const font = settings.fontFamily;
   const sizes = getFontSizes(settings.fontSize);
+  const scales = getSpacingScales(settings);
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
-  const margin = 18;
+  const margin = applyMargin(18, scales.marginScale);
   const w = pageW - margin * 2;
 
   // ── Dark header bar ──
@@ -51,7 +52,7 @@ export async function renderExecutiveTemplate(
   sections.forEach((section) => {
     if (y > pageH - margin - 15) { doc.addPage(); y = margin; }
     y = renderSectionHeading(doc, SECTION_TYPE_LABELS[section.type], margin, y, w, font, sizes.heading, accent, "underline");
-    y = renderSectionContent(doc, section, margin, y, w, font, sizes.body, accent, settings.dateFormat, pageH, margin);
-    y += 4;
+    y = renderSectionContent(doc, section, margin, y, w, font, sizes.body, accent, settings.dateFormat, pageH, margin, scales.lineScale);
+    y += 4 * scales.sectionScale;
   });
 }

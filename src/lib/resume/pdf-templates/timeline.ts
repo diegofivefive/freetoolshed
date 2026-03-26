@@ -1,7 +1,7 @@
 import type { jsPDF } from "jspdf";
 import type { ResumeData } from "../types";
 import { SECTION_TYPE_LABELS } from "../constants";
-import { getVisibleSections, getFontSizes, hexToRgb, renderSectionContent, renderSectionHeading } from "./shared";
+import { getVisibleSections, getFontSizes, hexToRgb, getSpacingScales, applyMargin, renderSectionContent, renderSectionHeading } from "./shared";
 
 export async function renderTimelineTemplate(
   doc: jsPDF,
@@ -11,9 +11,10 @@ export async function renderTimelineTemplate(
   const accent = hexToRgb(settings.accentColor);
   const font = settings.fontFamily;
   const sizes = getFontSizes(settings.fontSize);
+  const scales = getSpacingScales(settings);
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
-  const margin = 18;
+  const margin = applyMargin(18, scales.marginScale);
   const w = pageW - margin * 2;
   const timelineX = margin + 4;
 
@@ -86,14 +87,14 @@ export async function renderTimelineTemplate(
     y += 5;
 
     // Content
-    y = renderSectionContent(doc, section, contentX, y, contentW, font, sizes.body, accent, settings.dateFormat, pageH, margin);
-    y += 3;
+    y = renderSectionContent(doc, section, contentX, y, contentW, font, sizes.body, accent, settings.dateFormat, pageH, margin, scales.lineScale);
+    y += 3 * scales.sectionScale;
 
     // Timeline vertical line
     doc.setDrawColor(accent.r, accent.g, accent.b);
     doc.setLineWidth(0.4);
     doc.line(timelineX, sectionStartY + 2, timelineX, y - 1);
 
-    y += 3;
+    y += 3 * scales.sectionScale;
   });
 }

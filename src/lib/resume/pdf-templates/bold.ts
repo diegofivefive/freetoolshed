@@ -1,7 +1,7 @@
 import type { jsPDF } from "jspdf";
 import type { ResumeData } from "../types";
 import { SECTION_TYPE_LABELS } from "../constants";
-import { getVisibleSections, getFontSizes, hexToRgb, renderSectionContent } from "./shared";
+import { getVisibleSections, getFontSizes, hexToRgb, getSpacingScales, applyMargin, renderSectionContent } from "./shared";
 
 export async function renderBoldTemplate(
   doc: jsPDF,
@@ -11,9 +11,10 @@ export async function renderBoldTemplate(
   const accent = hexToRgb(settings.accentColor);
   const font = settings.fontFamily;
   const sizes = getFontSizes(settings.fontSize);
+  const scales = getSpacingScales(settings);
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
-  const margin = 18;
+  const margin = applyMargin(18, scales.marginScale);
   const w = pageW - margin * 2;
 
   let y = margin;
@@ -72,7 +73,7 @@ export async function renderBoldTemplate(
     doc.line(margin, y, pageW - margin, y);
     y += 5;
 
-    y = renderSectionContent(doc, section, margin, y, w, font, sizes.body, accent, settings.dateFormat, pageH, margin);
-    y += 5;
+    y = renderSectionContent(doc, section, margin, y, w, font, sizes.body, accent, settings.dateFormat, pageH, margin, scales.lineScale);
+    y += 5 * scales.sectionScale;
   });
 }

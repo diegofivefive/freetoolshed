@@ -3,6 +3,7 @@ import type { ResumeData, ResumeSection } from "../types";
 import { SECTION_TYPE_LABELS, FONT_SIZE_OPTIONS } from "../constants";
 import { formatDateRange, languageProficiencyLabel } from "../format";
 import { renderRichLine } from "../rich-text";
+import { getSpacingScales, applyMargin } from "./shared";
 
 function hexToRgb(hex: string) {
   const h = hex.replace("#", "");
@@ -30,9 +31,10 @@ export async function renderModernTemplate(
   const accent = hexToRgb(settings.accentColor);
   const font = settings.fontFamily;
   const sizes = getFontSizes(settings.fontSize);
+  const scales = getSpacingScales(settings);
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
-  const margin = 15;
+  const margin = applyMargin(15, scales.marginScale);
   const sidebarW = 62;
   const mainX = sidebarW + 8;
   const mainW = pageW - mainX - margin;
@@ -126,7 +128,7 @@ export async function renderModernTemplate(
 
   // Main sections
   mainSections.forEach((section) => {
-    y = renderSection(doc, section, mainX, y, mainW, font, sizes, accent, settings.dateFormat, pageH, margin);
+    y = renderSection(doc, section, mainX, y, mainW, font, sizes, accent, settings.dateFormat, pageH, margin, scales.sectionScale, scales.lineScale);
   });
 }
 
@@ -141,9 +143,11 @@ function renderSection(
   accent: { r: number; g: number; b: number },
   dateFormat: string,
   pageH: number,
-  margin: number
+  margin: number,
+  sectionScale: number = 1,
+  lineScale: number = 1
 ): number {
-  let y = startY + 4;
+  let y = startY + 4 * sectionScale;
   const pageBreak = () => {
     if (y > pageH - margin - 10) { doc.addPage(); y = margin; }
   };
