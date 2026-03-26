@@ -1,6 +1,6 @@
 import type { jsPDF } from "jspdf";
 import type { ResumeData, ResumeSection } from "../types";
-import { SECTION_TYPE_LABELS, FONT_SIZE_OPTIONS } from "../constants";
+import { getSectionLabel, FONT_SIZE_OPTIONS } from "../constants";
 import { formatDateRange, languageProficiencyLabel } from "../format";
 import { renderRichLine } from "../rich-text";
 import { getSpacingScales, applyMargin } from "./shared";
@@ -73,7 +73,7 @@ export async function renderModernTemplate(
     doc.setFont(font, "bold");
     doc.setFontSize(sizes.body);
     doc.setTextColor(255, 255, 255);
-    doc.text(SECTION_TYPE_LABELS[section.type].toUpperCase(), 8, sy);
+    doc.text(getSectionLabel(section).toUpperCase(), 8, sy);
     sy += 5;
     doc.setFont(font, "normal");
     doc.setFontSize(sizes.body - 1);
@@ -156,7 +156,7 @@ function renderSection(
   doc.setFont(font, "bold");
   doc.setFontSize(sizes.heading);
   doc.setTextColor(accent.r, accent.g, accent.b);
-  doc.text(SECTION_TYPE_LABELS[section.type].toUpperCase(), x, y);
+  doc.text(getSectionLabel(section).toUpperCase(), x, y);
   y += 2;
   doc.setDrawColor(accent.r, accent.g, accent.b);
   doc.setLineWidth(0.4);

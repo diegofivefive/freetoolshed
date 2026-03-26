@@ -1,6 +1,6 @@
 "use client";
 
-import type { Dispatch } from "react";
+import type { Dispatch, DragEvent } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -9,10 +9,10 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { ArrowUp, ArrowDown, Eye, EyeOff, Trash2, Plus } from "lucide-react";
-import { SECTION_TYPE_LABELS, CORE_SECTIONS, OPTIONAL_SECTIONS } from "@/lib/resume/constants";
+import { GripVertical, Eye, EyeOff, Trash2, Plus, LayoutList } from "lucide-react";
+import { SECTION_TYPE_LABELS, CORE_SECTIONS, OPTIONAL_SECTIONS, getSectionLabel } from "@/lib/resume/constants";
 import type { ResumeAction, ResumeSection, SectionType } from "@/lib/resume/types";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 interface SectionManagerProps {
   sections: ResumeSection[];
@@ -21,25 +21,49 @@ interface SectionManagerProps {
 
 export function SectionManager({ sections, dispatch }: SectionManagerProps) {
   const [addType, setAddType] = useState<SectionType | "">("");
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [overIndex, setOverIndex] = useState<number | null>(null);
+  const dragNodeRef = useRef<HTMLDivElement | null>(null);
   const sorted = [...sections].sort((a, b) => a.sortOrder - b.sortOrder);
 
-  const existingTypes = new Set(sections.map((s) => s.type));
+  const existingTypes = new Set<SectionType>(sections.filter((s) => s.type !== "custom").map((s) => s.type));
   const availableToAdd = OPTIONAL_SECTIONS.filter((t) => !existingTypes.has(t));
 
-  const moveUp = (index: number) => {
-    if (index <= 0) return;
+  const handleDragStart = (e: DragEvent<HTMLDivElement>, index: number) => {
+    setDragIndex(index);
+    dragNodeRef.current = e.currentTarget;
+    e.dataTransfer.effectAllowed = "move";
+    // Slight delay so the dragged element renders before going translucent
+    requestAnimationFrame(() => {
+      if (dragNodeRef.current) dragNodeRef.current.style.opacity = "0.4";
+    });
+  };
+
+  const handleDragOver = (e: DragEvent<HTMLDivElement>, index: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    if (dragIndex === null || index === dragIndex) {
+      setOverIndex(null);
+      return;
+    }
+    setOverIndex(index);
+  };
+
+  const handleDrop = (e: DragEvent<HTMLDivElement>, dropIdx: number) => {
+    e.preventDefault();
+    if (dragIndex === null || dragIndex === dropIdx) return;
     const reordered = [...sorted];
-    [reordered[index - 1], reordered[index]] = [reordered[index], reordered[index - 1]];
+    const [moved] = reordered.splice(dragIndex, 1);
+    reordered.splice(dropIdx, 0, moved);
     const updated = reordered.map((s, i) => ({ ...s, sortOrder: i }));
     dispatch({ type: "REORDER_SECTIONS", payload: updated as ResumeSection[] });
   };
 
-  const moveDown = (index: number) => {
-    if (index >= sorted.length - 1) return;
-    const reordered = [...sorted];
-    [reordered[index], reordered[index + 1]] = [reordered[index + 1], reordered[index]];
-    const updated = reordered.map((s, i) => ({ ...s, sortOrder: i }));
-    dispatch({ type: "REORDER_SECTIONS", payload: updated as ResumeSection[] });
+  const handleDragEnd = () => {
+    if (dragNodeRef.current) dragNodeRef.current.style.opacity = "1";
+    setDragIndex(null);
+    setOverIndex(null);
+    dragNodeRef.current = null;
   };
 
   const handleAdd = () => {
@@ -48,43 +72,42 @@ export function SectionManager({ sections, dispatch }: SectionManagerProps) {
     setAddType("");
   };
 
+  const handleAddCustom = () => {
+    dispatch({ type: "ADD_CUSTOM_SECTION", payload: "Custom Section" });
+  };
+
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
-        Reorder, show/hide, or add new sections to your resume.
+        Drag to reorder, show/hide, or add new sections to your resume.
       </p>
 
-      <div className="space-y-2">
+      <div className="space-y-1">
         {sorted.map((section, index) => {
           const isCore = CORE_SECTIONS.includes(section.type);
+          const isOver = overIndex === index && dragIndex !== null && dragIndex !== index;
           return (
             <div
               key={section.id}
-              className="flex items-center gap-2 rounded-lg border border-border px-3 py-2"
+              draggable
+              onDragStart={(e) => handleDragStart(e, index)}
+              onDragOver={(e) => handleDragOver(e, index)}
+              onDrop={(e) => handleDrop(e, index)}
+              onDragEnd={handleDragEnd}
+              className={`flex items-center gap-2 rounded-lg border px-3 py-2 transition-colors ${
+                isOver
+                  ? "border-primary bg-primary/5"
+                  : "border-border"
+              }`}
             >
-              {/* Reorder buttons */}
-              <div className="flex flex-col gap-0.5">
-                <button
-                  type="button"
-                  disabled={index === 0}
-                  onClick={() => moveUp(index)}
-                  className="rounded p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30"
-                >
-                  <ArrowUp className="size-3.5" />
-                </button>
-                <button
-                  type="button"
-                  disabled={index === sorted.length - 1}
-                  onClick={() => moveDown(index)}
-                  className="rounded p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30"
-                >
-                  <ArrowDown className="size-3.5" />
-                </button>
+              {/* Drag handle */}
+              <div className="cursor-grab text-muted-foreground active:cursor-grabbing">
+                <GripVertical className="size-4" />
               </div>
 
               {/* Section label */}
-              <span className={`flex-1 text-sm font-medium ${!section.visible ? "text-muted-foreground line-through" : ""}`}>
-                {SECTION_TYPE_LABELS[section.type]}
+              <span className={`flex-1 text-sm font-medium select-none ${!section.visible ? "text-muted-foreground line-through" : ""}`}>
+                {getSectionLabel(section)}
               </span>
 
               {/* Visibility toggle */}
@@ -97,8 +120,8 @@ export function SectionManager({ sections, dispatch }: SectionManagerProps) {
                 {section.visible ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
               </Button>
 
-              {/* Delete (optional sections only) */}
-              {!isCore && (
+              {/* Delete (optional and custom sections) */}
+              {(!isCore || section.type === "custom") && (
                 <Button
                   variant="ghost"
                   size="sm"
@@ -113,7 +136,7 @@ export function SectionManager({ sections, dispatch }: SectionManagerProps) {
         })}
       </div>
 
-      {/* Add section */}
+      {/* Add preset section */}
       {availableToAdd.length > 0 && (
         <div className="flex items-center gap-2">
           <Select value={addType} onValueChange={(v) => setAddType(v as SectionType)}>
@@ -134,6 +157,12 @@ export function SectionManager({ sections, dispatch }: SectionManagerProps) {
           </Button>
         </div>
       )}
+
+      {/* Add custom section */}
+      <Button variant="outline" size="sm" onClick={handleAddCustom}>
+        <LayoutList className="size-4" data-icon="inline-start" />
+        Add Custom Section
+      </Button>
     </div>
   );
 }

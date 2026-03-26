@@ -1,6 +1,6 @@
 import type { jsPDF } from "jspdf";
 import type { ResumeData } from "../types";
-import { SECTION_TYPE_LABELS } from "../constants";
+import { getSectionLabel } from "../constants";
 import { getVisibleSections, getFontSizes, hexToRgb, getSpacingScales, applyMargin, renderSectionContent, renderSectionHeading } from "./shared";
 
 export async function renderColumnsTemplate(
@@ -67,7 +67,7 @@ export async function renderColumnsTemplate(
   let ly = colStartY;
   leftSections.forEach((section) => {
     if (ly > pageH - margin - 15) return; // skip overflow for simplicity
-    ly = renderSectionHeading(doc, SECTION_TYPE_LABELS[section.type], leftX, ly, colW, font, sizes.heading - 1, accent, "underline");
+    ly = renderSectionHeading(doc, getSectionLabel(section), leftX, ly, colW, font, sizes.heading - 1, accent, "underline");
     ly = renderSectionContent(doc, section, leftX, ly, colW, font, sizes.body - 0.5, accent, settings.dateFormat, pageH, margin, scales.lineScale);
     ly += 5 * scales.sectionScale;
   });
@@ -76,7 +76,7 @@ export async function renderColumnsTemplate(
   let ry = colStartY;
   rightSections.forEach((section) => {
     if (ry > pageH - margin - 15) return;
-    ry = renderSectionHeading(doc, SECTION_TYPE_LABELS[section.type], rightX, ry, colW, font, sizes.heading - 1, accent, "underline");
+    ry = renderSectionHeading(doc, getSectionLabel(section), rightX, ry, colW, font, sizes.heading - 1, accent, "underline");
     ry = renderSectionContent(doc, section, rightX, ry, colW, font, sizes.body - 0.5, accent, settings.dateFormat, pageH, margin, scales.lineScale);
     ry += 5 * scales.sectionScale;
   });

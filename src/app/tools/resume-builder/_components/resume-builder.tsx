@@ -35,6 +35,23 @@ function resumeReducer(state: ResumeData, action: ResumeAction): ResumeData {
       return { ...state, sections: [...state.sections, newSection] };
     }
 
+    case "ADD_CUSTOM_SECTION": {
+      const maxOrd = state.sections.reduce((max, s) => Math.max(max, s.sortOrder), 0);
+      const custom = createEmptySection("custom", maxOrd + 1, action.payload) as unknown as ResumeSection;
+      return { ...state, sections: [...state.sections, custom] };
+    }
+
+    case "RENAME_SECTION": {
+      return {
+        ...state,
+        sections: state.sections.map((s) =>
+          s.id === action.payload.sectionId && s.type === "custom"
+            ? { ...s, title: action.payload.title }
+            : s
+        ),
+      };
+    }
+
     case "REMOVE_SECTION":
       return { ...state, sections: state.sections.filter((s) => s.id !== action.payload) };
 

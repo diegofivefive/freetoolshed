@@ -18,6 +18,7 @@ import { VolunteerEditor } from "./volunteer-editor";
 import { AwardsEditor } from "./awards-editor";
 import { PublicationsEditor } from "./publications-editor";
 import { ReferencesEditor } from "./references-editor";
+import { CustomEditor } from "./custom-editor";
 import { SectionManager } from "./section-manager";
 import { TemplateSelector } from "./template-selector";
 import { ColorPicker } from "./color-picker";
@@ -26,7 +27,7 @@ import { SpacingControls } from "./spacing-controls";
 import { ResumeHistory } from "./resume-history";
 import { AtsChecker } from "./ats-checker";
 import { generateResumePdf, printResumePdf } from "./pdf-export";
-import { SECTION_TYPE_LABELS } from "@/lib/resume/constants";
+import { getSectionLabel } from "@/lib/resume/constants";
 import type { ResumeData, ResumeAction, ResumeSection } from "@/lib/resume/types";
 
 interface ResumeFormProps {
@@ -69,6 +70,8 @@ function SectionEditor({
       return <PublicationsEditor section={section} dispatch={dispatch} />;
     case "references":
       return <ReferencesEditor section={section} dispatch={dispatch} />;
+    case "custom":
+      return <CustomEditor section={section} dispatch={dispatch} />;
     default:
       return null;
   }
@@ -152,9 +155,9 @@ export function ResumeForm({
             {visibleSections.map((section) => (
               <div key={section.id}>
                 <Separator className="mb-6" />
-                {section.type !== "summary" && (
+                {section.type !== "summary" && section.type !== "custom" && (
                   <h3 className="mb-3 text-sm font-semibold">
-                    {SECTION_TYPE_LABELS[section.type]}
+                    {getSectionLabel(section)}
                   </h3>
                 )}
                 <SectionEditor

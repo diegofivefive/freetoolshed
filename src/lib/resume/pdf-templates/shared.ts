@@ -1,6 +1,6 @@
 import type { jsPDF } from "jspdf";
 import type { ResumeSection, ResumeSettings } from "../types";
-import { SECTION_TYPE_LABELS, FONT_SIZE_OPTIONS, MARGIN_OPTIONS, SECTION_SPACING_OPTIONS, LINE_SPACING_OPTIONS } from "../constants";
+import { SECTION_TYPE_LABELS, FONT_SIZE_OPTIONS, MARGIN_OPTIONS, SECTION_SPACING_OPTIONS, LINE_SPACING_OPTIONS, getSectionLabel } from "../constants";
 import { formatDateRange, languageProficiencyLabel } from "../format";
 import { renderRichLine, stripHtml } from "../rich-text";
 
@@ -276,6 +276,34 @@ export function renderSectionContent(
         const contact = [item.email, item.phone].filter(Boolean).join(" | ");
         if (contact) { doc.text(contact, x, y); y += 4; }
         doc.setTextColor(50, 50, 50);
+      });
+      break;
+    }
+    case "custom": {
+      section.items.forEach((item) => {
+        pageBreak();
+        doc.setFont(font, "bold");
+        doc.setFontSize(bodyPt);
+        doc.setTextColor(30, 30, 30);
+        if (item.title) doc.text(item.title, x, y);
+        if (item.date) {
+          doc.setFont(font, "normal");
+          doc.setTextColor(120, 120, 120);
+          doc.text(item.date, x + w, y, { align: "right" });
+        }
+        y += 4;
+        doc.setFont(font, "normal");
+        doc.setTextColor(100, 100, 100);
+        if (item.subtitle) { doc.text(item.subtitle, x, y); y += 4; }
+        doc.setTextColor(50, 50, 50);
+        if (item.description) {
+          doc.setFont(font, "normal");
+          doc.setFontSize(bodyPt);
+          doc.setTextColor(50, 50, 50);
+          y = renderRichLine(doc, item.description, x, y, w, font, bodyPt, accentRgb);
+          y += 2;
+        }
+        y += 2;
       });
       break;
     }

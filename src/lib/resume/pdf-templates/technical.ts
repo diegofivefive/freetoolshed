@@ -1,6 +1,6 @@
 import type { jsPDF } from "jspdf";
 import type { ResumeData } from "../types";
-import { SECTION_TYPE_LABELS } from "../constants";
+import { getSectionLabel } from "../constants";
 import { getVisibleSections, getFontSizes, hexToRgb, getSpacingScales, applyMargin, renderSectionContent } from "./shared";
 
 export async function renderTechnicalTemplate(
@@ -74,7 +74,7 @@ export async function renderTechnicalTemplate(
     doc.setFont(font, "bold");
     doc.setFontSize(sizes.body - 1);
     doc.setTextColor(accent.r, accent.g, accent.b);
-    const label = SECTION_TYPE_LABELS[section.type].toUpperCase();
+    const label = getSectionLabel(section).toUpperCase();
     const labelLines = doc.splitTextToSize(label, gutterW - 2);
     doc.text(labelLines, margin, y);
 

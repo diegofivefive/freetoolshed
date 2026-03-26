@@ -2,6 +2,7 @@ import type {
   SectionType,
   ResumeData,
   ResumeSettings,
+  ResumeSection,
   SkillProficiency,
   LanguageProficiency,
   ResumeFontFamily,
@@ -25,6 +26,7 @@ export const SECTION_TYPE_LABELS: Record<SectionType, string> = {
   awards: "Awards & Honors",
   publications: "Publications",
   references: "References",
+  custom: "Custom Section",
 };
 
 export const SECTION_TYPE_ICONS: Record<SectionType, string> = {
@@ -39,7 +41,14 @@ export const SECTION_TYPE_ICONS: Record<SectionType, string> = {
   awards: "Trophy",
   publications: "BookOpen",
   references: "Users",
+  custom: "LayoutList",
 };
+
+/** Returns the display label for a section — uses the custom title for custom sections. */
+export function getSectionLabel(section: ResumeSection): string {
+  if (section.type === "custom") return section.title || "Custom Section";
+  return SECTION_TYPE_LABELS[section.type];
+}
 
 // Sections that cannot be deleted (but can be hidden)
 export const CORE_SECTIONS: SectionType[] = [
@@ -259,15 +268,20 @@ export function createEmptySectionItem(sectionType: SectionType): Record<string,
       return { id, title: "", publisher: "", date: "", url: "" };
     case "references":
       return { id, name: "", title: "", company: "", email: "", phone: "" };
+    case "custom":
+      return { id, title: "", subtitle: "", date: "", description: "" };
     default:
       return { id };
   }
 }
 
-export function createEmptySection(sectionType: SectionType, sortOrder: number): Record<string, unknown> {
+export function createEmptySection(sectionType: SectionType, sortOrder: number, customTitle?: string): Record<string, unknown> {
   const base = { id: crypto.randomUUID(), type: sectionType, visible: true, sortOrder };
   if (sectionType === "summary") {
     return { ...base, content: "" };
+  }
+  if (sectionType === "custom") {
+    return { ...base, title: customTitle || "Custom Section", items: [createEmptySectionItem(sectionType)] };
   }
   return { ...base, items: [createEmptySectionItem(sectionType)] };
 }

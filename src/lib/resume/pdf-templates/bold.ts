@@ -1,6 +1,6 @@
 import type { jsPDF } from "jspdf";
 import type { ResumeData } from "../types";
-import { SECTION_TYPE_LABELS } from "../constants";
+import { getSectionLabel } from "../constants";
 import { getVisibleSections, getFontSizes, hexToRgb, getSpacingScales, applyMargin, renderSectionContent } from "./shared";
 
 export async function renderBoldTemplate(
@@ -64,7 +64,7 @@ export async function renderBoldTemplate(
     doc.setFont(font, "bold");
     doc.setFontSize(sizes.heading + 1);
     doc.setTextColor(30, 30, 30);
-    doc.text(SECTION_TYPE_LABELS[section.type].toUpperCase(), margin + 7, y);
+    doc.text(getSectionLabel(section).toUpperCase(), margin + 7, y);
     y += 2;
 
     // Thick line under heading

@@ -1,7 +1,7 @@
 "use client";
 
 import type { ResumeData, ResumeSection } from "@/lib/resume/types";
-import { SECTION_TYPE_LABELS, MARGIN_OPTIONS, SECTION_SPACING_OPTIONS, LINE_SPACING_OPTIONS } from "@/lib/resume/constants";
+import { getSectionLabel, MARGIN_OPTIONS, SECTION_SPACING_OPTIONS, LINE_SPACING_OPTIONS } from "@/lib/resume/constants";
 import { formatDateRange, proficiencyToPercentage, languageProficiencyLabel } from "@/lib/resume/format";
 import type { ResumeSettings } from "@/lib/resume/types";
 
@@ -240,6 +240,24 @@ function SectionContent({ section, accent, fontSize, dateFormat, lineScale = 1 }
         </div>
       );
 
+    case "custom":
+      return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {section.items.map((item) => (
+            <div key={item.id}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                <span style={{ fontWeight: 600, fontSize }}>{item.title}</span>
+                {item.date && (
+                  <span style={{ fontSize: fontSize - 1, color: "#888", whiteSpace: "nowrap" }}>{item.date}</span>
+                )}
+              </div>
+              {item.subtitle && <div style={{ fontSize, color: "#666" }}>{item.subtitle}</div>}
+              {item.description && <div style={{ fontSize, color: "#444", marginTop: 1, lineHeight: lh }} dangerouslySetInnerHTML={{ __html: item.description }} />}
+            </div>
+          ))}
+        </div>
+      );
+
     default:
       return null;
   }
@@ -273,7 +291,7 @@ function ModernLayout({ state }: { state: ResumeData }) {
         {sidebarSections.map((section) => (
           <div key={section.id} style={{ marginTop: 16 * sp.sectionScale }}>
             <div style={{ fontSize: sizes.heading - 2, fontWeight: 700, color: accent, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
-              {SECTION_TYPE_LABELS[section.type]}
+              {getSectionLabel(section)}
             </div>
             <SectionContent section={section} accent={accent} fontSize={sizes.body} dateFormat={state.settings.dateFormat} lineScale={sp.lineScale} />
           </div>
@@ -286,7 +304,7 @@ function ModernLayout({ state }: { state: ResumeData }) {
         {mainSections.map((section) => (
           <div key={section.id} style={{ marginTop: 14 * sp.sectionScale }}>
             <div style={{ fontSize: sizes.heading, fontWeight: 700, color: accent, borderBottom: `1.5px solid ${accent}40`, paddingBottom: 3, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
-              {SECTION_TYPE_LABELS[section.type]}
+              {getSectionLabel(section)}
             </div>
             <SectionContent section={section} accent={accent} fontSize={sizes.body} dateFormat={state.settings.dateFormat} lineScale={sp.lineScale} />
           </div>
@@ -318,7 +336,7 @@ function ClassicLayout({ state }: { state: ResumeData }) {
       {sections.map((section) => (
         <div key={section.id} style={{ marginTop: 12 * sp.sectionScale }}>
           <div style={{ fontSize: sizes.heading, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, borderBottom: "1px solid #ccc", paddingBottom: 2, marginBottom: 6 }}>
-            {SECTION_TYPE_LABELS[section.type]}
+            {getSectionLabel(section)}
           </div>
           <SectionContent section={section} accent="#333" fontSize={sizes.body} dateFormat={state.settings.dateFormat} lineScale={sp.lineScale} />
         </div>
@@ -354,7 +372,7 @@ function ProfessionalLayout({ state }: { state: ResumeData }) {
       {sections.map((section) => (
         <div key={section.id} style={{ marginTop: 12 * sp.sectionScale }}>
           <div style={{ fontSize: sizes.heading, fontWeight: 700, color: accent, borderBottom: `2px solid ${accent}30`, paddingBottom: 3, marginBottom: 6 }}>
-            {SECTION_TYPE_LABELS[section.type]}
+            {getSectionLabel(section)}
           </div>
           <SectionContent section={section} accent={accent} fontSize={sizes.body} dateFormat={state.settings.dateFormat} lineScale={sp.lineScale} />
         </div>
@@ -384,7 +402,7 @@ function MinimalLayout({ state }: { state: ResumeData }) {
       {sections.map((section) => (
         <div key={section.id} style={{ marginTop: 14 * sp.sectionScale }}>
           <div style={{ fontSize: sizes.body, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1.5, color: "#999", marginBottom: 5 }}>
-            {SECTION_TYPE_LABELS[section.type]}
+            {getSectionLabel(section)}
           </div>
           <SectionContent section={section} accent="#666" fontSize={sizes.body} dateFormat={state.settings.dateFormat} lineScale={sp.lineScale} />
         </div>
@@ -420,7 +438,7 @@ function ExecutiveLayout({ state }: { state: ResumeData }) {
         {sections.map((section) => (
           <div key={section.id} style={{ marginTop: 14 * sp.sectionScale }}>
             <div style={{ fontSize: sizes.heading, fontWeight: 700, color: accent, borderBottom: `2px solid ${accent}30`, paddingBottom: 3, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
-              {SECTION_TYPE_LABELS[section.type]}
+              {getSectionLabel(section)}
             </div>
             <SectionContent section={section} accent={accent} fontSize={sizes.body} dateFormat={state.settings.dateFormat} lineScale={sp.lineScale} />
           </div>
@@ -450,7 +468,7 @@ function CreativeLayout({ state }: { state: ResumeData }) {
         {mainSections.map((section) => (
           <div key={section.id} style={{ marginTop: 14 * sp.sectionScale }}>
             <div style={{ fontSize: sizes.heading, fontWeight: 700, color: accent, borderBottom: `1.5px solid ${accent}40`, paddingBottom: 3, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
-              {SECTION_TYPE_LABELS[section.type]}
+              {getSectionLabel(section)}
             </div>
             <SectionContent section={section} accent={accent} fontSize={sizes.body} dateFormat={state.settings.dateFormat} lineScale={sp.lineScale} />
           </div>
@@ -471,7 +489,7 @@ function CreativeLayout({ state }: { state: ResumeData }) {
         {sidebarSections.map((section) => (
           <div key={section.id} style={{ marginTop: 16 * sp.sectionScale }}>
             <div style={{ fontSize: sizes.heading - 2, fontWeight: 700, color: accent, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
-              {SECTION_TYPE_LABELS[section.type]}
+              {getSectionLabel(section)}
             </div>
             <SectionContent section={section} accent={accent} fontSize={sizes.body} dateFormat={state.settings.dateFormat} lineScale={sp.lineScale} />
           </div>
@@ -508,7 +526,7 @@ function CompactLayout({ state }: { state: ResumeData }) {
       {sections.map((section) => (
         <div key={section.id} style={{ marginTop: 8 * sp.sectionScale }}>
           <div style={{ fontSize: sizes.body, fontWeight: 700, color: accent, textTransform: "uppercase", letterSpacing: 0.5, borderBottom: "1px solid #e5e5e5", paddingBottom: 1, marginBottom: 4 }}>
-            {SECTION_TYPE_LABELS[section.type]}
+            {getSectionLabel(section)}
           </div>
           <SectionContent section={section} accent={accent} fontSize={sizes.body - 1} dateFormat={state.settings.dateFormat} lineScale={sp.lineScale} />
         </div>
@@ -554,7 +572,7 @@ function ElegantLayout({ state }: { state: ResumeData }) {
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
             <div style={{ flex: 1, height: 1, background: `${accent}30` }} />
             <div style={{ fontSize: sizes.heading, fontWeight: 700, color: accent, textTransform: "uppercase", letterSpacing: 1 }}>
-              {SECTION_TYPE_LABELS[section.type]}
+              {getSectionLabel(section)}
             </div>
             <div style={{ flex: 1, height: 1, background: `${accent}30` }} />
           </div>
@@ -594,7 +612,7 @@ function BoldLayout({ state }: { state: ResumeData }) {
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
             <div style={{ width: 4, height: 16, background: accent, borderRadius: 1 }} />
             <div style={{ fontSize: sizes.heading, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>
-              {SECTION_TYPE_LABELS[section.type]}
+              {getSectionLabel(section)}
             </div>
           </div>
           <div style={{ borderTop: "2px solid #e5e5e5", paddingTop: 6 }}>
@@ -642,7 +660,7 @@ function TechnicalLayout({ state }: { state: ResumeData }) {
           {/* Left gutter label */}
           <div style={{ width: 90, flexShrink: 0, paddingTop: 1 }}>
             <div style={{ fontSize: sizes.body - 1, fontWeight: 700, color: accent, textTransform: "uppercase", letterSpacing: 0.5 }}>
-              {SECTION_TYPE_LABELS[section.type]}
+              {getSectionLabel(section)}
             </div>
           </div>
           {/* Vertical gutter line */}
@@ -686,7 +704,7 @@ function ColumnsLayout({ state }: { state: ResumeData }) {
           {leftSections.map((section) => (
             <div key={section.id} style={{ marginTop: 10 * sp.sectionScale }}>
               <div style={{ fontSize: sizes.heading - 1, fontWeight: 700, color: accent, borderBottom: `1.5px solid ${accent}30`, paddingBottom: 2, marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.5 }}>
-                {SECTION_TYPE_LABELS[section.type]}
+                {getSectionLabel(section)}
               </div>
               <SectionContent section={section} accent={accent} fontSize={sizes.body - 0.5} dateFormat={state.settings.dateFormat} lineScale={sp.lineScale} />
             </div>
@@ -696,7 +714,7 @@ function ColumnsLayout({ state }: { state: ResumeData }) {
           {rightSections.map((section) => (
             <div key={section.id} style={{ marginTop: 10 * sp.sectionScale }}>
               <div style={{ fontSize: sizes.heading - 1, fontWeight: 700, color: accent, borderBottom: `1.5px solid ${accent}30`, paddingBottom: 2, marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.5 }}>
-                {SECTION_TYPE_LABELS[section.type]}
+                {getSectionLabel(section)}
               </div>
               <SectionContent section={section} accent={accent} fontSize={sizes.body - 0.5} dateFormat={state.settings.dateFormat} lineScale={sp.lineScale} />
             </div>
@@ -745,7 +763,7 @@ function TimelineLayout({ state }: { state: ResumeData }) {
           {/* Content */}
           <div style={{ flex: 1, paddingBottom: 6 }}>
             <div style={{ fontSize: sizes.heading, fontWeight: 700, color: accent, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 5 }}>
-              {SECTION_TYPE_LABELS[section.type]}
+              {getSectionLabel(section)}
             </div>
             <SectionContent section={section} accent={accent} fontSize={sizes.body} dateFormat={state.settings.dateFormat} lineScale={sp.lineScale} />
           </div>

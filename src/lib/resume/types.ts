@@ -99,6 +99,14 @@ export interface Reference {
   phone: string;
 }
 
+export interface CustomItem {
+  id: string;
+  title: string;
+  subtitle: string;
+  date: string;
+  description: string;
+}
+
 // ── Section discriminated union ──────────────────────────────
 export type SectionType =
   | "summary"
@@ -111,7 +119,8 @@ export type SectionType =
   | "volunteer"
   | "awards"
   | "publications"
-  | "references";
+  | "references"
+  | "custom";
 
 interface SectionBase {
   id: string;
@@ -174,6 +183,12 @@ export interface ReferencesSection extends SectionBase {
   items: Reference[];
 }
 
+export interface CustomSection extends SectionBase {
+  type: "custom";
+  title: string;
+  items: CustomItem[];
+}
+
 export type ResumeSection =
   | SummarySection
   | ExperienceSection
@@ -185,7 +200,8 @@ export type ResumeSection =
   | VolunteerSection
   | AwardsSection
   | PublicationsSection
-  | ReferencesSection;
+  | ReferencesSection
+  | CustomSection;
 
 // ── Settings ─────────────────────────────────────────────────
 export type ResumeTemplateName =
@@ -256,6 +272,8 @@ export type ResumeAction =
   | { type: "SET_SETTINGS"; payload: Partial<ResumeSettings> }
   | { type: "SET_SECTION_CONTENT"; payload: { sectionId: string; content: string } }
   | { type: "ADD_SECTION"; payload: SectionType }
+  | { type: "ADD_CUSTOM_SECTION"; payload: string }
+  | { type: "RENAME_SECTION"; payload: { sectionId: string; title: string } }
   | { type: "REMOVE_SECTION"; payload: string }
   | { type: "TOGGLE_SECTION_VISIBILITY"; payload: string }
   | { type: "REORDER_SECTIONS"; payload: ResumeSection[] }
