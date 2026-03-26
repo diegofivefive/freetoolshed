@@ -1,0 +1,412 @@
+"use client";
+
+import type { ResumeData, ResumeSection } from "@/lib/resume/types";
+import { SECTION_TYPE_LABELS } from "@/lib/resume/constants";
+import { formatDateRange, proficiencyToPercentage, languageProficiencyLabel } from "@/lib/resume/format";
+
+interface ResumePreviewProps {
+  state: ResumeData;
+}
+
+const SCALE = 520 / 595;
+const PAGE_W = 595;
+const PAGE_H = 842;
+
+const FONT_MAP: Record<string, string> = {
+  helvetica: "Helvetica, Arial, sans-serif",
+  times: "'Times New Roman', Times, serif",
+  courier: "'Courier New', Courier, monospace",
+};
+
+const SIZE_MAP: Record<string, { body: number; heading: number; name: number }> = {
+  compact: { body: 8.5, heading: 11, name: 16 },
+  standard: { body: 9.5, heading: 12, name: 18 },
+  spacious: { body: 10.5, heading: 13, name: 20 },
+};
+
+function getVisibleSections(sections: ResumeSection[]): ResumeSection[] {
+  return [...sections].filter((s) => s.visible).sort((a, b) => a.sortOrder - b.sortOrder);
+}
+
+// ── Shared renderers ────────────────────────────────────────
+
+function ContactLine({ state, fontSize }: { state: ResumeData; fontSize: number }) {
+  const { email, phone, location, website, linkedin } = state.personalInfo;
+  const parts = [email, phone, location, website, linkedin].filter(Boolean);
+  if (parts.length === 0) return null;
+  return (
+    <div style={{ fontSize: fontSize - 1, color: "#666", display: "flex", flexWrap: "wrap", gap: "4px 12px" }}>
+      {parts.map((p, i) => (
+        <span key={i}>{p}</span>
+      ))}
+    </div>
+  );
+}
+
+function SectionContent({ section, accent, fontSize, dateFormat }: {
+  section: ResumeSection;
+  accent: string;
+  fontSize: number;
+  dateFormat: string;
+}) {
+  switch (section.type) {
+    case "summary":
+      return section.content ? (
+        <p style={{ fontSize, color: "#444", lineHeight: 1.5 }}>{section.content}</p>
+      ) : null;
+
+    case "experience":
+      return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {section.items.map((item) => (
+            <div key={item.id}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                <div>
+                  <span style={{ fontWeight: 600, fontSize }}>{item.title}</span>
+                  {item.company && <span style={{ fontSize, color: "#666" }}> at {item.company}</span>}
+                </div>
+                <span style={{ fontSize: fontSize - 1, color: "#888", whiteSpace: "nowrap" }}>
+                  {formatDateRange(item.startDate, item.endDate, item.isCurrentRole, dateFormat as "Month YYYY")}
+                </span>
+              </div>
+              {item.location && <div style={{ fontSize: fontSize - 1, color: "#888" }}>{item.location}</div>}
+              {item.bullets.filter(Boolean).length > 0 && (
+                <ul style={{ margin: "2px 0 0 14px", padding: 0, listStyle: "disc" }}>
+                  {item.bullets.filter(Boolean).map((b, i) => (
+                    <li key={i} style={{ fontSize, color: "#444", lineHeight: 1.4 }}>{b}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+      );
+
+    case "education":
+      return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {section.items.map((item) => (
+            <div key={item.id}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                <div>
+                  <span style={{ fontWeight: 600, fontSize }}>{item.degree}</span>
+                  {item.field && <span style={{ fontSize, color: "#666" }}> in {item.field}</span>}
+                </div>
+                <span style={{ fontSize: fontSize - 1, color: "#888", whiteSpace: "nowrap" }}>
+                  {formatDateRange(item.startDate, item.endDate, false, dateFormat as "Month YYYY")}
+                </span>
+              </div>
+              {item.school && <div style={{ fontSize, color: "#666" }}>{item.school}</div>}
+              {item.gpa && <div style={{ fontSize: fontSize - 1, color: "#888" }}>GPA: {item.gpa}</div>}
+              {item.description && <div style={{ fontSize, color: "#444", marginTop: 2 }}>{item.description}</div>}
+            </div>
+          ))}
+        </div>
+      );
+
+    case "skills":
+      return (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+          {section.items.filter((s) => s.name).map((item) => (
+            <span key={item.id} style={{
+              fontSize: fontSize - 1,
+              padding: "2px 8px",
+              borderRadius: 4,
+              background: accent + "18",
+              color: "#333",
+            }}>
+              {item.name}
+              <span style={{ color: "#999", marginLeft: 4 }}>
+                ({item.proficiency})
+              </span>
+            </span>
+          ))}
+        </div>
+      );
+
+    case "certifications":
+      return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          {section.items.map((item) => (
+            <div key={item.id} style={{ fontSize }}>
+              <span style={{ fontWeight: 600 }}>{item.name}</span>
+              {item.issuer && <span style={{ color: "#666" }}> — {item.issuer}</span>}
+              {item.date && <span style={{ color: "#888", marginLeft: 6 }}>{item.date}</span>}
+            </div>
+          ))}
+        </div>
+      );
+
+    case "languages":
+      return (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 16px" }}>
+          {section.items.filter((l) => l.name).map((item) => (
+            <span key={item.id} style={{ fontSize }}>
+              {item.name} <span style={{ color: "#888" }}>({languageProficiencyLabel(item.proficiency)})</span>
+            </span>
+          ))}
+        </div>
+      );
+
+    case "projects":
+      return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {section.items.map((item) => (
+            <div key={item.id}>
+              <span style={{ fontWeight: 600, fontSize }}>{item.name}</span>
+              {item.url && <span style={{ fontSize: fontSize - 1, color: accent, marginLeft: 6 }}>{item.url}</span>}
+              {item.description && <div style={{ fontSize, color: "#444", marginTop: 1 }}>{item.description}</div>}
+              {item.technologies.length > 0 && (
+                <div style={{ fontSize: fontSize - 1, color: "#888", marginTop: 1 }}>
+                  {item.technologies.join(", ")}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      );
+
+    case "volunteer":
+      return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {section.items.map((item) => (
+            <div key={item.id}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                <div>
+                  <span style={{ fontWeight: 600, fontSize }}>{item.role}</span>
+                  {item.organization && <span style={{ fontSize, color: "#666" }}> at {item.organization}</span>}
+                </div>
+                <span style={{ fontSize: fontSize - 1, color: "#888", whiteSpace: "nowrap" }}>
+                  {formatDateRange(item.startDate, item.endDate, false, dateFormat as "Month YYYY")}
+                </span>
+              </div>
+              {item.description && <div style={{ fontSize, color: "#444", marginTop: 1 }}>{item.description}</div>}
+            </div>
+          ))}
+        </div>
+      );
+
+    case "awards":
+      return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          {section.items.map((item) => (
+            <div key={item.id} style={{ fontSize }}>
+              <span style={{ fontWeight: 600 }}>{item.title}</span>
+              {item.issuer && <span style={{ color: "#666" }}> — {item.issuer}</span>}
+              {item.date && <span style={{ color: "#888", marginLeft: 6 }}>{item.date}</span>}
+              {item.description && <div style={{ color: "#444", marginTop: 1 }}>{item.description}</div>}
+            </div>
+          ))}
+        </div>
+      );
+
+    case "publications":
+      return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          {section.items.map((item) => (
+            <div key={item.id} style={{ fontSize }}>
+              <span style={{ fontWeight: 600 }}>{item.title}</span>
+              {item.publisher && <span style={{ color: "#666" }}> — {item.publisher}</span>}
+              {item.date && <span style={{ color: "#888", marginLeft: 6 }}>{item.date}</span>}
+            </div>
+          ))}
+        </div>
+      );
+
+    case "references":
+      return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {section.items.map((item) => (
+            <div key={item.id} style={{ fontSize }}>
+              <span style={{ fontWeight: 600 }}>{item.name}</span>
+              {item.title && <span style={{ color: "#666" }}> — {item.title}</span>}
+              {item.company && <span style={{ color: "#666" }}>, {item.company}</span>}
+              <div style={{ color: "#888", fontSize: fontSize - 1 }}>
+                {[item.email, item.phone].filter(Boolean).join(" | ")}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+
+    default:
+      return null;
+  }
+}
+
+// ── Template layouts ─────────────────────────────────────────
+
+function ModernLayout({ state }: { state: ResumeData }) {
+  const accent = state.settings.accentColor;
+  const sizes = SIZE_MAP[state.settings.fontSize];
+  const font = FONT_MAP[state.settings.fontFamily];
+  const sections = getVisibleSections(state.sections);
+  const sidebarSections = sections.filter((s) => ["skills", "languages", "certifications"].includes(s.type));
+  const mainSections = sections.filter((s) => !["skills", "languages", "certifications"].includes(s.type));
+
+  return (
+    <div style={{ display: "flex", height: "100%", fontFamily: font }}>
+      {/* Sidebar */}
+      <div style={{ width: "32%", background: accent + "12", padding: 20, boxSizing: "border-box" }}>
+        {state.personalInfo.photoUrl && (
+          <img src={state.personalInfo.photoUrl} alt="" style={{ width: 70, height: 70, borderRadius: "50%", objectFit: "cover", marginBottom: 12 }} />
+        )}
+        <div style={{ display: "flex", flexDirection: "column", gap: "4px 0" }}>
+          {state.personalInfo.email && <div style={{ fontSize: sizes.body - 1, color: "#555" }}>{state.personalInfo.email}</div>}
+          {state.personalInfo.phone && <div style={{ fontSize: sizes.body - 1, color: "#555" }}>{state.personalInfo.phone}</div>}
+          {state.personalInfo.location && <div style={{ fontSize: sizes.body - 1, color: "#555" }}>{state.personalInfo.location}</div>}
+          {state.personalInfo.website && <div style={{ fontSize: sizes.body - 1, color: accent }}>{state.personalInfo.website}</div>}
+          {state.personalInfo.linkedin && <div style={{ fontSize: sizes.body - 1, color: accent }}>{state.personalInfo.linkedin}</div>}
+        </div>
+        {sidebarSections.map((section) => (
+          <div key={section.id} style={{ marginTop: 16 }}>
+            <div style={{ fontSize: sizes.heading - 2, fontWeight: 700, color: accent, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
+              {SECTION_TYPE_LABELS[section.type]}
+            </div>
+            <SectionContent section={section} accent={accent} fontSize={sizes.body} dateFormat={state.settings.dateFormat} />
+          </div>
+        ))}
+      </div>
+      {/* Main */}
+      <div style={{ flex: 1, padding: 20, boxSizing: "border-box" }}>
+        <div style={{ fontSize: sizes.name, fontWeight: 700, color: "#1a1a1a" }}>{state.personalInfo.name || "Your Name"}</div>
+        {state.personalInfo.title && <div style={{ fontSize: sizes.heading, color: accent, marginTop: 2 }}>{state.personalInfo.title}</div>}
+        {mainSections.map((section) => (
+          <div key={section.id} style={{ marginTop: 14 }}>
+            <div style={{ fontSize: sizes.heading, fontWeight: 700, color: accent, borderBottom: `1.5px solid ${accent}40`, paddingBottom: 3, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
+              {SECTION_TYPE_LABELS[section.type]}
+            </div>
+            <SectionContent section={section} accent={accent} fontSize={sizes.body} dateFormat={state.settings.dateFormat} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ClassicLayout({ state }: { state: ResumeData }) {
+  const sizes = SIZE_MAP[state.settings.fontSize];
+  const font = FONT_MAP[state.settings.fontFamily];
+  const sections = getVisibleSections(state.sections);
+
+  return (
+    <div style={{ padding: 36, fontFamily: font, boxSizing: "border-box" }}>
+      <div style={{ textAlign: "center", marginBottom: 12 }}>
+        <div style={{ fontSize: sizes.name, fontWeight: 700 }}>{state.personalInfo.name || "Your Name"}</div>
+        {state.personalInfo.title && <div style={{ fontSize: sizes.heading, color: "#555", marginTop: 2 }}>{state.personalInfo.title}</div>}
+        <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "2px 12px", marginTop: 4 }}>
+          {[state.personalInfo.email, state.personalInfo.phone, state.personalInfo.location, state.personalInfo.website, state.personalInfo.linkedin]
+            .filter(Boolean).map((p, i) => (
+              <span key={i} style={{ fontSize: sizes.body - 1, color: "#666" }}>{p}</span>
+            ))}
+        </div>
+      </div>
+      <hr style={{ border: "none", borderTop: "1.5px solid #333", margin: "8px 0" }} />
+      {sections.map((section) => (
+        <div key={section.id} style={{ marginTop: 12 }}>
+          <div style={{ fontSize: sizes.heading, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, borderBottom: "1px solid #ccc", paddingBottom: 2, marginBottom: 6 }}>
+            {SECTION_TYPE_LABELS[section.type]}
+          </div>
+          <SectionContent section={section} accent="#333" fontSize={sizes.body} dateFormat={state.settings.dateFormat} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ProfessionalLayout({ state }: { state: ResumeData }) {
+  const accent = state.settings.accentColor;
+  const sizes = SIZE_MAP[state.settings.fontSize];
+  const font = FONT_MAP[state.settings.fontFamily];
+  const sections = getVisibleSections(state.sections);
+
+  return (
+    <div style={{ padding: 36, fontFamily: font, boxSizing: "border-box" }}>
+      {/* Header: two columns */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 12 }}>
+        <div>
+          <div style={{ fontSize: sizes.name, fontWeight: 700, color: accent }}>{state.personalInfo.name || "Your Name"}</div>
+          {state.personalInfo.title && <div style={{ fontSize: sizes.heading, color: "#555", marginTop: 2 }}>{state.personalInfo.title}</div>}
+        </div>
+        <div style={{ textAlign: "right", display: "flex", flexDirection: "column", gap: 1 }}>
+          {state.personalInfo.email && <div style={{ fontSize: sizes.body - 1, color: "#666" }}>{state.personalInfo.email}</div>}
+          {state.personalInfo.phone && <div style={{ fontSize: sizes.body - 1, color: "#666" }}>{state.personalInfo.phone}</div>}
+          {state.personalInfo.location && <div style={{ fontSize: sizes.body - 1, color: "#666" }}>{state.personalInfo.location}</div>}
+          {state.personalInfo.website && <div style={{ fontSize: sizes.body - 1, color: accent }}>{state.personalInfo.website}</div>}
+          {state.personalInfo.linkedin && <div style={{ fontSize: sizes.body - 1, color: accent }}>{state.personalInfo.linkedin}</div>}
+        </div>
+      </div>
+      <div style={{ height: 3, background: accent, marginBottom: 14 }} />
+      {sections.map((section) => (
+        <div key={section.id} style={{ marginTop: 12 }}>
+          <div style={{ fontSize: sizes.heading, fontWeight: 700, color: accent, borderBottom: `2px solid ${accent}30`, paddingBottom: 3, marginBottom: 6 }}>
+            {SECTION_TYPE_LABELS[section.type]}
+          </div>
+          <SectionContent section={section} accent={accent} fontSize={sizes.body} dateFormat={state.settings.dateFormat} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function MinimalLayout({ state }: { state: ResumeData }) {
+  const sizes = SIZE_MAP[state.settings.fontSize];
+  const font = FONT_MAP[state.settings.fontFamily];
+  const sections = getVisibleSections(state.sections);
+
+  return (
+    <div style={{ padding: 40, fontFamily: font, boxSizing: "border-box" }}>
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ fontSize: sizes.name, fontWeight: 600 }}>{state.personalInfo.name || "Your Name"}</div>
+        {state.personalInfo.title && <div style={{ fontSize: sizes.body + 1, color: "#888", marginTop: 2 }}>{state.personalInfo.title}</div>}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "2px 10px", marginTop: 4 }}>
+          {[state.personalInfo.email, state.personalInfo.phone, state.personalInfo.location, state.personalInfo.website, state.personalInfo.linkedin]
+            .filter(Boolean).map((p, i) => (
+              <span key={i} style={{ fontSize: sizes.body - 1, color: "#999" }}>{p}</span>
+            ))}
+        </div>
+      </div>
+      {sections.map((section) => (
+        <div key={section.id} style={{ marginTop: 14 }}>
+          <div style={{ fontSize: sizes.body, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1.5, color: "#999", marginBottom: 5 }}>
+            {SECTION_TYPE_LABELS[section.type]}
+          </div>
+          <SectionContent section={section} accent="#666" fontSize={sizes.body} dateFormat={state.settings.dateFormat} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Main preview ─────────────────────────────────────────────
+
+export function ResumePreview({ state }: ResumePreviewProps) {
+  return (
+    <div
+      className="origin-top-left"
+      style={{
+        width: PAGE_W,
+        height: PAGE_H,
+        transform: `scale(${SCALE})`,
+      }}
+    >
+      <div
+        style={{
+          width: PAGE_W,
+          height: PAGE_H,
+          fontSize: 10,
+          color: "#1a1a1a",
+          background: "#ffffff",
+          boxSizing: "border-box",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        {state.settings.template === "modern" && <ModernLayout state={state} />}
+        {state.settings.template === "classic" && <ClassicLayout state={state} />}
+        {state.settings.template === "professional" && <ProfessionalLayout state={state} />}
+        {state.settings.template === "minimal" && <MinimalLayout state={state} />}
+      </div>
+    </div>
+  );
+}

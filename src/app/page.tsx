@@ -14,6 +14,15 @@ const TOOLS: Tool[] = [
     icon: "FileText",
     paidAlternative: "FreshBooks",
   },
+  {
+    name: "Resume Builder",
+    slug: "resume-builder",
+    description:
+      "Build professional, ATS-friendly resumes with multiple templates and instant PDF export.",
+    category: "Career",
+    icon: "FileUser",
+    paidAlternative: "Resume.io",
+  },
 ];
 
 export default function HomePage() {
