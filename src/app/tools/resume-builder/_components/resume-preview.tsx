@@ -52,7 +52,7 @@ function SectionContent({ section, accent, fontSize, dateFormat }: {
   switch (section.type) {
     case "summary":
       return section.content ? (
-        <p style={{ fontSize, color: "#444", lineHeight: 1.5 }}>{section.content}</p>
+        <p style={{ fontSize, color: "#444", lineHeight: 1.5 }} dangerouslySetInnerHTML={{ __html: section.content }} />
       ) : null;
 
     case "experience":
@@ -73,7 +73,7 @@ function SectionContent({ section, accent, fontSize, dateFormat }: {
               {item.bullets.filter(Boolean).length > 0 && (
                 <ul style={{ margin: "2px 0 0 14px", padding: 0, listStyle: "disc" }}>
                   {item.bullets.filter(Boolean).map((b, i) => (
-                    <li key={i} style={{ fontSize, color: "#444", lineHeight: 1.4 }}>{b}</li>
+                    <li key={i} style={{ fontSize, color: "#444", lineHeight: 1.4 }} dangerouslySetInnerHTML={{ __html: b }} />
                   ))}
                 </ul>
               )}
@@ -98,7 +98,7 @@ function SectionContent({ section, accent, fontSize, dateFormat }: {
               </div>
               {item.school && <div style={{ fontSize, color: "#666" }}>{item.school}</div>}
               {item.gpa && <div style={{ fontSize: fontSize - 1, color: "#888" }}>GPA: {item.gpa}</div>}
-              {item.description && <div style={{ fontSize, color: "#444", marginTop: 2 }}>{item.description}</div>}
+              {item.description && <div style={{ fontSize, color: "#444", marginTop: 2 }} dangerouslySetInnerHTML={{ __html: item.description }} />}
             </div>
           ))}
         </div>
@@ -155,7 +155,7 @@ function SectionContent({ section, accent, fontSize, dateFormat }: {
             <div key={item.id}>
               <span style={{ fontWeight: 600, fontSize }}>{item.name}</span>
               {item.url && <span style={{ fontSize: fontSize - 1, color: accent, marginLeft: 6 }}>{item.url}</span>}
-              {item.description && <div style={{ fontSize, color: "#444", marginTop: 1 }}>{item.description}</div>}
+              {item.description && <div style={{ fontSize, color: "#444", marginTop: 1 }} dangerouslySetInnerHTML={{ __html: item.description }} />}
               {item.technologies.length > 0 && (
                 <div style={{ fontSize: fontSize - 1, color: "#888", marginTop: 1 }}>
                   {item.technologies.join(", ")}
@@ -180,7 +180,7 @@ function SectionContent({ section, accent, fontSize, dateFormat }: {
                   {formatDateRange(item.startDate, item.endDate, false, dateFormat as "Month YYYY")}
                 </span>
               </div>
-              {item.description && <div style={{ fontSize, color: "#444", marginTop: 1 }}>{item.description}</div>}
+              {item.description && <div style={{ fontSize, color: "#444", marginTop: 1 }} dangerouslySetInnerHTML={{ __html: item.description }} />}
             </div>
           ))}
         </div>
@@ -194,7 +194,7 @@ function SectionContent({ section, accent, fontSize, dateFormat }: {
               <span style={{ fontWeight: 600 }}>{item.title}</span>
               {item.issuer && <span style={{ color: "#666" }}> — {item.issuer}</span>}
               {item.date && <span style={{ color: "#888", marginLeft: 6 }}>{item.date}</span>}
-              {item.description && <div style={{ color: "#444", marginTop: 1 }}>{item.description}</div>}
+              {item.description && <div style={{ color: "#444", marginTop: 1 }} dangerouslySetInnerHTML={{ __html: item.description }} />}
             </div>
           ))}
         </div>

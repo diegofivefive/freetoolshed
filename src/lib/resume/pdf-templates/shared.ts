@@ -2,6 +2,7 @@ import type { jsPDF } from "jspdf";
 import type { ResumeSection } from "../types";
 import { SECTION_TYPE_LABELS, FONT_SIZE_OPTIONS } from "../constants";
 import { formatDateRange, languageProficiencyLabel } from "../format";
+import { renderRichLine, stripHtml } from "../rich-text";
 
 export function hexToRgb(hex: string) {
   const h = hex.replace("#", "");
@@ -51,10 +52,9 @@ export function renderSectionContent(
   switch (section.type) {
     case "summary": {
       if (section.content) {
-        const lines = doc.splitTextToSize(section.content, w);
         pageBreak();
-        doc.text(lines, x, y);
-        y += lines.length * lineH + 2;
+        y = renderRichLine(doc, section.content, x, y, w, font, bodyPt, accentRgb);
+        y += 2;
       }
       break;
     }
@@ -80,9 +80,11 @@ export function renderSectionContent(
         doc.setTextColor(50, 50, 50);
         item.bullets.filter(Boolean).forEach((b) => {
           pageBreak();
-          const lines = doc.splitTextToSize(`\u2022 ${b}`, w - 4);
-          doc.text(lines, x + 2, y);
-          y += lines.length * lineH + 1;
+          doc.setFont(font, "normal");
+          doc.setFontSize(bodyPt);
+          doc.setTextColor(50, 50, 50);
+          y = renderRichLine(doc, b, x + 2, y, w - 4, font, bodyPt, accentRgb, "\u2022 ");
+          y += 1;
         });
         y += 3;
       });
@@ -107,9 +109,11 @@ export function renderSectionContent(
         doc.setTextColor(50, 50, 50);
         if (item.gpa) { doc.text(`GPA: ${item.gpa}`, x, y); y += 4; }
         if (item.description) {
-          const lines = doc.splitTextToSize(item.description, w);
-          doc.text(lines, x, y);
-          y += lines.length * lineH + 2;
+          doc.setFont(font, "normal");
+          doc.setFontSize(bodyPt);
+          doc.setTextColor(50, 50, 50);
+          y = renderRichLine(doc, item.description, x, y, w, font, bodyPt, accentRgb);
+          y += 2;
         }
         y += 2;
       });
@@ -163,9 +167,11 @@ export function renderSectionContent(
         doc.setFont(font, "normal");
         doc.setTextColor(50, 50, 50);
         if (item.description) {
-          const lines = doc.splitTextToSize(item.description, w);
-          doc.text(lines, x, y);
-          y += lines.length * lineH + 1;
+          doc.setFont(font, "normal");
+          doc.setFontSize(bodyPt);
+          doc.setTextColor(50, 50, 50);
+          y = renderRichLine(doc, item.description, x, y, w, font, bodyPt, accentRgb);
+          y += 1;
         }
         if (item.technologies.length > 0) {
           doc.setTextColor(120, 120, 120);
@@ -195,9 +201,11 @@ export function renderSectionContent(
         if (item.organization) { doc.text(item.organization, x, y); y += 4; }
         doc.setTextColor(50, 50, 50);
         if (item.description) {
-          const lines = doc.splitTextToSize(item.description, w);
-          doc.text(lines, x, y);
-          y += lines.length * lineH + 2;
+          doc.setFont(font, "normal");
+          doc.setFontSize(bodyPt);
+          doc.setTextColor(50, 50, 50);
+          y = renderRichLine(doc, item.description, x, y, w, font, bodyPt, accentRgb);
+          y += 2;
         }
         y += 2;
       });
@@ -218,9 +226,11 @@ export function renderSectionContent(
         doc.setFont(font, "normal");
         doc.setTextColor(50, 50, 50);
         if (item.description) {
-          const lines = doc.splitTextToSize(item.description, w);
-          doc.text(lines, x, y);
-          y += lines.length * lineH + 2;
+          doc.setFont(font, "normal");
+          doc.setFontSize(bodyPt);
+          doc.setTextColor(50, 50, 50);
+          y = renderRichLine(doc, item.description, x, y, w, font, bodyPt, accentRgb);
+          y += 2;
         }
         y += 1;
       });

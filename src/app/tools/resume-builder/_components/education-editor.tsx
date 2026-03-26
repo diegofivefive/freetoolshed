@@ -3,9 +3,9 @@
 import type { Dispatch } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
+import { RichTextInput } from "./rich-text-input";
 import type { ResumeAction, EducationSection, Education } from "@/lib/resume/types";
 
 interface EducationEditorProps {
@@ -101,11 +101,11 @@ function EducationItem({
 
       <div className="space-y-1.5">
         <Label>Description (optional)</Label>
-        <Textarea
-          placeholder="Relevant coursework, honors, activities..."
+        <RichTextInput
           value={item.description}
-          onChange={(e) => update({ description: e.target.value })}
-          rows={2}
+          onChange={(html) => update({ description: html })}
+          placeholder="Relevant coursework, honors, activities..."
+          multiline
         />
       </div>
     </div>

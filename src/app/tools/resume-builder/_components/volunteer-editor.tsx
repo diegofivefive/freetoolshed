@@ -3,9 +3,9 @@
 import type { Dispatch } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
+import { RichTextInput } from "./rich-text-input";
 import type { ResumeAction, VolunteerSection, VolunteerExperience } from "@/lib/resume/types";
 
 interface VolunteerEditorProps {
@@ -52,8 +52,12 @@ export function VolunteerEditor({ section, dispatch }: VolunteerEditorProps) {
           </div>
           <div className="space-y-1.5">
             <Label>Description</Label>
-            <Textarea placeholder="Organized community outreach events..." value={item.description} rows={2}
-              onChange={(e) => dispatch({ type: "UPDATE_ITEM", payload: { sectionId: section.id, itemId: item.id, data: { description: e.target.value } } })} />
+            <RichTextInput
+              value={item.description}
+              onChange={(html) => dispatch({ type: "UPDATE_ITEM", payload: { sectionId: section.id, itemId: item.id, data: { description: html } } })}
+              placeholder="Organized community outreach events..."
+              multiline
+            />
           </div>
         </div>
       ))}

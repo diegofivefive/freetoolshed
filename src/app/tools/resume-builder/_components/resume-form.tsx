@@ -23,6 +23,7 @@ import { TemplateSelector } from "./template-selector";
 import { ColorPicker } from "./color-picker";
 import { FontSelector } from "./font-selector";
 import { ResumeHistory } from "./resume-history";
+import { AtsChecker } from "./ats-checker";
 import { generateResumePdf, printResumePdf } from "./pdf-export";
 import { SECTION_TYPE_LABELS } from "@/lib/resume/constants";
 import type { ResumeData, ResumeAction, ResumeSection } from "@/lib/resume/types";
@@ -123,6 +124,7 @@ export function ResumeForm({
           <TabsTrigger value="content">Content</TabsTrigger>
           <TabsTrigger value="sections">Sections</TabsTrigger>
           <TabsTrigger value="style">Style</TabsTrigger>
+          <TabsTrigger value="ats">ATS</TabsTrigger>
         </TabsList>
         <div className="mt-2">
           <Button
@@ -193,6 +195,10 @@ export function ResumeForm({
               dispatch={dispatch}
             />
           </div>
+        </TabsContent>
+
+        <TabsContent value="ats">
+          <AtsChecker state={state} />
         </TabsContent>
       </Tabs>
 

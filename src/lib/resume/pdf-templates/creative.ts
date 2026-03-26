@@ -2,6 +2,7 @@ import type { jsPDF } from "jspdf";
 import type { ResumeData, ResumeSection } from "../types";
 import { SECTION_TYPE_LABELS, FONT_SIZE_OPTIONS } from "../constants";
 import { formatDateRange, languageProficiencyLabel } from "../format";
+import { renderRichLine } from "../rich-text";
 import { renderSectionContent as sharedRenderSectionContent } from "./shared";
 
 function hexToRgb(hex: string) {
@@ -151,10 +152,9 @@ export async function renderCreativeTemplate(
     switch (section.type) {
       case "summary": {
         if (section.content) {
-          const lines = doc.splitTextToSize(section.content, mainW);
           pageBreak();
-          doc.text(lines, margin, y);
-          y += lines.length * lineH + 2;
+          y = renderRichLine(doc, section.content, margin, y, mainW, font, sizes.body, accent);
+          y += 2;
         }
         break;
       }
@@ -179,9 +179,11 @@ export async function renderCreativeTemplate(
           doc.setTextColor(50, 50, 50);
           item.bullets.filter(Boolean).forEach((b) => {
             pageBreak();
-            const lines = doc.splitTextToSize(`\u2022 ${b}`, mainW - 4);
-            doc.text(lines, margin + 2, y);
-            y += lines.length * lineH + 1;
+            doc.setFont(font, "normal");
+            doc.setFontSize(sizes.body);
+            doc.setTextColor(50, 50, 50);
+            y = renderRichLine(doc, b, margin + 2, y, mainW - 4, font, sizes.body, accent, "\u2022 ");
+            y += 1;
           });
           y += 3;
         });
@@ -206,9 +208,11 @@ export async function renderCreativeTemplate(
           doc.setTextColor(50, 50, 50);
           if (item.gpa) { doc.text(`GPA: ${item.gpa}`, margin, y); y += 4; }
           if (item.description) {
-            const lines = doc.splitTextToSize(item.description, mainW);
-            doc.text(lines, margin, y);
-            y += lines.length * lineH + 2;
+            doc.setFont(font, "normal");
+            doc.setFontSize(sizes.body);
+            doc.setTextColor(50, 50, 50);
+            y = renderRichLine(doc, item.description, margin, y, mainW, font, sizes.body, accent);
+            y += 2;
           }
           y += 2;
         });

@@ -3,9 +3,9 @@
 import type { Dispatch } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
+import { RichTextInput } from "./rich-text-input";
 import type { ResumeAction, ProjectsSection, Project } from "@/lib/resume/types";
 
 interface ProjectsEditorProps {
@@ -40,8 +40,12 @@ export function ProjectsEditor({ section, dispatch }: ProjectsEditorProps) {
           </div>
           <div className="space-y-1.5">
             <Label>Description</Label>
-            <Textarea placeholder="Built a real-time dashboard using React and WebSockets..." value={item.description} rows={2}
-              onChange={(e) => dispatch({ type: "UPDATE_ITEM", payload: { sectionId: section.id, itemId: item.id, data: { description: e.target.value } } })} />
+            <RichTextInput
+              value={item.description}
+              onChange={(html) => dispatch({ type: "UPDATE_ITEM", payload: { sectionId: section.id, itemId: item.id, data: { description: html } } })}
+              placeholder="Built a real-time dashboard using React and WebSockets..."
+              multiline
+            />
           </div>
           <div className="space-y-1.5">
             <Label>Technologies (comma-separated)</Label>

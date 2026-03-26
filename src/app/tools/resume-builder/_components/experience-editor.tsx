@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2, X } from "lucide-react";
+import { RichTextInput } from "./rich-text-input";
 import type { ResumeAction, ExperienceSection, WorkExperience } from "@/lib/resume/types";
 
 interface ExperienceEditorProps {
@@ -116,13 +117,14 @@ function ExperienceItem({
         <Label>Key Achievements / Responsibilities</Label>
         {item.bullets.map((bullet, i) => (
           <div key={i} className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">&bull;</span>
-            <Input
-              placeholder="Led a team of 5 engineers to deliver..."
-              value={bullet}
-              onChange={(e) => updateBullet(i, e.target.value)}
-              className="flex-1"
-            />
+            <span className="mt-2 text-xs text-muted-foreground">&bull;</span>
+            <div className="flex-1">
+              <RichTextInput
+                value={bullet}
+                onChange={(html) => updateBullet(i, html)}
+                placeholder="Led a team of 5 engineers to deliver..."
+              />
+            </div>
             {item.bullets.length > 1 && (
               <button
                 type="button"
