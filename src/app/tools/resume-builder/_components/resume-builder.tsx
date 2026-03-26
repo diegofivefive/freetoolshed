@@ -165,16 +165,20 @@ export function ResumeBuilder() {
         />
       </div>
 
-      {/* Preview */}
-      {showPreview && (
-        <div className="w-[520px] shrink-0">
-          <div className="sticky top-20">
-            <div className="overflow-hidden rounded-lg border border-border bg-white shadow-sm">
-              <ResumePreview state={state} />
-            </div>
+      {/* Preview — visible at xl+ by default, toggle overrides */}
+      <div
+        className={
+          showPreview
+            ? "hidden w-[520px] shrink-0 xl:block"
+            : "hidden"
+        }
+      >
+        <div className="sticky top-20">
+          <div className="overflow-hidden rounded-lg border border-border bg-white shadow-sm">
+            <ResumePreview state={state} />
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
