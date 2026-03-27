@@ -8,17 +8,23 @@ export function SeoContent() {
       {/* ── Intro ─────────────────────────────────────────── */}
       <section>
         <h2 className="text-2xl font-semibold">
-          Free Online Audio Editor
+          Trim Audio Online — No Install Required
         </h2>
         <p className="mt-3 max-w-3xl text-muted-foreground">
-          Edit, trim, merge, and convert audio files directly in your browser
-          with Free Tool Shed&apos;s Audio Editor. Unlike Adobe Audition
-          ($22.99/month) and Audacity (desktop-only download), our tool runs
-          entirely online — no installation, no account, no hidden fees. Import
-          MP3, WAV, OGG, AAC, FLAC, or WebM files, make your edits with a
-          visual waveform display, and export in seconds. Your audio never
-          leaves your device — all processing uses the Web Audio API locally in
-          your browser.
+          You shouldn&apos;t need to download a 100 MB desktop app just to trim
+          an MP3 or cut a section from a WAV file. Free Tool Shed&apos;s Audio
+          Editor lets you trim audio online, convert between formats, and apply
+          effects — all in your browser. No installation, no account, no
+          subscription. It works on any device: Windows, Mac, Linux,
+          Chromebooks, even a locked-down work computer.
+        </p>
+        <p className="mt-3 max-w-3xl text-muted-foreground">
+          Unlike Adobe Audition ($22.99/month) or Audacity (desktop-only),
+          this tool is built for quick edits: drop a file, make your cut,
+          download the result. Most tasks take under a minute. Need more?
+          Apply fade in/out, normalize volume, reduce noise, reverse audio, or
+          convert WAV to MP3 — all processed locally. Your files never leave
+          your device.
         </p>
       </section>
 
@@ -55,7 +61,7 @@ export function SeoContent() {
 
       {/* ── How To ────────────────────────────────────────── */}
       <section>
-        <h2 className="text-xl font-semibold">How to Edit Audio Online</h2>
+        <h2 className="text-xl font-semibold">How to Trim Audio Online (5 Steps)</h2>
         <ol className="mt-4 space-y-4">
           {[
             {
@@ -149,44 +155,44 @@ export function SeoContent() {
         <div className="mt-4 space-y-3">
           {[
             {
+              q: "Why use this instead of Audacity?",
+              a: "Audacity is more powerful — multi-track, VST plugins, spectral editing. But it requires a desktop install. This tool is for quick jobs: trim an MP3, cut a clip, convert a format. Open a URL, drop your file, done in under a minute. No download, works on Chromebooks and locked-down machines, nothing to uninstall afterward.",
+            },
+            {
               q: "Is this audio editor really free?",
               a: "Yes, completely free. No hidden fees, no premium tiers, and no sign-up required. The tool is ad-supported so it can remain free for everyone.",
             },
             {
               q: "Do I need to install anything?",
-              a: "No. This audio editor runs entirely in your browser using the Web Audio API. No downloads, plugins, or extensions required — unlike Audacity which needs a desktop install.",
+              a: "No. It runs entirely in your browser. No 100 MB download, no plugins, no extensions. Open the page and start editing — that's the whole point.",
             },
             {
-              q: "What audio formats can I import?",
-              a: "You can import MP3, WAV, OGG, AAC, FLAC, and WebM audio files. The browser decodes them natively, so there's no server-side processing involved.",
+              q: "How do I trim an MP3 online?",
+              a: "Drop your MP3 file onto the editor (or click to browse). Click and drag on the waveform to select the section you want to keep, then click the Crop button or press T. Hit Download to save the trimmed file. The whole process takes about 30 seconds.",
             },
             {
-              q: "What export formats are available?",
-              a: "Export as WAV (uncompressed, lossless), MP3, or OGG. For MP3 and OGG, you can choose the bitrate (128, 192, 256, or 320 kbps). WAV export is generated natively in the browser for maximum quality.",
+              q: "Can I convert WAV to MP3?",
+              a: "Yes. Import any WAV file, then choose MP3 from the export format dropdown and select your bitrate (128–320 kbps). Click Download. The conversion happens entirely in your browser.",
+            },
+            {
+              q: "What audio formats are supported?",
+              a: "Import: MP3, WAV, OGG, AAC, FLAC, and WebM. Export: WAV (lossless), MP3, or OGG with configurable bitrate.",
             },
             {
               q: "Is my audio data private?",
-              a: "Yes. All processing happens locally in your browser. Your audio files are never uploaded to any server. We can't see, access, or store your files.",
+              a: "Yes. All processing happens locally in your browser using the Web Audio API. Your files are never uploaded to any server. We can't see them and neither can anyone else.",
             },
             {
               q: "Can I undo my edits?",
-              a: "Yes. The editor maintains a 50-step undo/redo history. Use Ctrl+Z to undo and Ctrl+Y (or Ctrl+Shift+Z) to redo. You can also use the undo/redo buttons in the toolbar.",
-            },
-            {
-              q: "How do I trim audio to a specific section?",
-              a: "Click and drag on the waveform to select the region you want to keep, then click the Crop (trim) button or press T. Everything outside your selection will be removed.",
+              a: "Yes. The editor keeps a 50-step undo/redo history. Ctrl+Z to undo, Ctrl+Y to redo. You can also use the toolbar buttons.",
             },
             {
               q: "Does the noise reduction actually work?",
-              a: "Yes. It uses spectral gating — it estimates the noise floor from the quietest parts of your audio and attenuates sections below that threshold. Adjust the strength slider (0–1) to control aggressiveness. For heavy noise, you may need to apply it multiple times.",
+              a: "For light background noise (hiss, hum, room tone), yes. It estimates the noise floor from quiet sections and attenuates below that threshold. Adjust strength from 0–1. For heavy noise, apply multiple passes. It's not as advanced as Audacity's spectral subtraction, but it handles common cases.",
             },
             {
               q: "Is there a file size limit?",
-              a: "There's no hard limit, but performance depends on your browser's available memory. Most files under 100 MB work smoothly. Very long recordings (over an hour) may use significant memory.",
-            },
-            {
-              q: "Is this a good alternative to Audacity?",
-              a: "For basic to intermediate editing tasks — trimming, cutting, applying effects, and format conversion — yes. The main advantage is zero installation and browser-based convenience. For advanced features like multi-track mixing, spectral editing, or VST plugins, Audacity is more capable.",
+              a: "No hard limit — it depends on your browser's available memory. Files under 100 MB work smoothly. Very long recordings (1+ hour) may use significant memory.",
             },
           ].map((faq) => (
             <details

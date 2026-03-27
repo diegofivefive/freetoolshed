@@ -6,7 +6,7 @@ import { AdSlot } from "@/components/layout/ad-slot";
 const toolConfig = {
   name: "Audio Editor",
   description:
-    "Edit, trim, merge, and convert audio files with a visual waveform editor. Supports MP3, WAV, OGG, and more.",
+    "Trim, cut, and convert audio files online — no install, no sign-up. Works on any device with a browser.",
   slug: "audio-editor",
   paidAlternative: "Adobe Audition",
 };
@@ -21,6 +21,30 @@ export default function AudioEditorPage() {
     mainEntity: [
       {
         "@type": "Question",
+        name: "Why use this instead of Audacity?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Audacity is more powerful for advanced work, but it requires a desktop install. This tool is for quick jobs — trim an MP3, cut a clip, convert a format — right in your browser. No download, works on any device, takes under a minute.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "How do I trim an MP3 online?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Drop your MP3 onto the editor, click and drag on the waveform to select the section you want, click Crop (or press T), then Download. Takes about 30 seconds.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Can I convert WAV to MP3 online?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Yes. Import any WAV file, choose MP3 from the export dropdown, select your bitrate (128–320 kbps), and click Download. The conversion happens in your browser — nothing is uploaded.",
+        },
+      },
+      {
+        "@type": "Question",
         name: "Is this audio editor really free?",
         acceptedAnswer: {
           "@type": "Answer",
@@ -32,15 +56,7 @@ export default function AudioEditorPage() {
         name: "Do I need to install anything?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "No. This audio editor runs entirely in your browser. No downloads, plugins, or sign-ups needed — unlike Audacity which requires a desktop install.",
-        },
-      },
-      {
-        "@type": "Question",
-        name: "Is my audio data private?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "Yes. All audio processing happens locally in your browser using the Web Audio API. Your files are never uploaded to any server.",
+          text: "No. It runs entirely in your browser. No 100 MB download, no plugins, no extensions. Open the page and start editing.",
         },
       },
       {
@@ -48,15 +64,15 @@ export default function AudioEditorPage() {
         name: "What audio formats are supported?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "You can import MP3, WAV, OGG, AAC, FLAC, and WebM audio files. Export is available in WAV, MP3, and OGG formats.",
+          text: "Import: MP3, WAV, OGG, AAC, FLAC, and WebM. Export: WAV (lossless), MP3, or OGG with configurable bitrate.",
         },
       },
       {
         "@type": "Question",
-        name: "Can I trim and cut audio?",
+        name: "Is my audio data private?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Yes. Select any region on the waveform to trim, cut, or delete it. You can also split audio at the playhead position.",
+          text: "Yes. All processing happens locally in your browser using the Web Audio API. Your files are never uploaded to any server.",
         },
       },
       {
@@ -64,23 +80,7 @@ export default function AudioEditorPage() {
         name: "Does it support effects like fade in and fade out?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Yes. Apply fade in, fade out, normalize volume, reverse audio, and basic noise reduction — all processed in real time in your browser.",
-        },
-      },
-      {
-        "@type": "Question",
-        name: "Can I merge multiple audio files?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "Yes. Import multiple audio files and merge them sequentially. You can reorder tracks before combining them into a single file.",
-        },
-      },
-      {
-        "@type": "Question",
-        name: "Is this a good alternative to Audacity or Adobe Audition?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "For basic to intermediate editing tasks like trimming, cutting, merging, and applying effects, yes. It runs in the browser with no install required. Adobe Audition costs $22.99/month and Audacity requires a desktop download.",
+          text: "Yes. Apply fade in, fade out, normalize volume, reverse audio, amplify, and noise reduction — all processed locally in your browser.",
         },
       },
     ],
@@ -98,42 +98,41 @@ export default function AudioEditorPage() {
       />
 
       <h1 className="text-3xl font-bold tracking-tight">
-        Free Audio Editor
+        Trim Audio Online — Free, No Install
       </h1>
       <p className="mt-2 text-lg text-muted-foreground">
-        Edit, trim, merge, and convert audio files with a visual waveform
-        editor — a free alternative to Adobe Audition and Audacity. No
-        sign-up required.
+        Need to trim an MP3, cut a WAV, or convert audio formats? Do it right
+        here — no downloading Audacity, no Adobe subscription, no sign-up.
+        Just drop your file and edit.
       </p>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <div className="rounded-lg border border-border bg-card p-4">
-          <h2 className="text-sm font-semibold">Visual Waveform Editor</h2>
+          <h2 className="text-sm font-semibold">No Install, Any Device</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            See your audio as a detailed waveform. Click and drag to select
-            regions for trimming, cutting, or applying effects with precision.
+            Runs entirely in your browser. Works on Windows, Mac, Linux, and
+            Chromebooks — no 100 MB download for a 30-second trim.
           </p>
         </div>
         <div className="rounded-lg border border-border bg-card p-4">
-          <h2 className="text-sm font-semibold">Trim, Cut & Merge</h2>
+          <h2 className="text-sm font-semibold">Trim, Cut & Export in Seconds</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Remove unwanted sections, split audio at any point, or combine
-            multiple files into one. All edits are non-destructive with full
-            undo/redo support.
+            Drop an MP3 or WAV, drag to select the part you want, hit trim,
+            and download. Most edits take under a minute.
           </p>
         </div>
         <div className="rounded-lg border border-border bg-card p-4">
-          <h2 className="text-sm font-semibold">Built-in Audio Effects</h2>
+          <h2 className="text-sm font-semibold">Convert MP3, WAV, OGG & More</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Apply fade in, fade out, normalize volume, reverse audio, and
-            noise reduction — all processed instantly in your browser.
+            Import MP3, WAV, OGG, AAC, FLAC, or WebM. Export as WAV
+            (lossless), MP3, or OGG with configurable bitrate.
           </p>
         </div>
         <div className="rounded-lg border border-border bg-card p-4">
-          <h2 className="text-sm font-semibold">Multi-Format Export</h2>
+          <h2 className="text-sm font-semibold">Your Files Stay Private</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Import MP3, WAV, OGG, AAC, FLAC, and WebM. Export as WAV, MP3, or
-            OGG. All conversion happens client-side — your files stay private.
+            All processing happens locally using the Web Audio API. Nothing is
+            uploaded — your audio never leaves your device.
           </p>
         </div>
       </div>
