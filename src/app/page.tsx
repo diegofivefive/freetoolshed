@@ -24,6 +24,15 @@ const TOOLS: Tool[] = [
     icon: "FileUser",
     paidAlternative: "Resume.io",
   },
+  {
+    name: "Floor Plan Maker",
+    slug: "floor-plan-maker",
+    description:
+      "Design room layouts with drag-and-drop furniture, walls, and rooms. Export as SVG, PNG, or PDF.",
+    category: "Design",
+    icon: "LayoutGrid",
+    paidAlternative: "SmartDraw",
+  },
 ];
 
 export default function HomePage() {
