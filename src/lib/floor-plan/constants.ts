@@ -75,6 +75,12 @@ export function formatDimension(value: number, unit: MeasurementUnit): string {
   return `${value.toFixed(2)} m`;
 }
 
+export function formatArea(width: number, height: number, unit: MeasurementUnit): string {
+  const area = width * height;
+  if (unit === "ft") return `${Math.round(area)} sq ft`;
+  return `${area.toFixed(1)} m²`;
+}
+
 // ── Factory functions ───────────────────────────────────────
 
 export function createDefaultPlan(): FloorPlan {
@@ -105,5 +111,6 @@ export function createDefaultEditorState(): EditorState {
     isDragging: false,
     isDrawing: false,
     drawStart: null,
+    underlay: null,
   };
 }

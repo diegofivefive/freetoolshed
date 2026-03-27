@@ -31,7 +31,7 @@ export const furnitureElementSchema = baseElementSchema.extend({
   width: z.number().positive(),
   height: z.number().positive(),
   furnitureType: z.string(),
-  category: z.enum(["living", "bedroom", "kitchen", "bathroom", "office", "outdoor"]),
+  category: z.enum(["living", "bedroom", "kitchen", "bathroom", "office", "outdoor", "doors-windows", "electrical"]),
   fill: z.string(),
 });
 

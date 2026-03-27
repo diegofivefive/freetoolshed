@@ -1,6 +1,6 @@
 "use client";
 
-import type { Dispatch } from "react";
+import { useRef, type Dispatch } from "react";
 import type {
   EditorState,
   FloorPlanAction,
@@ -133,6 +133,10 @@ export function PropertiesPanel({
             Show Dimensions
           </label>
         </div>
+
+        <Separator className="my-3" />
+
+        <UnderlayControls state={state} dispatch={dispatch} />
 
         <Separator className="my-3" />
 
@@ -519,6 +523,94 @@ export function PropertiesPanel({
           Delete All Selected
         </button>
       </div>
+    </div>
+  );
+}
+
+// ── Underlay controls ────────────────────────────────────────
+
+function UnderlayControls({
+  state,
+  dispatch,
+}: {
+  state: EditorState;
+  dispatch: Dispatch<FloorPlanAction>;
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      dispatch({
+        type: "SET_UNDERLAY",
+        payload: { dataUrl: reader.result as string, opacity: 0.3 },
+      });
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
+  return (
+    <div>
+      <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        Blueprint Underlay
+      </h3>
+
+      {state.underlay ? (
+        <div className="mt-2 space-y-2">
+          <div>
+            <Label className="text-xs">
+              Opacity ({Math.round(state.underlay.opacity * 100)}%)
+            </Label>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={Math.round(state.underlay.opacity * 100)}
+              onChange={(e) =>
+                dispatch({
+                  type: "SET_UNDERLAY_OPACITY",
+                  payload: Number(e.target.value) / 100,
+                })
+              }
+              className="mt-1 w-full"
+            />
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="flex-1 rounded-md border border-border px-2 py-1 text-xs hover:bg-accent"
+            >
+              Replace
+            </button>
+            <button
+              onClick={() => dispatch({ type: "REMOVE_UNDERLAY" })}
+              className="flex-1 rounded-md border border-border px-2 py-1 text-xs text-pink-500 hover:bg-pink-500/10"
+            >
+              Remove
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          className="mt-2 w-full rounded-md border border-dashed border-border px-3 py-2 text-xs text-muted-foreground hover:border-brand hover:text-foreground"
+        >
+          Upload image to trace over
+        </button>
+      )}
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileChange}
+      />
     </div>
   );
 }

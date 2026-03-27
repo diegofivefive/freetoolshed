@@ -1,7 +1,7 @@
 "use client";
 
 import type { RoomElement, MeasurementUnit } from "@/lib/floor-plan/types";
-import { PIXELS_PER_UNIT } from "@/lib/floor-plan/constants";
+import { PIXELS_PER_UNIT, formatArea } from "@/lib/floor-plan/constants";
 import { RoomDimensions } from "./dimension-label";
 
 interface RoomRendererProps {
@@ -46,11 +46,11 @@ export function RoomRenderer({
         rx={2 / zoom}
       />
 
-      {/* Room label */}
+      {/* Room label + area */}
       {element.label && (
         <text
           x={px + pw / 2}
-          y={py + ph / 2}
+          y={py + ph / 2 - fontSize * 0.4}
           textAnchor="middle"
           dominantBaseline="central"
           fontSize={fontSize}
@@ -62,6 +62,18 @@ export function RoomRenderer({
           {element.label}
         </text>
       )}
+      <text
+        x={px + pw / 2}
+        y={py + ph / 2 + fontSize * (element.label ? 0.8 : 0)}
+        textAnchor="middle"
+        dominantBaseline="central"
+        fontSize={fontSize * 0.75}
+        fill="var(--color-muted-foreground)"
+        fontFamily="var(--font-geist-mono)"
+        style={{ userSelect: "none", pointerEvents: "none" }}
+      >
+        {formatArea(element.width, element.height, unit)}
+      </text>
 
       {/* Dimensions */}
       {(showDimensions || element.showDimensions) && (

@@ -55,9 +55,16 @@ export function buildSvgString(
         );
         if (el.label) {
           parts.push(
-            `<text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#1e293b" font-family="sans-serif" font-weight="500">${escapeXml(el.label)}</text>`
+            `<text x="${cx}" y="${cy - 5}" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#1e293b" font-family="sans-serif" font-weight="500">${escapeXml(el.label)}</text>`
           );
         }
+        // Area label
+        const areaText = plan.unit === "ft"
+          ? `${Math.round(el.width * el.height)} sq ft`
+          : `${(el.width * el.height).toFixed(1)} m²`;
+        parts.push(
+          `<text x="${cx}" y="${cy + (el.label ? 10 : 0)}" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#64748b" font-family="monospace">${escapeXml(areaText)}</text>`
+        );
         if (options.includeDimensions) {
           const wLabel = formatDim(el.width, plan.unit);
           const hLabel = formatDim(el.height, plan.unit);

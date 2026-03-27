@@ -73,3 +73,128 @@ export function zoomAtPoint(
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
+
+// ── Smart alignment guides ──────────────────────────────────
+
+export interface AlignGuide {
+  axis: "x" | "y";
+  position: number; // in plan units
+}
+
+export interface AlignResult {
+  x: number;
+  y: number;
+  guides: AlignGuide[];
+}
+
+interface ElementEdges {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+  centerX: number;
+  centerY: number;
+}
+
+function getEdges(el: { x: number; y: number; width?: number; height?: number }): ElementEdges {
+  const w = el.width ?? 0;
+  const h = el.height ?? 0;
+  return {
+    left: el.x,
+    right: el.x + w,
+    top: el.y,
+    bottom: el.y + h,
+    centerX: el.x + w / 2,
+    centerY: el.y + h / 2,
+  };
+}
+
+/**
+ * Check a dragged element's position against all other elements
+ * and snap to alignment if within threshold. Returns snapped
+ * position and active guide lines.
+ */
+export function computeAlignGuides(
+  draggedX: number,
+  draggedY: number,
+  draggedW: number,
+  draggedH: number,
+  otherElements: { x: number; y: number; width?: number; height?: number }[],
+  threshold = 0.5
+): AlignResult {
+  const dragged: ElementEdges = {
+    left: draggedX,
+    right: draggedX + draggedW,
+    top: draggedY,
+    bottom: draggedY + draggedH,
+    centerX: draggedX + draggedW / 2,
+    centerY: draggedY + draggedH / 2,
+  };
+
+  const guides: AlignGuide[] = [];
+  let snappedX = draggedX;
+  let snappedY = draggedY;
+  let bestDx = threshold;
+  let bestDy = threshold;
+
+  for (const other of otherElements) {
+    const edges = getEdges(other);
+
+    // X-axis alignment (vertical guide lines)
+    const xPairs: [number, number][] = [
+      [dragged.left, edges.left],
+      [dragged.left, edges.right],
+      [dragged.right, edges.left],
+      [dragged.right, edges.right],
+      [dragged.centerX, edges.centerX],
+      [dragged.left, edges.centerX],
+      [dragged.right, edges.centerX],
+      [dragged.centerX, edges.left],
+      [dragged.centerX, edges.right],
+    ];
+
+    for (const [dEdge, oEdge] of xPairs) {
+      const dist = Math.abs(dEdge - oEdge);
+      if (dist < bestDx) {
+        bestDx = dist;
+        snappedX = draggedX + (oEdge - dEdge);
+        // Reset x guides when we find a closer match
+        const filtered = guides.filter((g) => g.axis !== "x");
+        guides.length = 0;
+        guides.push(...filtered);
+        guides.push({ axis: "x", position: oEdge });
+      } else if (dist === bestDx && dist < threshold) {
+        guides.push({ axis: "x", position: oEdge });
+      }
+    }
+
+    // Y-axis alignment (horizontal guide lines)
+    const yPairs: [number, number][] = [
+      [dragged.top, edges.top],
+      [dragged.top, edges.bottom],
+      [dragged.bottom, edges.top],
+      [dragged.bottom, edges.bottom],
+      [dragged.centerY, edges.centerY],
+      [dragged.top, edges.centerY],
+      [dragged.bottom, edges.centerY],
+      [dragged.centerY, edges.top],
+      [dragged.centerY, edges.bottom],
+    ];
+
+    for (const [dEdge, oEdge] of yPairs) {
+      const dist = Math.abs(dEdge - oEdge);
+      if (dist < bestDy) {
+        bestDy = dist;
+        snappedY = draggedY + (oEdge - dEdge);
+        const filtered = guides.filter((g) => g.axis !== "y");
+        guides.length = 0;
+        guides.push(...filtered);
+        guides.push({ axis: "y", position: oEdge });
+      } else if (dist === bestDy && dist < threshold) {
+        guides.push({ axis: "y", position: oEdge });
+      }
+    }
+  }
+
+  return { x: snappedX, y: snappedY, guides };
+}

@@ -78,6 +78,40 @@ export const FURNITURE_CATALOG: FurnitureCatalogItem[] = [
   { id: "bench-outdoor", name: "Outdoor Bench", category: "outdoor", defaultWidth: 5, defaultHeight: 1.5, viewBox: "0 0 100 100", svgPath: "M5 20 h90 v60 h-90 z M5 10 h90 v15 h-90 z" },
   { id: "fire-pit", name: "Fire Pit", category: "outdoor", defaultWidth: 3, defaultHeight: 3, viewBox: "0 0 100 100", svgPath: "M50 5 a45 45 0 1 1 0 90 a45 45 0 1 1 0 -90 M50 20 a30 30 0 1 1 0 60 a30 30 0 1 1 0 -60" },
   { id: "hot-tub", name: "Hot Tub", category: "outdoor", defaultWidth: 4, defaultHeight: 4, viewBox: "0 0 100 100", svgPath: "M50 5 a45 45 0 1 1 0 90 a45 45 0 1 1 0 -90 M50 15 a35 35 0 1 1 0 70 a35 35 0 1 1 0 -70 M25 40 h50 M25 60 h50" },
+
+  // ── Doors & Windows ───────────────────────────────────────
+  // Doors show a swing arc in plan view
+  { id: "door-single", name: "Single Door", category: "doors-windows", defaultWidth: 3, defaultHeight: 0.5, viewBox: "0 0 100 100", svgPath: "M5 45 h90 v10 h-90 z M5 45 v-40 a90 90 0 0 1 90 40" },
+  { id: "door-single-right", name: "Single Door (Right)", category: "doors-windows", defaultWidth: 3, defaultHeight: 0.5, viewBox: "0 0 100 100", svgPath: "M5 45 h90 v10 h-90 z M95 45 v-40 a-90 90 0 0 0 -90 40" },
+  { id: "door-double", name: "Double Door", category: "doors-windows", defaultWidth: 5, defaultHeight: 0.5, viewBox: "0 0 100 100", svgPath: "M5 45 h90 v10 h-90 z M5 45 v-35 a45 45 0 0 1 45 35 M95 45 v-35 a-45 45 0 0 0 -45 35" },
+  { id: "door-sliding", name: "Sliding Door", category: "doors-windows", defaultWidth: 5, defaultHeight: 0.5, viewBox: "0 0 100 100", svgPath: "M5 35 h90 v10 h-90 z M5 55 h90 v10 h-90 z M5 35 h50 v10 h-50 z M45 55 h50 v10 h-50 z" },
+  { id: "door-pocket", name: "Pocket Door", category: "doors-windows", defaultWidth: 3, defaultHeight: 0.5, viewBox: "0 0 100 100", svgPath: "M5 40 h90 v20 h-90 z M10 45 h40 v10 h-40 z M55 40 v20" },
+  { id: "door-bifold", name: "Bi-Fold Door", category: "doors-windows", defaultWidth: 3, defaultHeight: 1.5, viewBox: "0 0 100 100", svgPath: "M5 90 h90 v5 h-90 z M5 90 l22 -80 l23 80 M50 90 l22 -80 l23 80" },
+  { id: "door-french", name: "French Door", category: "doors-windows", defaultWidth: 5, defaultHeight: 0.5, viewBox: "0 0 100 100", svgPath: "M5 45 h90 v10 h-90 z M5 45 v-35 a45 45 0 0 1 45 35 M95 45 v-35 a-45 45 0 0 0 -45 35 M27 45 v-20 M73 45 v-20" },
+  { id: "door-garage", name: "Garage Door", category: "doors-windows", defaultWidth: 8, defaultHeight: 0.5, viewBox: "0 0 100 100", svgPath: "M5 30 h90 v40 h-90 z M5 42 h90 M5 54 h90 M5 66 h90" },
+  // Windows show pane divisions
+  { id: "window-single", name: "Single Window", category: "doors-windows", defaultWidth: 3, defaultHeight: 0.3, viewBox: "0 0 100 100", svgPath: "M5 25 h90 v50 h-90 z M5 50 h90 M50 25 v50" },
+  { id: "window-double", name: "Double Window", category: "doors-windows", defaultWidth: 5, defaultHeight: 0.3, viewBox: "0 0 100 100", svgPath: "M5 25 h90 v50 h-90 z M5 50 h90 M33 25 v50 M66 25 v50" },
+  { id: "window-bay", name: "Bay Window", category: "doors-windows", defaultWidth: 5, defaultHeight: 2, viewBox: "0 0 100 100", svgPath: "M5 80 h20 v15 h-20 z M25 80 l25 -70 l25 70 v15 h-50 z M75 80 h20 v15 h-20 z M50 15 v75" },
+  { id: "window-sliding", name: "Sliding Window", category: "doors-windows", defaultWidth: 4, defaultHeight: 0.3, viewBox: "0 0 100 100", svgPath: "M5 25 h90 v50 h-90 z M5 25 h50 v25 h-50 z M45 50 h50 v25 h-50 z" },
+
+  // ── Electrical ────────────────────────────────────────────
+  // Standard architectural plan symbols for electrical fixtures
+  { id: "outlet-standard", name: "Wall Outlet", category: "electrical", defaultWidth: 1, defaultHeight: 1, viewBox: "0 0 100 100", svgPath: "M50 5 a45 45 0 1 1 0 90 a45 45 0 1 1 0 -90 M50 5 v90" },
+  { id: "outlet-duplex", name: "Duplex Outlet", category: "electrical", defaultWidth: 1, defaultHeight: 1, viewBox: "0 0 100 100", svgPath: "M50 5 a45 45 0 1 1 0 90 a45 45 0 1 1 0 -90 M50 5 v90 M20 50 h60" },
+  { id: "outlet-gfci", name: "GFCI Outlet", category: "electrical", defaultWidth: 1, defaultHeight: 1, viewBox: "0 0 100 100", svgPath: "M50 5 a45 45 0 1 1 0 90 a45 45 0 1 1 0 -90 M50 5 v90 M20 50 h60 M30 30 h40 v40 h-40 z" },
+  { id: "outlet-240v", name: "240V Outlet", category: "electrical", defaultWidth: 1, defaultHeight: 1, viewBox: "0 0 100 100", svgPath: "M50 5 a45 45 0 1 1 0 90 a45 45 0 1 1 0 -90 M50 5 v90 M20 50 h60 M15 35 h70 M15 65 h70" },
+  { id: "switch-single", name: "Light Switch", category: "electrical", defaultWidth: 0.8, defaultHeight: 0.8, viewBox: "0 0 100 100", svgPath: "M50 90 v-80 M50 10 l30 50" },
+  { id: "switch-3way", name: "3-Way Switch", category: "electrical", defaultWidth: 0.8, defaultHeight: 0.8, viewBox: "0 0 100 100", svgPath: "M50 90 v-80 M50 10 l30 50 M50 10 l-30 50" },
+  { id: "switch-dimmer", name: "Dimmer Switch", category: "electrical", defaultWidth: 0.8, defaultHeight: 0.8, viewBox: "0 0 100 100", svgPath: "M50 90 v-80 M50 10 l30 50 M35 50 h30" },
+  { id: "light-ceiling", name: "Ceiling Light", category: "electrical", defaultWidth: 1.5, defaultHeight: 1.5, viewBox: "0 0 100 100", svgPath: "M50 10 a40 40 0 1 1 0 80 a40 40 0 1 1 0 -80 M25 25 l50 50 M75 25 l-50 50" },
+  { id: "light-recessed", name: "Recessed Light", category: "electrical", defaultWidth: 1, defaultHeight: 1, viewBox: "0 0 100 100", svgPath: "M50 10 a40 40 0 1 1 0 80 a40 40 0 1 1 0 -80 M50 25 a25 25 0 1 1 0 50 a25 25 0 1 1 0 -50" },
+  { id: "light-pendant", name: "Pendant Light", category: "electrical", defaultWidth: 1, defaultHeight: 1, viewBox: "0 0 100 100", svgPath: "M50 10 a40 40 0 1 1 0 80 a40 40 0 1 1 0 -80 M50 30 v40 M35 45 h30" },
+  { id: "light-track", name: "Track Light", category: "electrical", defaultWidth: 4, defaultHeight: 0.5, viewBox: "0 0 100 100", svgPath: "M5 40 h90 v20 h-90 z M20 30 a10 10 0 1 1 0 1 M50 30 a10 10 0 1 1 0 1 M80 30 a10 10 0 1 1 0 1" },
+  { id: "ceiling-fan", name: "Ceiling Fan", category: "electrical", defaultWidth: 3, defaultHeight: 3, viewBox: "0 0 100 100", svgPath: "M50 10 a40 40 0 1 1 0 80 a40 40 0 1 1 0 -80 M50 50 l-35 -20 M50 50 l35 -20 M50 50 l-35 20 M50 50 l35 20 M50 40 a10 10 0 1 1 0 20 a10 10 0 1 1 0 -20" },
+  { id: "smoke-detector", name: "Smoke Detector", category: "electrical", defaultWidth: 0.8, defaultHeight: 0.8, viewBox: "0 0 100 100", svgPath: "M50 10 a40 40 0 1 1 0 80 a40 40 0 1 1 0 -80 M30 40 a10 10 0 0 1 15 15 M42 32 a20 20 0 0 1 25 25" },
+  { id: "thermostat", name: "Thermostat", category: "electrical", defaultWidth: 0.8, defaultHeight: 0.8, viewBox: "0 0 100 100", svgPath: "M20 10 h60 v80 h-60 z M50 30 a15 15 0 1 1 0 30 a15 15 0 1 1 0 -30 M50 25 v-10 M50 65 v10 M30 45 h-5 M70 45 h5" },
+  { id: "electrical-panel", name: "Electrical Panel", category: "electrical", defaultWidth: 1.5, defaultHeight: 2.5, viewBox: "0 0 100 100", svgPath: "M10 5 h80 v90 h-80 z M15 15 h70 v25 h-70 z M15 45 h70 v25 h-70 z M40 78 h20 v10 h-20 z" },
 ];
 
 export const FURNITURE_CATEGORIES: { id: FurnitureCategory; label: string }[] = [
@@ -87,6 +121,8 @@ export const FURNITURE_CATEGORIES: { id: FurnitureCategory; label: string }[] = 
   { id: "bathroom", label: "Bathroom" },
   { id: "office", label: "Office" },
   { id: "outdoor", label: "Outdoor" },
+  { id: "doors-windows", label: "Doors/Windows" },
+  { id: "electrical", label: "Electrical" },
 ];
 
 export function getFurnitureItem(furnitureType: string): FurnitureCatalogItem | undefined {

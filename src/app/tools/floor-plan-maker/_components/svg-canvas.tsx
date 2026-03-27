@@ -17,7 +17,7 @@ import {
   getRoomPreset,
   DEFAULT_WALL_THICKNESS,
 } from "@/lib/floor-plan/constants";
-import { screenToWorld, zoomAtPoint, snapToGrid, clamp } from "@/lib/floor-plan/geometry";
+import { screenToWorld, zoomAtPoint, snapToGrid, clamp, computeAlignGuides, type AlignGuide } from "@/lib/floor-plan/geometry";
 import { GridLayer } from "./grid-layer";
 import { ElementRenderer } from "./element-renderer";
 import { ResizeHandles, type HandlePosition } from "./resize-handles";
@@ -70,6 +70,9 @@ export function SvgCanvas({ state, dispatch }: SvgCanvasProps) {
   // Wall drawing state (click start → click end)
   const [wallStart, setWallStart] = useState<{ x: number; y: number } | null>(null);
   const [wallPreview, setWallPreview] = useState<{ x: number; y: number } | null>(null);
+
+  // Alignment guides
+  const [alignGuides, setAlignGuides] = useState<AlignGuide[]>([]);
 
   // ── Get world coords from mouse event ─────────────────────
   const getWorldCoords = useCallback(
@@ -406,6 +409,27 @@ export function SvgCanvas({ state, dispatch }: SvgCanvasProps) {
           newX = snapToGrid(newX, plan.gridSize);
           newY = snapToGrid(newY, plan.gridSize);
         }
+
+        // Smart alignment guides
+        const draggedEl = plan.elements.find((el) => el.id === dragRef.current!.elementId);
+        if (draggedEl) {
+          const dragW = "width" in draggedEl ? (draggedEl as { width: number }).width : 0;
+          const dragH = "height" in draggedEl ? (draggedEl as { height: number }).height : 0;
+          const others = plan.elements
+            .filter((el) => el.id !== dragRef.current!.elementId)
+            .map((el) => ({
+              x: el.x,
+              y: el.y,
+              width: "width" in el ? (el as { width: number }).width : undefined,
+              height: "height" in el ? (el as { height: number }).height : undefined,
+            }));
+
+          const result = computeAlignGuides(newX, newY, dragW, dragH, others);
+          newX = result.x;
+          newY = result.y;
+          setAlignGuides(result.guides);
+        }
+
         dispatch({
           type: "MOVE_ELEMENT",
           payload: { id: dragRef.current.elementId, x: newX, y: newY },
@@ -474,6 +498,7 @@ export function SvgCanvas({ state, dispatch }: SvgCanvasProps) {
       if (isDraggingElement) {
         setIsDraggingElement(false);
         dragRef.current = null;
+        setAlignGuides([]);
       }
     },
     [isPanning, state.isDrawing, drawPreview, isResizing, isRotating, isDraggingElement, dispatch, plan.elements.length]
@@ -564,6 +589,20 @@ export function SvgCanvas({ state, dispatch }: SvgCanvasProps) {
           strokeWidth={1 / viewport.zoom}
         />
 
+        {/* Underlay image */}
+        {state.underlay && (
+          <image
+            href={state.underlay.dataUrl}
+            x={0}
+            y={0}
+            width={canvasW}
+            height={canvasH}
+            opacity={state.underlay.opacity}
+            preserveAspectRatio="xMidYMid meet"
+            style={{ pointerEvents: "none" }}
+          />
+        )}
+
         {/* Grid */}
         {plan.showGrid && (
           <GridLayer
@@ -616,6 +655,37 @@ export function SvgCanvas({ state, dispatch }: SvgCanvasProps) {
             rx={2 / viewport.zoom}
           />
         )}
+
+        {/* Alignment guides */}
+        {alignGuides.map((guide, i) => (
+          guide.axis === "x" ? (
+            <line
+              key={`guide-${i}`}
+              x1={guide.position * PIXELS_PER_UNIT}
+              y1={0}
+              x2={guide.position * PIXELS_PER_UNIT}
+              y2={canvasH}
+              stroke="var(--color-brand)"
+              strokeWidth={1 / viewport.zoom}
+              strokeDasharray={`${3 / viewport.zoom} ${3 / viewport.zoom}`}
+              opacity={0.7}
+              style={{ pointerEvents: "none" }}
+            />
+          ) : (
+            <line
+              key={`guide-${i}`}
+              x1={0}
+              y1={guide.position * PIXELS_PER_UNIT}
+              x2={canvasW}
+              y2={guide.position * PIXELS_PER_UNIT}
+              stroke="var(--color-brand)"
+              strokeWidth={1 / viewport.zoom}
+              strokeDasharray={`${3 / viewport.zoom} ${3 / viewport.zoom}`}
+              opacity={0.7}
+              style={{ pointerEvents: "none" }}
+            />
+          )
+        ))}
 
         {/* Wall drawing preview line */}
         {wallStart && wallPreview && (

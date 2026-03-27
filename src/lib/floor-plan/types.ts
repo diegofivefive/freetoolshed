@@ -25,7 +25,9 @@ export type FurnitureCategory =
   | "kitchen"
   | "bathroom"
   | "office"
-  | "outdoor";
+  | "outdoor"
+  | "doors-windows"
+  | "electrical";
 
 // ── Elements ─────────────────────────────────────────────────
 
@@ -112,6 +114,11 @@ export interface FloorPlan {
 
 // ── Editor state ─────────────────────────────────────────────
 
+export interface UnderlayImage {
+  dataUrl: string;
+  opacity: number;
+}
+
 export interface EditorState {
   plan: FloorPlan;
   selectedElementIds: string[];
@@ -123,6 +130,7 @@ export interface EditorState {
   isDragging: boolean;
   isDrawing: boolean;
   drawStart: { x: number; y: number } | null;
+  underlay: UnderlayImage | null;
 }
 
 // ── Reducer actions ──────────────────────────────────────────
@@ -155,7 +163,10 @@ export type FloorPlanAction =
   | { type: "LOCK_ELEMENTS"; payload: string[] }
   | { type: "UNLOCK_ELEMENTS"; payload: string[] }
   | { type: "LOAD_PLAN"; payload: FloorPlan }
-  | { type: "RESET" };
+  | { type: "RESET" }
+  | { type: "SET_UNDERLAY"; payload: UnderlayImage }
+  | { type: "SET_UNDERLAY_OPACITY"; payload: number }
+  | { type: "REMOVE_UNDERLAY" };
 
 // ── Saved plans ──────────────────────────────────────────────
 

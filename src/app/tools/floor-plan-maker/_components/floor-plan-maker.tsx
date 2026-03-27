@@ -308,6 +308,18 @@ function floorPlanReducer(
     case "RESET":
       return createDefaultEditorState();
 
+    // ── Underlay ──
+    case "SET_UNDERLAY":
+      return { ...state, underlay: action.payload };
+
+    case "SET_UNDERLAY_OPACITY":
+      return state.underlay
+        ? { ...state, underlay: { ...state.underlay, opacity: action.payload } }
+        : state;
+
+    case "REMOVE_UNDERLAY":
+      return { ...state, underlay: null };
+
     default:
       return state;
   }

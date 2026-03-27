@@ -11,6 +11,7 @@ import {
   exportAllJson,
   parseImportedJson,
 } from "@/lib/floor-plan/storage";
+import { FLOOR_PLAN_TEMPLATES } from "@/lib/floor-plan/templates";
 import {
   Save,
   FolderOpen,
@@ -20,6 +21,7 @@ import {
   Trash2,
   Copy,
   ChevronDown,
+  LayoutTemplate,
 } from "lucide-react";
 
 interface PlanManagerProps {
@@ -30,6 +32,7 @@ interface PlanManagerProps {
 export function PlanManager({ plan, dispatch }: PlanManagerProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [showLoadDialog, setShowLoadDialog] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -104,6 +107,27 @@ export function PlanManager({ plan, dispatch }: PlanManagerProps) {
   const handleLoadPlan = (loadedPlan: FloorPlan) => {
     dispatch({ type: "LOAD_PLAN", payload: loadedPlan });
     setShowLoadDialog(false);
+    setShowTemplates(false);
+    setShowMenu(false);
+  };
+
+  const handleLoadTemplate = (templateId: string) => {
+    const tpl = FLOOR_PLAN_TEMPLATES.find((t) => t.id === templateId);
+    if (!tpl) return;
+    if (plan.elements.length > 0) {
+      const confirmed = window.confirm(
+        "Load template? Your current draft is auto-saved."
+      );
+      if (!confirmed) return;
+    }
+    // Create a fresh plan with new IDs
+    const newPlan: FloorPlan = {
+      ...tpl.plan,
+      id: crypto.randomUUID(),
+      elements: tpl.plan.elements.map((el) => ({ ...el, id: crypto.randomUUID() })),
+    };
+    dispatch({ type: "LOAD_PLAN", payload: newPlan });
+    setShowTemplates(false);
     setShowMenu(false);
   };
 
@@ -125,17 +149,29 @@ export function PlanManager({ plan, dispatch }: PlanManagerProps) {
             onClick={() => {
               setShowMenu(false);
               setShowLoadDialog(false);
+              setShowTemplates(false);
             }}
           />
 
           {/* Menu */}
           <div className="absolute left-0 top-full z-50 mt-1 w-52 rounded-lg border border-border bg-card py-1 shadow-lg">
             <MenuItem icon={FilePlus} label="New Plan" onClick={handleNew} />
+            <MenuItem
+              icon={LayoutTemplate}
+              label="From Template"
+              onClick={() => {
+                setShowTemplates((prev) => !prev);
+                setShowLoadDialog(false);
+              }}
+            />
             <MenuItem icon={Save} label="Save to History" onClick={handleSave} />
             <MenuItem
               icon={FolderOpen}
               label="Load from History"
-              onClick={() => setShowLoadDialog((prev) => !prev)}
+              onClick={() => {
+                setShowLoadDialog((prev) => !prev);
+                setShowTemplates(false);
+              }}
             />
 
             <div className="my-1 h-px bg-border" />
@@ -146,6 +182,26 @@ export function PlanManager({ plan, dispatch }: PlanManagerProps) {
 
             {importError && (
               <p className="px-3 py-1 text-xs text-pink-500">{importError}</p>
+            )}
+
+            {/* Templates list */}
+            {showTemplates && (
+              <div className="max-h-60 overflow-y-auto border-t border-border">
+                {FLOOR_PLAN_TEMPLATES.map((tpl) => (
+                  <button
+                    key={tpl.id}
+                    onClick={() => handleLoadTemplate(tpl.id)}
+                    className="w-full border-b border-border px-3 py-2 text-left last:border-b-0 hover:bg-accent"
+                  >
+                    <span className="block truncate text-sm font-medium">
+                      {tpl.name}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {tpl.description}
+                    </span>
+                  </button>
+                ))}
+              </div>
             )}
 
             {/* Load dialog */}

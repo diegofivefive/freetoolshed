@@ -11,7 +11,7 @@ import {
   FURNITURE_CATEGORIES,
   getFurnitureByCategory,
 } from "@/lib/floor-plan/furniture";
-import { Sofa, Bed, CookingPot, Bath, Monitor, TreePine } from "lucide-react";
+import { Sofa, Bed, CookingPot, Bath, Monitor, TreePine, DoorOpen, Plug } from "lucide-react";
 
 interface FurniturePaletteProps {
   dispatch: Dispatch<FloorPlanAction>;
@@ -25,6 +25,8 @@ const CATEGORY_ICONS: Record<FurnitureCategory, typeof Sofa> = {
   bathroom: Bath,
   office: Monitor,
   outdoor: TreePine,
+  "doors-windows": DoorOpen,
+  electrical: Plug,
 };
 
 export function FurniturePalette({ dispatch, elementCount }: FurniturePaletteProps) {
