@@ -33,6 +33,15 @@ const TOOLS: Tool[] = [
     icon: "LayoutGrid",
     paidAlternative: "SmartDraw",
   },
+  {
+    name: "Audio Editor",
+    slug: "audio-editor",
+    description:
+      "Edit, trim, merge, and convert audio files with a visual waveform editor. Export as WAV, MP3, or OGG.",
+    category: "Media",
+    icon: "AudioLines",
+    paidAlternative: "Adobe Audition",
+  },
 ];
 
 export default function HomePage() {
