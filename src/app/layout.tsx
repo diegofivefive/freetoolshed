@@ -46,8 +46,6 @@ export const metadata: Metadata = {
   },
   other: {
     "google-adsense-account": "ca-pub-7700405385978151",
-    // Replace with your Google Search Console verification code
-    "google-site-verification": "REPLACE_WITH_VERIFICATION_CODE",
   },
 };
 

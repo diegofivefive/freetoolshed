@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Wrench } from "lucide-react";
+import { Wrench, Shield, Zap, DollarSign } from "lucide-react";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import type { Tool } from "@/types";
 
 const TOOLS: Tool[] = [
@@ -39,6 +40,7 @@ export default function HomePage() {
 
       {TOOLS.length > 0 ? (
         <section>
+          <h2 className="mb-4 text-xl font-semibold">All Tools</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {TOOLS.map((tool) => (
               <Link key={tool.slug} href={`/tools/${tool.slug}`}>
@@ -68,6 +70,93 @@ export default function HomePage() {
           </p>
         </section>
       )}
+
+      <Separator className="my-12" />
+
+      <section className="mb-12">
+        <h2 className="text-2xl font-semibold tracking-tight">
+          Why Free Tool Shed?
+        </h2>
+        <p className="mt-4 text-muted-foreground">
+          Too many essential tools hide behind paywalls, subscriptions, and mandatory
+          sign-ups. Need to generate an invoice? That&apos;ll be $15/month. Want to build
+          a resume? Hand over your email first. We think that&apos;s wrong.
+        </p>
+        <p className="mt-3 text-muted-foreground">
+          Free Tool Shed is a growing collection of browser-based tools that do the same
+          job as paid software — completely free, with no account required. Each tool is
+          built to be fast, private, and production-quality, so you never have to
+          compromise just because you&apos;re not paying.
+        </p>
+
+        <div className="mt-8 grid gap-6 sm:grid-cols-3">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2 text-brand">
+              <DollarSign className="size-5" />
+              <h3 className="font-semibold">100% Free, No Catch</h3>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              No subscriptions, no freemium limits, no &quot;free trial&quot; that expires
+              in 7 days. Our tools are ad-supported so they stay free for everyone.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2 text-brand">
+              <Shield className="size-5" />
+              <h3 className="font-semibold">Private by Design</h3>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Everything runs in your browser. Your files, data, and documents never
+              leave your device — we can&apos;t see them, and neither can anyone else.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2 text-brand">
+              <Zap className="size-5" />
+              <h3 className="font-semibold">No Sign Up Required</h3>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Just open a tool and start using it. No account creation, no email
+              verification, no onboarding flow. Your time matters.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="mb-12">
+        <h2 className="text-2xl font-semibold tracking-tight">
+          How It Works
+        </h2>
+        <p className="mt-4 text-muted-foreground">
+          Every tool on Free Tool Shed is a standalone web application that runs entirely
+          in your browser. When you create an invoice, build a resume, or use any of our
+          tools, the processing happens on your machine using modern web technologies
+          like WebAssembly and the Web Audio API. There are no servers storing your data
+          and no cloud accounts to manage.
+        </p>
+        <p className="mt-3 text-muted-foreground">
+          Your work is automatically saved to your browser&apos;s local storage so you
+          can pick up where you left off. When you&apos;re ready, export your finished
+          work as a PDF or other standard format — the file goes straight to your
+          device.
+        </p>
+      </section>
+
+      <section className="mb-4">
+        <h2 className="text-2xl font-semibold tracking-tight">
+          More Tools on the Way
+        </h2>
+        <p className="mt-4 text-muted-foreground">
+          We&apos;re actively building new tools and adding them regularly. From document
+          editors and image converters to calculators and data formatters — if there&apos;s a
+          paid tool that should be free, we&apos;re working on it. Bookmark this page and
+          check back soon, or{" "}
+          <Link href="/contact" className="text-brand underline underline-offset-4">
+            let us know
+          </Link>{" "}
+          which tool you&apos;d like to see next.
+        </p>
+      </section>
     </main>
   );
 }

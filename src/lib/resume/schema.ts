@@ -116,7 +116,7 @@ const resumeSectionSchema = z.discriminatedUnion("type", [
 ]);
 
 const settingsSchema = z.object({
-  template: z.enum(["modern", "classic", "professional", "minimal"]),
+  template: z.enum(["modern", "classic", "professional", "minimal", "executive", "creative", "compact", "elegant", "bold", "technical", "columns", "timeline"]),
   accentColor: z.string(),
   fontFamily: z.enum(["helvetica", "times", "courier"]),
   dateFormat: z.enum(["MM/YYYY", "Month YYYY", "YYYY"]).default("Month YYYY"),
