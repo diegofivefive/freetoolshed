@@ -11,6 +11,80 @@ import type {
 import { createDefaultInvoiceData } from "@/lib/invoice/constants";
 import { calculateInvoice } from "@/lib/invoice/calculations";
 import { saveDraft, loadDraft, getNextInvoiceNumber, loadDefaults } from "@/lib/invoice/storage";
+import { ToolGuide } from "@/components/shared/tool-guide";
+import type { ToolGuideSection } from "@/components/shared/tool-guide";
+
+const INVOICE_GUIDE_SECTIONS: ToolGuideSection[] = [
+  {
+    title: "Getting Started",
+    content:
+      "Fill in your company details and client information in the Details tab. Set the invoice number, date, and payment terms. The due date calculates automatically based on your payment terms.",
+    steps: [
+      "Enter your company name, address, and contact info",
+      "Add your client's name and details",
+      "Set invoice number, date, and payment terms",
+      "Move to the Items tab to add line items",
+    ],
+  },
+  {
+    title: "Adding Line Items",
+    content:
+      "Each line item has a description, quantity, unit type, and unit price. Toggle the tax checkbox per item to control which items are taxed. You must have at least one line item.",
+    steps: [
+      "Click \"Add Item\" to add a new line",
+      "Choose a unit type: Item, Hour, Day, Unit, or Service",
+      "Enable/disable tax per item with the tax checkbox",
+      "Amounts calculate automatically (qty × price)",
+    ],
+  },
+  {
+    title: "Tax & Discounts",
+    content:
+      "Set a tax rate percentage in the summary section — it applies only to line items with tax enabled. Add a discount as a percentage or flat amount.",
+    steps: [
+      "Tax rate applies to items with the tax checkbox on",
+      "Toggle discount between % and flat currency",
+      "Grand total = subtotal + tax - discount",
+    ],
+  },
+  {
+    title: "Templates & Styling",
+    content:
+      "Switch between three PDF templates in the Style tab. Customize the accent color, upload your logo, and choose a date format.",
+    steps: [
+      "Modern — clean, minimal with whitespace",
+      "Classic — traditional with full borders",
+      "Compact — dense layout for many line items",
+      "Pick from 8 preset colors or enter a custom hex",
+    ],
+  },
+  {
+    title: "Notes & Payment",
+    content:
+      "Add a memo, terms & conditions, and a payment link (Stripe, PayPal, etc.) in the Notes tab. Set the invoice status to Draft, Sent, Paid, or Overdue.",
+  },
+  {
+    title: "Export & Print",
+    content:
+      "Download as PDF or print directly from the browser. The filename is auto-generated from the invoice number and client name. Both company name and client name are required to export.",
+  },
+  {
+    title: "Saving & History",
+    content:
+      "Your invoice auto-saves as you type. Use the History panel to save snapshots, duplicate past invoices, or export/import as JSON. Save your company info as defaults for future invoices.",
+    steps: [
+      "Auto-saves every second to localStorage",
+      "History panel: save, load, duplicate, or delete invoices",
+      "Export single invoice or all invoices as JSON",
+      "\"Save Company as Default\" pre-fills future invoices",
+    ],
+  },
+  {
+    title: "Multi-Currency",
+    content:
+      "Choose from 20 currencies in the Details tab. Amounts format automatically with the correct symbol and decimal places (e.g., JPY and KRW use no decimals).",
+  },
+];
 
 function invoiceReducer(
   state: InvoiceData,
@@ -137,6 +211,7 @@ export function InvoiceGenerator() {
   }, []);
 
   return (
+    <>
     <div className="flex gap-6">
       {/* Form */}
       <div className="min-w-0 flex-1">
@@ -165,5 +240,7 @@ export function InvoiceGenerator() {
         </div>
       </div>
     </div>
+    <ToolGuide sections={INVOICE_GUIDE_SECTIONS} />
+    </>
   );
 }

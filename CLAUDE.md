@@ -149,9 +149,10 @@ When the user asks to build a new tool, create a plan (use EnterPlanMode) that b
 5. **Secondary Features** — Supporting features (e.g., templates, settings, customization)
 6. **Export/Output** — PDF generation, file download, print, copy-to-clipboard
 7. **Persistence** — localStorage auto-save, history/versioning, JSON import/export
-8. **SEO Content** — Full seo-content.tsx (intro, features list, how-to steps, comparison table, FAQ)
-9. **Integration** — Add to TOOLS array in `page.tsx`, add to `sitemap.ts`, verify build passes
-10. **Review & Polish** — Final check: no `any` types, no `console.log`, pink for errors, all patterns followed
+8. **Tool Guide** — Add `<ToolGuide>` with tool-specific sections (see Tool Guide section below)
+9. **SEO Content** — Full seo-content.tsx (intro, features list, how-to steps, comparison table, FAQ)
+10. **Integration** — Add to TOOLS array in `page.tsx`, add to `sitemap.ts`, verify build passes
+11. **Review & Polish** — Final check: no `any` types, no `console.log`, pink for errors, all patterns followed
 
 ### Tool Page Structure (follow for ALL tools)
 ```
@@ -251,13 +252,70 @@ export function ToolNameLoader() {
 }
 ```
 
-### Integration Checklist (Stage 9)
+### Tool Guide (Stage 8)
+
+Every tool MUST include a `<ToolGuide>` that renders in the right sidebar below the ad. The guide is always visible on desktop (lg+) and disappears with the sidebar on narrow viewports.
+
+#### How it works
+- `src/app/tools/layout.tsx` has a `<div id="tool-guide-portal" />` in the sidebar
+- `<ToolGuide>` (from `@/components/shared/tool-guide`) uses `createPortal` to render into that div
+- The guide scrolls independently with `maxHeight: calc(100vh - 5rem - 250px - 3rem)`
+
+#### Adding a guide to a tool
+1. Import `ToolGuide` and `ToolGuideSection` in the main tool component:
+```tsx
+import { ToolGuide } from "@/components/shared/tool-guide";
+import type { ToolGuideSection } from "@/components/shared/tool-guide";
+```
+
+2. Define guide sections as a module-level constant:
+```tsx
+const TOOL_GUIDE_SECTIONS: ToolGuideSection[] = [
+  {
+    title: "Getting Started",
+    content: "Brief description of how to begin using the tool.",
+    steps: ["Step 1", "Step 2", "Step 3"],
+  },
+  {
+    title: "Section Name",
+    content: "Description of this feature area.",
+    steps: ["Optional numbered steps"],
+  },
+  // Add 4-8 sections covering all major features
+];
+```
+
+3. Render `<ToolGuide>` in EVERY return path of the component (including upload/empty states):
+```tsx
+return (
+  <>
+    {/* ... tool UI ... */}
+    <ToolGuide sections={TOOL_GUIDE_SECTIONS} />
+  </>
+);
+```
+
+#### Guide content guidelines
+- **5-8 sections** per tool covering: getting started, main features, keyboard shortcuts (if any), export/output
+- Section titles render as **uppercase brand-green headings** with divider lines between sections
+- Content text is muted with relaxed line height
+- Steps are optional numbered lists for procedural instructions
+- Keep descriptions concise — the sidebar is 300px wide
+
+#### Styling (handled by `tool-guide.tsx`, do NOT override)
+- Section titles: `text-xs font-semibold uppercase tracking-wider text-brand`
+- Section dividers: `border-t border-border pt-4`
+- Header: `border-b border-brand/30 pb-2`
+- Content: `text-sm leading-relaxed text-muted-foreground`
+
+### Integration Checklist (Stage 10)
 1. Add entry to `TOOLS` array in `src/app/page.tsx` (name, slug, description, category, icon, paidAlternative)
 2. Add entry to `toolPages` in `src/app/sitemap.ts` (priority 0.8, weekly changeFrequency)
 3. Ensure `page.tsx` includes mid-content `<AdSlot>` between tool and SEO content
 4. Ensure `seo-content.tsx` has: intro paragraph, feature list, how-to steps, comparison table, FAQ
-5. Run `pnpm build` — must pass with zero errors
-6. Verify in dev preview: tool loads, ad placeholders visible, no console errors
+5. Ensure `<ToolGuide>` is rendered in all return paths of the main tool component
+6. Run `pnpm build` — must pass with zero errors
+7. Verify in dev preview: tool loads, ad placeholders visible, guide visible in sidebar, no console errors
 
 ---
 
@@ -291,6 +349,7 @@ When the user says **"create brief"**, generate a standalone markdown document t
 - [ ] Added to sitemap.ts
 - [ ] page.tsx has mid-content AdSlot
 - [ ] seo-content.tsx complete
+- [ ] ToolGuide added with 5-8 sections
 - [ ] Build passes (pnpm build)
 - [ ] Preview verified
 

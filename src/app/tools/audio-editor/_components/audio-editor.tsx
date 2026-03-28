@@ -45,7 +45,6 @@ import { EffectsPanel } from "./effects-panel";
 import { ExportPanel } from "./export-panel";
 import { loadPrefs, savePrefs } from "@/lib/audio/storage";
 import { ToolGuide } from "@/components/shared/tool-guide";
-import { ToolGuideButton } from "@/components/shared/tool-guide-button";
 import type { ToolGuideSection } from "@/components/shared/tool-guide";
 
 const AUDIO_GUIDE_SECTIONS: ToolGuideSection[] = [
@@ -148,7 +147,6 @@ export function AudioEditor() {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [recordMode, setRecordMode] = useState<"new" | "append">("new");
-  const [guideOpen, setGuideOpen] = useState(false);
 
   // Keep looping ref in sync with state
   useEffect(() => {
@@ -635,6 +633,7 @@ export function AudioEditor() {
     }
 
     return (
+      <>
       <div
         onDrop={handleDrop}
         onDragOver={handleDragOver}
@@ -676,6 +675,8 @@ export function AudioEditor() {
           className="hidden"
         />
       </div>
+      <ToolGuide sections={AUDIO_GUIDE_SECTIONS} />
+    </>
     );
   }
 
@@ -901,11 +902,6 @@ export function AudioEditor() {
           )}
         </div>
 
-        <Separator orientation="vertical" className="mx-1 h-6" />
-        <ToolGuideButton
-          isOpen={guideOpen}
-          onToggle={() => setGuideOpen((o) => !o)}
-        />
       </div>
 
       {/* Waveform area */}
@@ -977,11 +973,7 @@ export function AudioEditor() {
       </div>
     </div>
 
-    <ToolGuide
-      sections={AUDIO_GUIDE_SECTIONS}
-      isOpen={guideOpen}
-      onToggle={() => setGuideOpen((o) => !o)}
-    />
+    <ToolGuide sections={AUDIO_GUIDE_SECTIONS} />
   </>
   );
 }

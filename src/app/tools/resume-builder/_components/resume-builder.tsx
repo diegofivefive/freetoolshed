@@ -6,6 +6,87 @@ import { ResumePreview } from "./resume-preview";
 import type { ResumeData, ResumeAction, ResumeSection } from "@/lib/resume/types";
 import { createDefaultResumeData, createEmptySection, createEmptySectionItem } from "@/lib/resume/constants";
 import { saveDraft, loadDraft, loadDefaults } from "@/lib/resume/storage";
+import { ToolGuide } from "@/components/shared/tool-guide";
+import type { ToolGuideSection } from "@/components/shared/tool-guide";
+
+const RESUME_GUIDE_SECTIONS: ToolGuideSection[] = [
+  {
+    title: "Getting Started",
+    content:
+      "Start in the Content tab with your personal information — name, title, email, phone, and location. Then fill in each section below. Your resume auto-saves as you type.",
+    steps: [
+      "Fill in your personal details at the top",
+      "Add a professional summary",
+      "Add work experience, education, and skills",
+      "Choose a template and customize in the Style tab",
+      "Download as PDF when ready",
+    ],
+  },
+  {
+    title: "Managing Sections",
+    content:
+      "Use the Sections tab to control which sections appear on your resume. Drag to reorder, toggle visibility, or add new sections. Hidden sections keep their data — just toggle them back on.",
+    steps: [
+      "Drag the handle to reorder sections",
+      "Toggle the eye icon to show/hide a section",
+      "Click \"Add Section\" for optional sections like certifications or languages",
+      "Create custom sections with your own titles",
+      "Core sections (Summary, Experience, Education, Skills) can be hidden but not deleted",
+    ],
+  },
+  {
+    title: "Templates & Styling",
+    content:
+      "Choose from 12 professionally designed templates in the Style tab. Each can be customized with your brand color, font, spacing, and margins.",
+    steps: [
+      "12 templates: Modern, Classic, Professional, Minimal, Executive, Creative, Compact, Elegant, Bold, Technical, Columns, Timeline",
+      "8 accent color presets or custom hex color",
+      "3 font families: Sans-Serif, Serif, Monospace",
+      "Adjustable font size, margins, section spacing, and line spacing",
+    ],
+  },
+  {
+    title: "ATS Keyword Checker",
+    content:
+      "Paste a job description in the ATS tab to see how well your resume matches. The checker extracts keywords and shows which ones you're missing.",
+    steps: [
+      "Paste the full job description text",
+      "Click \"Analyze Match\" to run the check",
+      "Green (70%+) = strong match",
+      "Amber (40-69%) = moderate — add missing keywords",
+      "Pink (<40%) = weak — review missing keywords list",
+      "Results update live as you edit your resume",
+    ],
+  },
+  {
+    title: "Work Experience Tips",
+    content:
+      "Each experience entry supports multiple bullet points. Check \"Current Role\" to auto-set the end date to \"Present\". Use the rich text toolbar for bold, italic, and links.",
+    steps: [
+      "Click \"Add Item\" to add a new position",
+      "Add/remove bullet points within each entry",
+      "Check \"Current Role\" for your present job",
+      "Rich text: bold, italic, underline, and links supported",
+    ],
+  },
+  {
+    title: "Export & Print",
+    content:
+      "Download your resume as a PDF or print directly. Your full name is required to export. The filename auto-generates as Resume-FirstName_LastName.pdf.",
+  },
+  {
+    title: "Saving & History",
+    content:
+      "Your current resume auto-saves every second. Use History to save named snapshots, duplicate resumes for different jobs, or export/import as JSON backups.",
+    steps: [
+      "Auto-saves draft to localStorage continuously",
+      "Save named snapshots in History",
+      "Duplicate a saved resume to tailor for different jobs",
+      "Export/import as JSON for backup or transfer",
+      "\"Save Defaults\" stores your preferred template and style settings",
+    ],
+  },
+];
 
 function resumeReducer(state: ResumeData, action: ResumeAction): ResumeData {
   switch (action.type) {
@@ -170,6 +251,7 @@ export function ResumeBuilder() {
   }, []);
 
   return (
+    <>
     <div className="flex gap-6">
       {/* Form */}
       <div className="min-w-0 flex-1">
@@ -197,5 +279,7 @@ export function ResumeBuilder() {
         </div>
       </div>
     </div>
+    <ToolGuide sections={RESUME_GUIDE_SECTIONS} />
+    </>
   );
 }

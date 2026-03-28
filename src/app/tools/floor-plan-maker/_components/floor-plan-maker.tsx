@@ -24,6 +24,101 @@ import { PlanManager } from "./plan-manager";
 import { ExportPanel } from "./export-panel";
 import { Input } from "@/components/ui/input";
 import { Undo2, Redo2, Download } from "lucide-react";
+import { ToolGuide } from "@/components/shared/tool-guide";
+import type { ToolGuideSection } from "@/components/shared/tool-guide";
+
+const FLOOR_PLAN_GUIDE_SECTIONS: ToolGuideSection[] = [
+  {
+    title: "Getting Started",
+    content:
+      "Use the toolbar on the left to switch between drawing tools. Click the canvas to place elements. Your plan auto-saves as you work.",
+    steps: [
+      "V — Select tool: click elements to move, resize, or rotate",
+      "R — Room tool: drag on the canvas to draw a room",
+      "W — Wall tool: click to set start and end points",
+      "T — Text tool: click to place a text label",
+      "F — Toggle the furniture palette",
+    ],
+  },
+  {
+    title: "Drawing Rooms",
+    content:
+      "Select the Room tool (R) and drag on the canvas to draw a rectangular room. Choose from 11 preset room types (living room, bedroom, kitchen, etc.) in the properties panel. Each preset has a default color and size.",
+    steps: [
+      "Drag to draw, then adjust size in properties",
+      "Change room type via the dropdown to update color and label",
+      "Rooms display their name, dimensions, and area automatically",
+      "Toggle \"Show Dimensions\" in plan settings to control labels",
+    ],
+  },
+  {
+    title: "Furniture & Fixtures",
+    content:
+      "Press F or click the furniture icon to open the catalog. Browse 115 items across 8 categories. Click any item to place it on the canvas.",
+    steps: [
+      "Living: sofas, chairs, tables, rugs, fireplace",
+      "Bedroom: beds (king to single), nightstands, dressers",
+      "Kitchen: counters, island, appliances, stools",
+      "Bathroom: toilet, tub, shower, vanity",
+      "Office: desks, chairs, filing, whiteboard",
+      "Outdoor: tables, grill, planters, hot tub",
+      "Doors/Windows: 8 door types + 4 window types",
+      "Electrical: outlets, switches, lights, panel",
+    ],
+  },
+  {
+    title: "Walls & Text",
+    content:
+      "Use the Wall tool (W) to draw walls between two points — walls snap to horizontal or vertical if close. Use the Text tool (T) to add labels and annotations anywhere on the canvas.",
+    steps: [
+      "Walls: click start point, then click end point",
+      "Adjust wall thickness and color in properties",
+      "Text: set font size (8–72), weight, and color",
+    ],
+  },
+  {
+    title: "Selection & Editing",
+    content:
+      "Click an element to select it. Shift+click for multi-select. Drag to move, use handles to resize, or rotate via the rotation handle. Lock elements to prevent accidental changes.",
+    steps: [
+      "Drag corners or edges to resize",
+      "Rotation snaps to 15° increments",
+      "Bring to Front / Send to Back to control layering",
+      "Ctrl+C / Ctrl+V to copy and paste (offset by 1 unit)",
+      "Ctrl+Z / Ctrl+Y for undo and redo (50 steps)",
+      "Delete or Backspace to remove selected elements",
+      "Escape to deselect all",
+    ],
+  },
+  {
+    title: "Grid & Measurements",
+    content:
+      "Configure the grid and measurement units in the properties panel (when nothing is selected). Choose feet or meters, adjust grid size, and toggle snap-to-grid for precise placement.",
+    steps: [
+      "Grid sizes: 0.5, 1, 2, or 5 units",
+      "Snap to Grid for precise alignment",
+      "Feet display as 5'-6\", meters as 2.50 m",
+      "Alignment guides appear when moving near other elements",
+    ],
+  },
+  {
+    title: "Blueprint Underlay",
+    content:
+      "Upload an existing floor plan image (PNG, JPEG, WebP) as a background to trace over. Adjust the opacity to see your drawing on top.",
+  },
+  {
+    title: "Export & File Management",
+    content:
+      "Export your plan as SVG (vector), PNG (raster at 1x/2x/4x resolution), or PDF (Letter or A4). Save plans to history, load templates, or backup/import as JSON.",
+    steps: [
+      "SVG — scalable vector, lossless quality",
+      "PNG — choose 1x, 2x, or 4x resolution",
+      "PDF — auto-orientation, fits to page with header",
+      "Optionally include grid and dimensions in exports",
+      "File menu: New, Templates, Save, Load, Export/Import JSON",
+    ],
+  },
+];
 
 // ── Helpers ─────────────────────────────────────────────────
 
@@ -410,6 +505,7 @@ export function FloorPlanMaker() {
   );
 
   return (
+    <>
     <div className="flex h-[calc(100vh-16rem)] min-h-[500px] flex-col rounded-lg border border-border bg-card">
       {/* Top bar */}
       <div className="flex items-center gap-2 border-b border-border px-3 py-2">
@@ -519,5 +615,7 @@ export function FloorPlanMaker() {
         />
       </div>
     </div>
+    <ToolGuide sections={FLOOR_PLAN_GUIDE_SECTIONS} />
+    </>
   );
 }
