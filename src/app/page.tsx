@@ -32,6 +32,7 @@ const TOOLS: Tool[] = [
     category: "Design",
     icon: "LayoutGrid",
     paidAlternative: "SmartDraw",
+    badge: "Under Construction",
   },
   {
     name: "Audio Editor",
@@ -62,7 +63,14 @@ export default function HomePage() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {TOOLS.map((tool) => (
               <Link key={tool.slug} href={`/tools/${tool.slug}`}>
-                <Card className="h-full transition-colors hover:border-brand/50 hover:bg-muted/50">
+                <Card className="relative h-full overflow-hidden transition-colors hover:border-brand/50 hover:bg-muted/50">
+                  {tool.badge && (
+                    <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+                      <span className="-rotate-12 rounded-md border-2 border-brand/60 px-4 py-1.5 text-lg font-bold uppercase tracking-wider text-brand/60">
+                        {tool.badge}
+                      </span>
+                    </div>
+                  )}
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-base">{tool.name}</CardTitle>

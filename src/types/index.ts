@@ -5,6 +5,7 @@ export interface Tool {
   category: string;
   icon: string;
   paidAlternative?: string;
+  badge?: string;
 }
 
 export interface ToolCategory {
