@@ -43,6 +43,15 @@ const TOOLS: Tool[] = [
     icon: "AudioLines",
     paidAlternative: "Adobe Audition",
   },
+  {
+    name: "Flowchart Maker",
+    slug: "flowchart-maker",
+    description:
+      "Create flowcharts, process diagrams, and decision trees with smart connection routing. Export as SVG, PNG, or PDF.",
+    category: "Design",
+    icon: "GitBranch",
+    paidAlternative: "Lucidchart",
+  },
 ];
 
 export default function HomePage() {
