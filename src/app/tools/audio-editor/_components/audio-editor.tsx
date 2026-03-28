@@ -44,6 +44,81 @@ import { Waveform } from "./waveform";
 import { EffectsPanel } from "./effects-panel";
 import { ExportPanel } from "./export-panel";
 import { loadPrefs, savePrefs } from "@/lib/audio/storage";
+import { ToolGuide } from "@/components/shared/tool-guide";
+import { ToolGuideButton } from "@/components/shared/tool-guide-button";
+import type { ToolGuideSection } from "@/components/shared/tool-guide";
+
+const AUDIO_GUIDE_SECTIONS: ToolGuideSection[] = [
+  {
+    title: "Getting Started",
+    content:
+      "Drop an audio file onto the editor or click the upload area to browse. Supports MP3, WAV, OGG, AAC, FLAC, and WebM formats.",
+    steps: [
+      "Import an audio file or record from your microphone",
+      "Use the waveform to navigate and select regions",
+      "Apply effects, trim, or edit your audio",
+      "Export in your preferred format",
+    ],
+  },
+  {
+    title: "Selection & Navigation",
+    content:
+      "Click and drag on the waveform to select a region. Effects and operations like trim, delete, and silence apply to the selected region. If nothing is selected, effects apply to the entire track.",
+    steps: [
+      "Click + drag on the waveform to select a region",
+      "Use the minimap below the waveform to navigate long files",
+      "Scroll to pan, or use +/- to zoom in and out",
+    ],
+  },
+  {
+    title: "Keyboard Shortcuts",
+    content: "Speed up your workflow with these shortcuts:",
+    steps: [
+      "Space — Play / Pause",
+      "T — Trim to selection",
+      "Delete — Delete selection",
+      "L — Toggle loop playback",
+      "Ctrl+Z — Undo",
+      "Ctrl+Y — Redo",
+      "+ / - — Zoom in / out",
+    ],
+  },
+  {
+    title: "Effects",
+    content:
+      "Apply effects to the entire track or just a selection. Each effect can be undone. The effects bar shows which region will be affected.",
+    steps: [
+      "Fade In / Fade Out — Gradual volume ramp",
+      "Normalize — Boost volume to peak level",
+      "Reverse — Flip audio backwards",
+      "Amplify — Multiply volume by a gain factor",
+      "Denoise — Reduce background noise (0–1 strength)",
+      "Speed — Change playback speed and pitch",
+      "EQ — Apply preset or custom frequency adjustments",
+      "Compress — Apply dynamics compression",
+    ],
+  },
+  {
+    title: "EQ (Equalizer)",
+    content:
+      "Choose a preset from the dropdown, or select \"Custom...\" to fine-tune a specific frequency band.",
+    steps: [
+      "Frequency (Hz) — The center frequency to boost or cut",
+      "Gain (dB) — How much to boost (+) or cut (-)",
+      "Q factor — Bandwidth: higher = narrower, more surgical",
+    ],
+  },
+  {
+    title: "Recording",
+    content:
+      "Click the microphone icon to record from your device. Choose \"replace\" to start fresh or \"append\" to add to existing audio.",
+  },
+  {
+    title: "Export",
+    content:
+      "Choose your output format (WAV, MP3, or OGG) and bitrate, then click Download. WAV is lossless; MP3 and OGG are compressed for smaller files.",
+  },
+];
 
 function getInitialState() {
   const prefs = loadPrefs();
@@ -73,6 +148,7 @@ export function AudioEditor() {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [recordMode, setRecordMode] = useState<"new" | "append">("new");
+  const [guideOpen, setGuideOpen] = useState(false);
 
   // Keep looping ref in sync with state
   useEffect(() => {
@@ -605,6 +681,7 @@ export function AudioEditor() {
 
   // Track loaded — show editor
   return (
+    <>
     <div className="flex flex-col gap-3 rounded-lg border border-border bg-card">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-1 border-b border-border px-3 py-2">
@@ -823,6 +900,12 @@ export function AudioEditor() {
             </>
           )}
         </div>
+
+        <Separator orientation="vertical" className="mx-1 h-6" />
+        <ToolGuideButton
+          isOpen={guideOpen}
+          onToggle={() => setGuideOpen((o) => !o)}
+        />
       </div>
 
       {/* Waveform area */}
@@ -893,5 +976,12 @@ export function AudioEditor() {
         </div>
       </div>
     </div>
+
+    <ToolGuide
+      sections={AUDIO_GUIDE_SECTIONS}
+      isOpen={guideOpen}
+      onToggle={() => setGuideOpen((o) => !o)}
+    />
+  </>
   );
 }

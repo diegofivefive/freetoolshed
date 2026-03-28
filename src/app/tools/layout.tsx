@@ -11,6 +11,7 @@ export default function ToolsLayout({
       <aside className="hidden w-[300px] shrink-0 lg:block">
         <div className="sticky top-20">
           <AdSlot slot="sidebar" />
+          <div id="tool-guide-portal" />
         </div>
       </aside>
     </div>
