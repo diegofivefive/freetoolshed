@@ -26,28 +26,31 @@ export const EdgeRenderer = memo(function EdgeRenderer({
   const activeColor = isSelected ? "var(--color-brand)" : edge.style.stroke;
   const markerId = `fc-edge-${edge.id.slice(0, 8)}`;
 
-  // Scale marker size relative to stroke width so arrowheads integrate
-  const baseMarkerSize = Math.max(6, 10 - edge.style.strokeWidth * 0.5);
+  // Marker pixel size scales with stroke width for proportional arrows.
+  // Using userSpaceOnUse so sizes are in absolute pixels — no gap.
+  const sw = edge.style.strokeWidth;
+  const markerPx = Math.max(10, sw * 4);
 
   return (
     <g data-edge-id={edge.id}>
-      {/* Per-edge marker defs so color always matches the edge stroke */}
+      {/* Per-edge marker defs — userSpaceOnUse for seamless line integration */}
       <defs>
         {/* Arrow (open) */}
         <marker
           id={`${markerId}-arrow`}
-          viewBox="0 0 12 12"
-          refX="10"
-          refY="6"
-          markerWidth={baseMarkerSize}
-          markerHeight={baseMarkerSize}
+          viewBox="0 0 10 10"
+          refX="9"
+          refY="5"
+          markerWidth={markerPx}
+          markerHeight={markerPx}
+          markerUnits="userSpaceOnUse"
           orient="auto-start-reverse"
         >
           <path
-            d="M 2 2 L 10 6 L 2 10"
+            d="M 1 1.5 L 9 5 L 1 8.5"
             fill="none"
             stroke={activeColor}
-            strokeWidth="1.5"
+            strokeWidth="1.2"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
@@ -56,40 +59,43 @@ export const EdgeRenderer = memo(function EdgeRenderer({
         {/* Filled arrow */}
         <marker
           id={`${markerId}-filled-arrow`}
-          viewBox="0 0 12 12"
-          refX="10"
-          refY="6"
-          markerWidth={baseMarkerSize}
-          markerHeight={baseMarkerSize}
+          viewBox="0 0 10 10"
+          refX="9"
+          refY="5"
+          markerWidth={markerPx}
+          markerHeight={markerPx}
+          markerUnits="userSpaceOnUse"
           orient="auto-start-reverse"
         >
-          <path d="M 2 2 L 10 6 L 2 10 Z" fill={activeColor} />
+          <path d="M 1 1.5 L 9 5 L 1 8.5 Z" fill={activeColor} />
         </marker>
 
         {/* Diamond */}
         <marker
           id={`${markerId}-diamond`}
-          viewBox="0 0 12 12"
-          refX="6"
-          refY="6"
-          markerWidth={baseMarkerSize}
-          markerHeight={baseMarkerSize}
+          viewBox="0 0 10 10"
+          refX="5"
+          refY="5"
+          markerWidth={markerPx}
+          markerHeight={markerPx}
+          markerUnits="userSpaceOnUse"
           orient="auto-start-reverse"
         >
-          <path d="M 1 6 L 6 2 L 11 6 L 6 10 Z" fill={activeColor} />
+          <path d="M 0 5 L 5 1 L 10 5 L 5 9 Z" fill={activeColor} />
         </marker>
 
         {/* Circle */}
         <marker
           id={`${markerId}-circle`}
-          viewBox="0 0 12 12"
-          refX="6"
-          refY="6"
-          markerWidth={baseMarkerSize}
-          markerHeight={baseMarkerSize}
+          viewBox="0 0 10 10"
+          refX="5"
+          refY="5"
+          markerWidth={markerPx}
+          markerHeight={markerPx}
+          markerUnits="userSpaceOnUse"
           orient="auto-start-reverse"
         >
-          <circle cx="6" cy="6" r="4" fill={activeColor} />
+          <circle cx="5" cy="5" r="4" fill={activeColor} />
         </marker>
       </defs>
 
@@ -192,17 +198,18 @@ export function ArrowMarkerDefs() {
 
   return (
     <defs>
-      {/* Only need a selected-color filled arrow for the draft connection line */}
+      {/* Draft connection line arrow — userSpaceOnUse, fixed 10px */}
       <marker
         id="fc-arrow-filled-arrow-selected"
-        viewBox="0 0 12 12"
-        refX="10"
-        refY="6"
-        markerWidth="8"
-        markerHeight="8"
+        viewBox="0 0 10 10"
+        refX="9"
+        refY="5"
+        markerWidth="10"
+        markerHeight="10"
+        markerUnits="userSpaceOnUse"
         orient="auto-start-reverse"
       >
-        <path d="M 2 2 L 10 6 L 2 10 Z" fill={selectedColor} />
+        <path d="M 1 1.5 L 9 5 L 1 8.5 Z" fill={selectedColor} />
       </marker>
     </defs>
   );
