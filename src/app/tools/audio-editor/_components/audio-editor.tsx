@@ -86,8 +86,14 @@ export function AudioEditor() {
     return audioContextRef.current;
   }, []);
 
+  const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500 MB
+
   const handleFileSelect = useCallback(
     async (file: File) => {
+      if (file.size > MAX_FILE_SIZE) {
+        alert(`File too large (${Math.round(file.size / 1024 / 1024)} MB). Maximum is 500 MB.`);
+        return;
+      }
       try {
         dispatch({ type: "SET_PROCESSING", payload: true });
         const arrayBuffer = await file.arrayBuffer();

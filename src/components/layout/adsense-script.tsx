@@ -10,7 +10,7 @@ export function AdSenseScript() {
       async
       src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${CLIENT_ID}`}
       crossOrigin="anonymous"
-      strategy="beforeInteractive"
+      strategy="afterInteractive"
     />
   );
 }

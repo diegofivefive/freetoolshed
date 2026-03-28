@@ -585,7 +585,7 @@ export function SvgCanvas({ state, dispatch }: SvgCanvasProps) {
           width={canvasW}
           height={canvasH}
           fill={plan.backgroundColor}
-          stroke="var(--color-border)"
+          stroke="rgba(0,0,0,0.3)"
           strokeWidth={1 / viewport.zoom}
         />
 

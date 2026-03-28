@@ -11,8 +11,12 @@ export function GridLayer({ width, height, gridSize, zoom }: GridLayerProps) {
   const majorInterval = 5;
   const strokeWidth = 1 / zoom;
 
+  // Use a fixed color that's visible on the white artboard background
+  const gridColor = "rgba(0,0,0,0.15)";
+  const majorGridColor = "rgba(0,0,0,0.25)";
+
   return (
-    <g>
+    <g style={{ pointerEvents: "none" }}>
       {/* Minor grid lines */}
       <defs>
         <pattern
@@ -26,18 +30,16 @@ export function GridLayer({ width, height, gridSize, zoom }: GridLayerProps) {
             y1={0}
             x2={gridSize}
             y2={gridSize}
-            stroke="var(--color-border)"
+            stroke={gridColor}
             strokeWidth={strokeWidth}
-            opacity={0.3}
           />
           <line
             x1={0}
             y1={gridSize}
             x2={gridSize}
             y2={gridSize}
-            stroke="var(--color-border)"
+            stroke={gridColor}
             strokeWidth={strokeWidth}
-            opacity={0.3}
           />
         </pattern>
 
@@ -58,18 +60,16 @@ export function GridLayer({ width, height, gridSize, zoom }: GridLayerProps) {
             y1={0}
             x2={gridSize * majorInterval}
             y2={gridSize * majorInterval}
-            stroke="var(--color-border)"
+            stroke={majorGridColor}
             strokeWidth={strokeWidth}
-            opacity={0.5}
           />
           <line
             x1={0}
             y1={gridSize * majorInterval}
             x2={gridSize * majorInterval}
             y2={gridSize * majorInterval}
-            stroke="var(--color-border)"
+            stroke={majorGridColor}
             strokeWidth={strokeWidth}
-            opacity={0.5}
           />
         </pattern>
       </defs>

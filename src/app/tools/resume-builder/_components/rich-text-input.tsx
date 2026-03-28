@@ -85,7 +85,16 @@ export function RichTextInput({
     } else {
       const url = prompt("Enter URL:");
       if (url) {
-        execCmd("createLink", url);
+        const trimmed = url.trim();
+        if (/^https?:\/\//i.test(trimmed)) {
+          execCmd("createLink", trimmed);
+        } else if (/^[a-z]+:/i.test(trimmed)) {
+          // Block javascript:, data:, vbscript:, etc.
+          return;
+        } else {
+          // Bare domain — prepend https://
+          execCmd("createLink", `https://${trimmed}`);
+        }
       }
     }
   }, [execCmd]);
