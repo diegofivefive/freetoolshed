@@ -48,6 +48,9 @@ function getPeaks(
   return peaks;
 }
 
+const MINIMAP_HEIGHT = 40;
+const RULER_HEIGHT = 24;
+
 export function Waveform({
   buffer,
   zoom,
@@ -59,10 +62,13 @@ export function Waveform({
   onScrollOffsetChange,
   onZoomChange,
 }: WaveformProps) {
+  const rulerRef = useRef<HTMLCanvasElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const minimapRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(800);
   const [isDragging, setIsDragging] = useState(false);
+  const [isMinimapDragging, setIsMinimapDragging] = useState(false);
   const dragStartRef = useRef<number>(0);
 
   // Measure container
@@ -112,15 +118,13 @@ export function Waveform({
     ctx.fillStyle = WAVEFORM_COLORS.background;
     ctx.fillRect(0, 0, width, height);
 
-    // Grid lines (every second)
+    // Grid lines (no labels — ruler handles those)
     const startTime = scrollOffset;
     const endTime = scrollOffset + width / zoom;
     const gridStep = zoom > 200 ? 0.5 : zoom > 50 ? 1 : zoom > 20 ? 5 : 10;
 
     ctx.strokeStyle = WAVEFORM_COLORS.gridLine;
     ctx.lineWidth = 0.5;
-    ctx.fillStyle = WAVEFORM_COLORS.timeLabel;
-    ctx.font = "10px var(--font-geist-mono)";
 
     const firstGrid = Math.ceil(startTime / gridStep) * gridStep;
     for (let t = firstGrid; t <= endTime; t += gridStep) {
@@ -129,15 +133,6 @@ export function Waveform({
       ctx.moveTo(x, 0);
       ctx.lineTo(x, height);
       ctx.stroke();
-
-      // Time label
-      const min = Math.floor(t / 60);
-      const sec = Math.floor(t % 60);
-      const label =
-        gridStep < 1
-          ? `${min}:${sec.toString().padStart(2, "0")}.${Math.round((t % 1) * 10)}`
-          : `${min}:${sec.toString().padStart(2, "0")}`;
-      ctx.fillText(label, x + 2, 10);
     }
 
     // Selection highlight
@@ -198,14 +193,7 @@ export function Waveform({
       ctx.lineTo(phX, height);
       ctx.stroke();
 
-      // Playhead triangle
-      ctx.fillStyle = WAVEFORM_COLORS.playhead;
-      ctx.beginPath();
-      ctx.moveTo(phX - 5, 0);
-      ctx.lineTo(phX + 5, 0);
-      ctx.lineTo(phX, 8);
-      ctx.closePath();
-      ctx.fill();
+      // Playhead triangle (rendered on the ruler instead)
     }
   }, [
     buffer,
@@ -216,6 +204,111 @@ export function Waveform({
     selection,
     timeToPx,
   ]);
+
+  // --- Time ruler rendering ---
+  useEffect(() => {
+    const canvas = rulerRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = containerWidth * dpr;
+    canvas.height = RULER_HEIGHT * dpr;
+    ctx.scale(dpr, dpr);
+
+    const width = containerWidth;
+    const height = RULER_HEIGHT;
+
+    // Background
+    ctx.fillStyle = WAVEFORM_COLORS.background;
+    ctx.fillRect(0, 0, width, height);
+
+    // Bottom border line
+    ctx.strokeStyle = WAVEFORM_COLORS.gridLine;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, height - 0.5);
+    ctx.lineTo(width, height - 0.5);
+    ctx.stroke();
+
+    const startTime = scrollOffset;
+    const endTime = scrollOffset + width / zoom;
+
+    // Determine major and minor grid steps based on zoom
+    let majorStep: number;
+    let minorStep: number;
+    if (zoom > 400) {
+      majorStep = 0.5;
+      minorStep = 0.1;
+    } else if (zoom > 200) {
+      majorStep = 1;
+      minorStep = 0.5;
+    } else if (zoom > 100) {
+      majorStep = 2;
+      minorStep = 1;
+    } else if (zoom > 50) {
+      majorStep = 5;
+      minorStep = 1;
+    } else if (zoom > 20) {
+      majorStep = 10;
+      minorStep = 5;
+    } else {
+      majorStep = 30;
+      minorStep = 10;
+    }
+
+    // Draw minor ticks
+    ctx.strokeStyle = WAVEFORM_COLORS.gridLine;
+    ctx.lineWidth = 0.5;
+    const firstMinor = Math.ceil(startTime / minorStep) * minorStep;
+    for (let t = firstMinor; t <= endTime; t += minorStep) {
+      const x = timeToPx(t);
+      ctx.beginPath();
+      ctx.moveTo(x, height - 5);
+      ctx.lineTo(x, height);
+      ctx.stroke();
+    }
+
+    // Draw major ticks + labels
+    ctx.strokeStyle = WAVEFORM_COLORS.timeLabel;
+    ctx.lineWidth = 1;
+    ctx.fillStyle = WAVEFORM_COLORS.timeLabel;
+    ctx.font = "10px var(--font-geist-mono)";
+    ctx.textBaseline = "top";
+
+    const firstMajor = Math.ceil(startTime / majorStep) * majorStep;
+    for (let t = firstMajor; t <= endTime; t += majorStep) {
+      const x = timeToPx(t);
+
+      // Major tick
+      ctx.beginPath();
+      ctx.moveTo(x, height - 10);
+      ctx.lineTo(x, height);
+      ctx.stroke();
+
+      // Label
+      const min = Math.floor(t / 60);
+      const sec = Math.floor(t % 60);
+      const label =
+        majorStep < 1
+          ? `${min}:${sec.toString().padStart(2, "0")}.${Math.round((t % 1) * 10)}`
+          : `${min}:${sec.toString().padStart(2, "0")}`;
+      ctx.fillText(label, x + 3, 2);
+    }
+
+    // Playhead marker on ruler
+    const phX = timeToPx(playheadPosition);
+    if (phX >= 0 && phX <= width) {
+      ctx.fillStyle = WAVEFORM_COLORS.playhead;
+      ctx.beginPath();
+      ctx.moveTo(phX - 4, height);
+      ctx.lineTo(phX + 4, height);
+      ctx.lineTo(phX, height - 6);
+      ctx.closePath();
+      ctx.fill();
+    }
+  }, [containerWidth, zoom, scrollOffset, playheadPosition, timeToPx]);
 
   // Mouse handlers for selection
   const handleMouseDown = useCallback(
@@ -275,21 +368,151 @@ export function Waveform({
 
   useEffect(() => {
     const canvas = canvasRef.current;
+    const ruler = rulerRef.current;
     if (!canvas) return;
     canvas.addEventListener("wheel", handleWheel, { passive: false });
-    return () => canvas.removeEventListener("wheel", handleWheel);
+    ruler?.addEventListener("wheel", handleWheel, { passive: false });
+    return () => {
+      canvas.removeEventListener("wheel", handleWheel);
+      ruler?.removeEventListener("wheel", handleWheel);
+    };
   }, [handleWheel]);
 
+  // --- Minimap rendering ---
+  useEffect(() => {
+    const canvas = minimapRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = containerWidth * dpr;
+    canvas.height = MINIMAP_HEIGHT * dpr;
+    ctx.scale(dpr, dpr);
+
+    const width = containerWidth;
+    const height = MINIMAP_HEIGHT;
+
+    // Background
+    ctx.fillStyle = WAVEFORM_COLORS.background;
+    ctx.fillRect(0, 0, width, height);
+
+    // Draw full waveform (all channels mixed)
+    const samplesPerPixel = buffer.length / width;
+    const channelCount = buffer.numberOfChannels;
+
+    for (let i = 0; i < width; i++) {
+      let min = 1;
+      let max = -1;
+      const startSample = Math.floor(i * samplesPerPixel);
+      const endSample = Math.min(
+        Math.floor(startSample + samplesPerPixel),
+        buffer.length
+      );
+      for (let ch = 0; ch < channelCount; ch++) {
+        const data = buffer.getChannelData(ch);
+        for (let j = startSample; j < endSample; j++) {
+          if (data[j] < min) min = data[j];
+          if (data[j] > max) max = data[j];
+        }
+      }
+      const y1 = height / 2 - max * (height / 2) * 0.85;
+      const y2 = height / 2 - min * (height / 2) * 0.85;
+      ctx.fillStyle = WAVEFORM_COLORS.waveformMuted;
+      ctx.fillRect(i, y1, 1, Math.max(1, y2 - y1));
+    }
+
+    // Selection overlay on minimap
+    if (selection) {
+      const selX1 = (selection.start / buffer.duration) * width;
+      const selX2 = (selection.end / buffer.duration) * width;
+      ctx.fillStyle = WAVEFORM_COLORS.selection;
+      ctx.fillRect(selX1, 0, selX2 - selX1, height);
+    }
+
+    // Viewport indicator
+    const vpStart = (scrollOffset / buffer.duration) * width;
+    const vpWidth = (containerWidth / zoom / buffer.duration) * width;
+
+    // Dim areas outside viewport
+    ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+    ctx.fillRect(0, 0, vpStart, height);
+    ctx.fillRect(vpStart + vpWidth, 0, width - vpStart - vpWidth, height);
+
+    // Viewport border
+    ctx.strokeStyle = WAVEFORM_COLORS.selectionBorder;
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(vpStart, 0.5, vpWidth, height - 1);
+
+    // Playhead on minimap
+    const phX = (playheadPosition / buffer.duration) * width;
+    ctx.strokeStyle = WAVEFORM_COLORS.playhead;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(phX, 0);
+    ctx.lineTo(phX, height);
+    ctx.stroke();
+  }, [buffer, containerWidth, zoom, scrollOffset, playheadPosition, selection]);
+
+  // Minimap click/drag to navigate
+  const minimapToOffset = useCallback(
+    (clientX: number): number => {
+      const rect = minimapRef.current?.getBoundingClientRect();
+      if (!rect) return 0;
+      const x = clientX - rect.left;
+      const time = (x / containerWidth) * buffer.duration;
+      const viewDuration = containerWidth / zoom;
+      const offset = time - viewDuration / 2;
+      const maxOffset = Math.max(0, buffer.duration - viewDuration);
+      return Math.max(0, Math.min(offset, maxOffset));
+    },
+    [containerWidth, buffer.duration, zoom]
+  );
+
+  const handleMinimapDown = useCallback(
+    (e: MouseEvent<HTMLCanvasElement>) => {
+      setIsMinimapDragging(true);
+      onScrollOffsetChange(minimapToOffset(e.clientX));
+    },
+    [minimapToOffset, onScrollOffsetChange]
+  );
+
+  const handleMinimapMove = useCallback(
+    (e: MouseEvent<HTMLCanvasElement>) => {
+      if (!isMinimapDragging) return;
+      onScrollOffsetChange(minimapToOffset(e.clientX));
+    },
+    [isMinimapDragging, minimapToOffset, onScrollOffsetChange]
+  );
+
+  const handleMinimapUp = useCallback(() => {
+    setIsMinimapDragging(false);
+  }, []);
+
   return (
-    <div ref={containerRef} className="relative w-full">
+    <div ref={containerRef} className="relative w-full space-y-0">
+      <canvas
+        ref={rulerRef}
+        className="w-full cursor-default rounded-t border border-b-0 border-border"
+        style={{ height: RULER_HEIGHT }}
+      />
       <canvas
         ref={canvasRef}
-        className="w-full cursor-crosshair rounded border border-border"
+        className="w-full cursor-crosshair border border-border"
         style={{ height: WAVEFORM_HEIGHT }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+      />
+      <canvas
+        ref={minimapRef}
+        className="w-full cursor-pointer rounded-b border border-t-0 border-border"
+        style={{ height: MINIMAP_HEIGHT }}
+        onMouseDown={handleMinimapDown}
+        onMouseMove={handleMinimapMove}
+        onMouseUp={handleMinimapUp}
+        onMouseLeave={handleMinimapUp}
       />
     </div>
   );

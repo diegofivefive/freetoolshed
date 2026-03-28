@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useCallback, useRef, useEffect } from "react";
+import { useReducer, useCallback, useRef, useEffect, useState } from "react";
 import {
   Upload,
   Play,
@@ -17,6 +17,10 @@ import {
   SplitSquareHorizontal,
   VolumeOff,
   Crop,
+  Repeat,
+  FilePlus,
+  Mic,
+  CircleDot,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -34,6 +38,7 @@ import {
   silenceSelection,
   splitAtPosition,
   concatenateBuffers,
+  resampleBuffer,
 } from "@/lib/audio/operations";
 import { Waveform } from "./waveform";
 import { EffectsPanel } from "./effects-panel";
@@ -52,12 +57,27 @@ function getInitialState() {
 export function AudioEditor() {
   const [state, dispatch] = useReducer(editorReducer, undefined, getInitialState);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const appendInputRef = useRef<HTMLInputElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
   const playbackStartTimeRef = useRef<number>(0);
   const playbackOffsetRef = useRef<number>(0);
   const animFrameRef = useRef<number>(0);
+  const isLoopingRef = useRef(state.isLooping);
+  const startPlaybackRef = useRef<((fromPosition?: number) => void) | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordedChunksRef = useRef<Blob[]>([]);
+  const recordStreamRef = useRef<MediaStream | null>(null);
+  const recordTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [recordMode, setRecordMode] = useState<"new" | "append">("new");
+
+  // Keep looping ref in sync with state
+  useEffect(() => {
+    isLoopingRef.current = state.isLooping;
+  }, [state.isLooping]);
 
   const getAudioContext = useCallback(() => {
     if (!audioContextRef.current) {
@@ -137,6 +157,125 @@ export function AudioEditor() {
     dispatch({ type: "SET_PLAYBACK_STATUS", payload: "idle" });
   }, []);
 
+  // --- Append / merge ---
+  const handleAppendFile = useCallback(
+    async (file: File) => {
+      if (!state.track) return;
+      try {
+        dispatch({ type: "SET_PROCESSING", payload: true });
+        const arrayBuffer = await file.arrayBuffer();
+        const ctx = getAudioContext();
+        let appendBuffer = await ctx.decodeAudioData(arrayBuffer);
+
+        // Resample if sample rates differ
+        if (appendBuffer.sampleRate !== state.track.sampleRate) {
+          appendBuffer = await resampleBuffer(appendBuffer, state.track.sampleRate);
+        }
+
+        stopPlayback();
+        const merged = concatenateBuffers(ctx, state.track.buffer, appendBuffer);
+        dispatch({
+          type: "APPLY_BUFFER",
+          payload: { buffer: merged, label: `Append: ${file.name}` },
+        });
+      } catch {
+        dispatch({ type: "SET_PROCESSING", payload: false });
+      }
+    },
+    [state.track, getAudioContext, stopPlayback]
+  );
+
+  const handleAppendInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) handleAppendFile(file);
+      e.target.value = "";
+    },
+    [handleAppendFile]
+  );
+
+  // --- Mic recording ---
+  const startRecording = useCallback(
+    async (mode: "new" | "append") => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        recordStreamRef.current = stream;
+        recordedChunksRef.current = [];
+        setRecordMode(mode);
+
+        const recorder = new MediaRecorder(stream);
+        mediaRecorderRef.current = recorder;
+
+        recorder.ondataavailable = (e) => {
+          if (e.data.size > 0) recordedChunksRef.current.push(e.data);
+        };
+
+        recorder.onstop = async () => {
+          // Stop all tracks on the stream
+          stream.getTracks().forEach((t) => t.stop());
+          recordStreamRef.current = null;
+
+          if (recordTimerRef.current) {
+            clearInterval(recordTimerRef.current);
+            recordTimerRef.current = null;
+          }
+          setIsRecording(false);
+          setRecordingTime(0);
+
+          const blob = new Blob(recordedChunksRef.current, {
+            type: recorder.mimeType,
+          });
+          if (blob.size === 0) return;
+
+          try {
+            dispatch({ type: "SET_PROCESSING", payload: true });
+            const arrayBuffer = await blob.arrayBuffer();
+            const ctx = getAudioContext();
+            const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+
+            if (mode === "append" && state.track) {
+              let buf = audioBuffer;
+              if (buf.sampleRate !== state.track.sampleRate) {
+                buf = await resampleBuffer(buf, state.track.sampleRate);
+              }
+              stopPlayback();
+              const merged = concatenateBuffers(ctx, state.track.buffer, buf);
+              dispatch({
+                type: "APPLY_BUFFER",
+                payload: { buffer: merged, label: "Append: mic recording" },
+              });
+            } else {
+              dispatch({
+                type: "LOAD_TRACK",
+                payload: { name: "Recording.webm", buffer: audioBuffer },
+              });
+            }
+          } catch {
+            dispatch({ type: "SET_PROCESSING", payload: false });
+          }
+        };
+
+        recorder.start(100); // collect data every 100ms
+        setIsRecording(true);
+
+        // Timer for elapsed display
+        const startMs = Date.now();
+        recordTimerRef.current = setInterval(() => {
+          setRecordingTime((Date.now() - startMs) / 1000);
+        }, 100);
+      } catch {
+        // Permission denied or no mic
+      }
+    },
+    [getAudioContext, state.track, stopPlayback]
+  );
+
+  const stopRecording = useCallback(() => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      mediaRecorderRef.current.stop();
+    }
+  }, []);
+
   const startPlayback = useCallback(
     (fromPosition?: number) => {
       if (!state.track) return;
@@ -176,11 +315,18 @@ export function AudioEditor() {
       dispatch({ type: "SET_PLAYBACK_STATUS", payload: "playing" });
 
       // Animate playhead
+      const loopStartPos = selStart ?? 0;
       const tick = () => {
         const elapsed = ctx.currentTime - playbackStartTimeRef.current;
         const currentPos = playbackOffsetRef.current + elapsed;
         const endPos = selEnd ?? state.track!.duration;
         if (currentPos >= endPos) {
+          if (isLoopingRef.current) {
+            // Restart from loop start
+            dispatch({ type: "SET_PLAYHEAD", payload: loopStartPos });
+            startPlaybackRef.current?.(loopStartPos);
+            return;
+          }
           dispatch({ type: "SET_PLAYHEAD", payload: endPos });
           stopPlayback();
           return;
@@ -191,13 +337,19 @@ export function AudioEditor() {
       animFrameRef.current = requestAnimationFrame(tick);
 
       source.onended = () => {
-        cancelAnimationFrame(animFrameRef.current);
-        dispatch({ type: "SET_PLAYBACK_STATUS", payload: "idle" });
-        sourceNodeRef.current = null;
+        // Only treat as stop if not looping (loop restarts via tick)
+        if (!isLoopingRef.current) {
+          cancelAnimationFrame(animFrameRef.current);
+          dispatch({ type: "SET_PLAYBACK_STATUS", payload: "idle" });
+          sourceNodeRef.current = null;
+        }
       };
     },
     [state.track, state.playheadPosition, state.selection, getAudioContext, stopPlayback]
   );
+
+  // Keep ref in sync for loop callbacks
+  startPlaybackRef.current = startPlayback;
 
   const togglePlayback = useCallback(() => {
     if (state.playbackStatus === "playing") {
@@ -321,6 +473,9 @@ export function AudioEditor() {
       } else if (e.key === "t" && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
         handleTrim();
+      } else if (e.key === "l" && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        dispatch({ type: "TOGGLE_LOOP" });
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -355,6 +510,15 @@ export function AudioEditor() {
       if (audioContextRef.current) {
         audioContextRef.current.close();
       }
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+        mediaRecorderRef.current.stop();
+      }
+      if (recordStreamRef.current) {
+        recordStreamRef.current.getTracks().forEach((t) => t.stop());
+      }
+      if (recordTimerRef.current) {
+        clearInterval(recordTimerRef.current);
+      }
     };
   }, []);
 
@@ -365,8 +529,29 @@ export function AudioEditor() {
     return `${m}:${s.toString().padStart(2, "0")}.${ms.toString().padStart(2, "0")}`;
   };
 
-  // No track loaded — show drop zone
+  // No track loaded — show drop zone or recording UI
   if (!state.track) {
+    if (isRecording) {
+      return (
+        <div className="flex min-h-[400px] flex-col items-center justify-center rounded-lg border-2 border-dashed border-pink-500/50 bg-card">
+          <CircleDot className="mb-4 size-12 animate-pulse text-pink-500" />
+          <p className="text-lg font-medium">Recording...</p>
+          <p className="mt-1 font-mono text-2xl text-pink-500">
+            {formatTime(recordingTime)}
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-4 border-pink-500 text-pink-500 hover:bg-pink-500/10"
+            onClick={stopRecording}
+          >
+            <Square className="mr-1.5 size-3.5" />
+            Stop Recording
+          </Button>
+        </div>
+      );
+    }
+
     return (
       <div
         onDrop={handleDrop}
@@ -389,6 +574,18 @@ export function AudioEditor() {
         <p className="mt-1 text-sm text-muted-foreground">
           or click to browse — MP3, WAV, OGG, AAC, FLAC, WebM
         </p>
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-4"
+          onClick={(e) => {
+            e.stopPropagation();
+            startRecording("new");
+          }}
+        >
+          <Mic className="mr-1.5 size-3.5" />
+          Record from Microphone
+        </Button>
         <input
           ref={fileInputRef}
           type="file"
@@ -421,6 +618,44 @@ export function AudioEditor() {
           onChange={handleFileInputChange}
           className="hidden"
         />
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => appendInputRef.current?.click()}
+          title="Append audio file"
+          disabled={state.isProcessing}
+        >
+          <FilePlus className="size-4" />
+        </Button>
+        <input
+          ref={appendInputRef}
+          type="file"
+          accept={IMPORT_ACCEPT}
+          onChange={handleAppendInputChange}
+          className="hidden"
+        />
+        {isRecording ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={stopRecording}
+            title={`Stop recording (${formatTime(recordingTime)})`}
+            className="text-pink-500"
+          >
+            <CircleDot className="size-4 animate-pulse" />
+            <span className="ml-1 font-mono text-xs">{formatTime(recordingTime)}</span>
+          </Button>
+        ) : (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => startRecording("append")}
+            title="Record from microphone (append)"
+            disabled={state.isProcessing}
+          >
+            <Mic className="size-4" />
+          </Button>
+        )}
 
         <Separator orientation="vertical" className="mx-1 h-6" />
 
@@ -520,6 +755,15 @@ export function AudioEditor() {
           title="Stop"
         >
           <Square className="size-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => dispatch({ type: "TOGGLE_LOOP" })}
+          title={state.isLooping ? "Disable loop (L)" : "Enable loop (L)"}
+          className={state.isLooping ? "text-brand" : ""}
+        >
+          <Repeat className="size-4" />
         </Button>
 
         <Separator orientation="vertical" className="mx-1 h-6" />

@@ -122,6 +122,28 @@ export function silenceSelection(
 }
 
 /**
+ * Resample an AudioBuffer to a target sample rate using OfflineAudioContext.
+ */
+export async function resampleBuffer(
+  source: AudioBuffer,
+  targetSampleRate: number
+): Promise<AudioBuffer> {
+  if (source.sampleRate === targetSampleRate) return source;
+  const duration = source.duration;
+  const targetLength = Math.ceil(duration * targetSampleRate);
+  const offline = new OfflineAudioContext(
+    source.numberOfChannels,
+    targetLength,
+    targetSampleRate
+  );
+  const bufferSource = offline.createBufferSource();
+  bufferSource.buffer = source;
+  bufferSource.connect(offline.destination);
+  bufferSource.start(0);
+  return offline.startRendering();
+}
+
+/**
  * Concatenate two buffers sequentially.
  * Both must have the same number of channels and sample rate.
  */

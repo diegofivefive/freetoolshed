@@ -67,6 +67,7 @@ export const INITIAL_EDITOR_STATE: EditorState = {
   isProcessing: false,
   exportFormat: "wav",
   exportBitrate: 192,
+  isLooping: false,
 };
 
 /** Keyboard shortcuts */

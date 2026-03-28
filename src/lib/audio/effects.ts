@@ -150,6 +150,33 @@ export function amplify(
 }
 
 /**
+ * Change speed (and pitch) by resampling.
+ * rate > 1 = faster/higher pitch, rate < 1 = slower/lower pitch.
+ * Applies to entire buffer (not region-scoped — speed change alters duration).
+ */
+export async function changeSpeed(
+  source: AudioBuffer,
+  rate: number
+): Promise<AudioBuffer> {
+  if (rate <= 0 || rate === 1) return source;
+
+  const newLength = Math.ceil(source.length / rate);
+  const offline = new OfflineAudioContext(
+    source.numberOfChannels,
+    newLength,
+    source.sampleRate
+  );
+
+  const bufferSource = offline.createBufferSource();
+  bufferSource.buffer = source;
+  bufferSource.playbackRate.value = rate;
+  bufferSource.connect(offline.destination);
+  bufferSource.start(0);
+
+  return offline.startRendering();
+}
+
+/**
  * Simple noise reduction using spectral gating.
  * Estimates noise floor from the quietest 10% of the signal,
  * then attenuates samples below the threshold.
@@ -218,3 +245,176 @@ export function noiseReduction(
   }
   return buf;
 }
+
+/** A single EQ band definition */
+export interface EqBand {
+  type: BiquadFilterType;
+  frequency: number;
+  gain: number;
+  Q: number;
+}
+
+/**
+ * Apply parametric EQ bands to the entire buffer using OfflineAudioContext.
+ * Each band is a BiquadFilterNode chained in series.
+ */
+export async function applyEq(
+  source: AudioBuffer,
+  bands: EqBand[]
+): Promise<AudioBuffer> {
+  if (bands.length === 0) return source;
+
+  const offline = new OfflineAudioContext(
+    source.numberOfChannels,
+    source.length,
+    source.sampleRate
+  );
+
+  const bufferSource = offline.createBufferSource();
+  bufferSource.buffer = source;
+
+  // Chain filters
+  let lastNode: AudioNode = bufferSource;
+  for (const band of bands) {
+    const filter = offline.createBiquadFilter();
+    filter.type = band.type;
+    filter.frequency.value = band.frequency;
+    filter.Q.value = band.Q;
+    filter.gain.value = band.gain;
+    lastNode.connect(filter);
+    lastNode = filter;
+  }
+  lastNode.connect(offline.destination);
+
+  bufferSource.start(0);
+  return offline.startRendering();
+}
+
+/** Common EQ presets */
+export const EQ_PRESETS: Record<string, { label: string; bands: EqBand[] }> = {
+  bassBoost: {
+    label: "Bass Boost",
+    bands: [
+      { type: "lowshelf", frequency: 200, gain: 6, Q: 1 },
+    ],
+  },
+  bassCut: {
+    label: "Bass Cut",
+    bands: [
+      { type: "lowshelf", frequency: 200, gain: -6, Q: 1 },
+    ],
+  },
+  trebleBoost: {
+    label: "Treble Boost",
+    bands: [
+      { type: "highshelf", frequency: 4000, gain: 6, Q: 1 },
+    ],
+  },
+  trebleCut: {
+    label: "Treble Cut",
+    bands: [
+      { type: "highshelf", frequency: 4000, gain: -6, Q: 1 },
+    ],
+  },
+  midScoop: {
+    label: "Mid Scoop",
+    bands: [
+      { type: "peaking", frequency: 1000, gain: -6, Q: 1.5 },
+    ],
+  },
+  midBoost: {
+    label: "Mid Boost",
+    bands: [
+      { type: "peaking", frequency: 1000, gain: 6, Q: 1.5 },
+    ],
+  },
+  warmth: {
+    label: "Warmth",
+    bands: [
+      { type: "lowshelf", frequency: 250, gain: 3, Q: 1 },
+      { type: "highshelf", frequency: 6000, gain: -2, Q: 1 },
+    ],
+  },
+  brightness: {
+    label: "Brightness",
+    bands: [
+      { type: "highshelf", frequency: 3000, gain: 4, Q: 1 },
+      { type: "peaking", frequency: 8000, gain: 2, Q: 1 },
+    ],
+  },
+  voiceClarity: {
+    label: "Voice Clarity",
+    bands: [
+      { type: "highpass", frequency: 80, gain: 0, Q: 0.7 },
+      { type: "peaking", frequency: 2500, gain: 4, Q: 1.5 },
+      { type: "highshelf", frequency: 6000, gain: 2, Q: 1 },
+    ],
+  },
+};
+
+/** Compressor settings */
+export interface CompressorSettings {
+  threshold: number;  // dB, typically -50 to 0
+  knee: number;       // dB, 0 to 40
+  ratio: number;      // 1 to 20
+  attack: number;     // seconds, 0 to 1
+  release: number;    // seconds, 0 to 1
+}
+
+/**
+ * Apply dynamics compression to the entire buffer.
+ * Uses DynamicsCompressorNode via OfflineAudioContext.
+ */
+export async function applyCompressor(
+  source: AudioBuffer,
+  settings: CompressorSettings
+): Promise<AudioBuffer> {
+  const offline = new OfflineAudioContext(
+    source.numberOfChannels,
+    source.length,
+    source.sampleRate
+  );
+
+  const bufferSource = offline.createBufferSource();
+  bufferSource.buffer = source;
+
+  const compressor = offline.createDynamicsCompressor();
+  compressor.threshold.value = settings.threshold;
+  compressor.knee.value = settings.knee;
+  compressor.ratio.value = settings.ratio;
+  compressor.attack.value = settings.attack;
+  compressor.release.value = settings.release;
+
+  bufferSource.connect(compressor).connect(offline.destination);
+  bufferSource.start(0);
+
+  return offline.startRendering();
+}
+
+/** Common compressor presets */
+export const COMPRESSOR_PRESETS: Record<string, { label: string; settings: CompressorSettings }> = {
+  gentle: {
+    label: "Gentle",
+    settings: { threshold: -24, knee: 30, ratio: 2, attack: 0.01, release: 0.25 },
+  },
+  medium: {
+    label: "Medium",
+    settings: { threshold: -18, knee: 12, ratio: 4, attack: 0.005, release: 0.15 },
+  },
+  heavy: {
+    label: "Heavy",
+    settings: { threshold: -12, knee: 6, ratio: 8, attack: 0.003, release: 0.1 },
+  },
+  limiter: {
+    label: "Limiter",
+    settings: { threshold: -3, knee: 0, ratio: 20, attack: 0.001, release: 0.05 },
+  },
+  voice: {
+    label: "Voice",
+    settings: { threshold: -20, knee: 10, ratio: 3, attack: 0.01, release: 0.2 },
+  },
+  podcast: {
+    label: "Podcast",
+    settings: { threshold: -16, knee: 8, ratio: 4, attack: 0.005, release: 0.15 },
+  },
+};

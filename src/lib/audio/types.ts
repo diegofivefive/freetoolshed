@@ -80,6 +80,8 @@ export interface EditorState {
   exportFormat: ExportFormat;
   /** Export quality (bitrate for mp3: 128, 192, 256, 320) */
   exportBitrate: number;
+  /** Whether playback should loop */
+  isLooping: boolean;
 }
 
 /** Actions for the editor reducer */
@@ -99,4 +101,5 @@ export type EditorAction =
   | { type: "REDO" }
   | { type: "SET_PROCESSING"; payload: boolean }
   | { type: "SET_EXPORT_FORMAT"; payload: ExportFormat }
-  | { type: "SET_EXPORT_BITRATE"; payload: number };
+  | { type: "SET_EXPORT_BITRATE"; payload: number }
+  | { type: "TOGGLE_LOOP" };

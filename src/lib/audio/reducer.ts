@@ -145,6 +145,9 @@ export function editorReducer(
     case "SET_EXPORT_BITRATE":
       return { ...state, exportBitrate: action.payload };
 
+    case "TOGGLE_LOOP":
+      return { ...state, isLooping: !state.isLooping };
+
     default:
       return state;
   }

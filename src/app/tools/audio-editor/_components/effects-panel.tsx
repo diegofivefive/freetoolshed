@@ -8,6 +8,9 @@ import {
   FlipHorizontal,
   Volume1,
   AudioLines,
+  Zap,
+  SlidersHorizontal,
+  Activity,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -20,6 +23,11 @@ import {
   reverse,
   amplify,
   noiseReduction,
+  changeSpeed,
+  applyEq,
+  EQ_PRESETS,
+  applyCompressor,
+  COMPRESSOR_PRESETS,
 } from "@/lib/audio/effects";
 
 interface EffectsPanelProps {
@@ -39,6 +47,12 @@ export function EffectsPanel({
 }: EffectsPanelProps) {
   const [amplifyGain, setAmplifyGain] = useState("1.5");
   const [noiseStrength, setNoiseStrength] = useState("0.8");
+  const [speedRate, setSpeedRate] = useState("1.0");
+  const [compPreset, setCompPreset] = useState("medium");
+  const [eqPreset, setEqPreset] = useState("bassBoost");
+  const [eqFreq, setEqFreq] = useState("1000");
+  const [eqGain, setEqGain] = useState("6");
+  const [eqQ, setEqQ] = useState("1.0");
 
   const startTime = selection?.start;
   const endTime = selection?.end;
@@ -201,6 +215,168 @@ export function EffectsPanel({
           className="h-8 w-16 text-xs"
           title="Strength 0–1 (higher = more aggressive)"
         />
+      </div>
+
+      {/* Speed / pitch change */}
+      <div className="flex items-center gap-1">
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={disabled}
+          onClick={async () => {
+            const rate = parseFloat(speedRate);
+            if (isNaN(rate) || rate <= 0 || rate > 4) return;
+            const result = await changeSpeed(buffer, rate);
+            onApply(result, `Speed ×${rate}`);
+          }}
+          title="Change speed and pitch (applies to entire track)"
+        >
+          <Zap className="mr-1.5 size-3.5" />
+          Speed
+        </Button>
+        <Label className="sr-only" htmlFor="speed-rate">
+          Speed rate
+        </Label>
+        <Input
+          id="speed-rate"
+          type="number"
+          min="0.25"
+          max="4"
+          step="0.05"
+          value={speedRate}
+          onChange={(e) => setSpeedRate(e.target.value)}
+          className="h-8 w-16 text-xs"
+          title="Rate: 0.25–4× (1.0 = normal, 2.0 = double speed)"
+        />
+      </div>
+
+      {/* EQ preset */}
+      <div className="flex items-center gap-1">
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={disabled}
+          onClick={async () => {
+            const preset = EQ_PRESETS[eqPreset];
+            if (!preset) return;
+            const result = await applyEq(buffer, preset.bands);
+            onApply(result, `EQ: ${preset.label}`);
+          }}
+          title="Apply EQ preset"
+        >
+          <SlidersHorizontal className="mr-1.5 size-3.5" />
+          EQ
+        </Button>
+        <Label className="sr-only" htmlFor="eq-preset">
+          EQ Preset
+        </Label>
+        <select
+          id="eq-preset"
+          value={eqPreset}
+          onChange={(e) => setEqPreset(e.target.value)}
+          className="h-8 rounded border border-border bg-background px-1.5 text-xs"
+        >
+          {Object.entries(EQ_PRESETS).map(([key, { label }]) => (
+            <option key={key} value={key}>
+              {label}
+            </option>
+          ))}
+          <option value="__custom">Custom...</option>
+        </select>
+      </div>
+
+      {/* Custom EQ controls */}
+      {eqPreset === "__custom" && (
+        <div className="flex items-center gap-1">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={disabled}
+            onClick={async () => {
+              const freq = parseFloat(eqFreq);
+              const gain = parseFloat(eqGain);
+              const q = parseFloat(eqQ);
+              if (isNaN(freq) || isNaN(gain) || isNaN(q)) return;
+              const result = await applyEq(buffer, [
+                { type: "peaking", frequency: freq, gain, Q: q },
+              ]);
+              onApply(result, `EQ: ${freq}Hz ${gain > 0 ? "+" : ""}${gain}dB`);
+            }}
+            title="Apply custom EQ band"
+          >
+            Apply
+          </Button>
+          <Input
+            id="eq-freq"
+            type="number"
+            min="20"
+            max="20000"
+            step="10"
+            value={eqFreq}
+            onChange={(e) => setEqFreq(e.target.value)}
+            className="h-8 w-20 text-xs"
+            title="Frequency (Hz)"
+            placeholder="Hz"
+          />
+          <Input
+            id="eq-gain"
+            type="number"
+            min="-24"
+            max="24"
+            step="1"
+            value={eqGain}
+            onChange={(e) => setEqGain(e.target.value)}
+            className="h-8 w-16 text-xs"
+            title="Gain (dB)"
+            placeholder="dB"
+          />
+          <Input
+            id="eq-q"
+            type="number"
+            min="0.1"
+            max="20"
+            step="0.1"
+            value={eqQ}
+            onChange={(e) => setEqQ(e.target.value)}
+            className="h-8 w-16 text-xs"
+            title="Q factor (bandwidth)"
+            placeholder="Q"
+          />
+        </div>
+      )}
+
+      {/* Compressor / Limiter */}
+      <div className="flex items-center gap-1">
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={disabled}
+          onClick={async () => {
+            const preset = COMPRESSOR_PRESETS[compPreset];
+            if (!preset) return;
+            const result = await applyCompressor(buffer, preset.settings);
+            onApply(result, `Compressor: ${preset.label}`);
+          }}
+          title="Apply dynamics compression"
+        >
+          <Activity className="mr-1.5 size-3.5" />
+          Compress
+        </Button>
+        <Label className="sr-only" htmlFor="comp-preset">
+          Compressor Preset
+        </Label>
+        <select
+          id="comp-preset"
+          value={compPreset}
+          onChange={(e) => setCompPreset(e.target.value)}
+          className="h-8 rounded border border-border bg-background px-1.5 text-xs"
+        >
+          {Object.entries(COMPRESSOR_PRESETS).map(([key, { label }]) => (
+            <option key={key} value={key}>
+              {label}
+            </option>
+          ))}
+        </select>
       </div>
     </div>
   );
