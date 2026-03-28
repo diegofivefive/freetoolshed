@@ -158,6 +158,7 @@ export type FlowchartAction =
   // Edges
   | { type: "ADD_EDGE"; payload: FlowchartEdge }
   | { type: "UPDATE_EDGE"; payload: { id: string } & Partial<Omit<FlowchartEdge, "id">> }
+  | { type: "MOVE_CONTROL_POINT"; payload: { edgeId: string; cpIndex: number; x: number; y: number } }
   | { type: "REMOVE_EDGES"; payload: string[] }
   // Selection
   | { type: "SELECT_NODES"; payload: string[] }

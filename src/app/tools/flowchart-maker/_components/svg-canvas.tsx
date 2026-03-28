@@ -22,7 +22,8 @@ import {
   clamp,
   getNodesInRect,
 } from "@/lib/flowchart/geometry";
-import { computeDraftEdgePath, findClosestAnchor } from "@/lib/flowchart/routing";
+import { computeDraftEdgePath, findClosestAnchor, getAutoBezierControls } from "@/lib/flowchart/routing";
+import { getAnchorWorldPosition } from "@/lib/flowchart/shapes";
 import { GridLayer } from "./grid-layer";
 import { NodeRenderer } from "./node-renderer";
 import { EdgeRenderer, ArrowMarkerDefs } from "./edge-renderer";
@@ -77,6 +78,13 @@ export function SvgCanvas({ state, dispatch }: SvgCanvasProps) {
     nodeId: string;
     centerX: number;
     centerY: number;
+  } | null>(null);
+
+  // Control point drag state
+  const [isDraggingCP, setIsDraggingCP] = useState(false);
+  const cpDragRef = useRef<{
+    edgeId: string;
+    cpIndex: number;
   } | null>(null);
 
   // Space key for pan mode
@@ -247,7 +255,20 @@ export function SvgCanvas({ state, dispatch }: SvgCanvasProps) {
         return;
       }
 
-      // Click on an edge → select it
+      // Click on a control point handle → start dragging it
+      const cpEl = target.closest("[data-edge-cp]");
+      if (cpEl) {
+        const cpEdgeId = cpEl.getAttribute("data-edge-cp");
+        const cpIdx = Number(cpEl.getAttribute("data-cp-index"));
+        if (cpEdgeId != null && !isNaN(cpIdx)) {
+          e.stopPropagation();
+          setIsDraggingCP(true);
+          cpDragRef.current = { edgeId: cpEdgeId, cpIndex: cpIdx };
+          return;
+        }
+      }
+
+      // Click on an edge → select it (and auto-init control points for bezier)
       const edgeEl = target.closest("[data-edge-id]");
       const edgeId = edgeEl?.getAttribute("data-edge-id");
       if (edgeId && state.activeTool === "select") {
@@ -262,6 +283,41 @@ export function SvgCanvas({ state, dispatch }: SvgCanvasProps) {
           });
         } else {
           dispatch({ type: "SELECT_EDGES", payload: [edgeId] });
+        }
+
+        // Auto-initialize control points for bezier edges so user can drag them
+        const edge = diagram.edges.find((ed) => ed.id === edgeId);
+        if (
+          edge &&
+          edge.routeType === "bezier" &&
+          edge.controlPoints.length === 0
+        ) {
+          const srcNode = diagram.nodes.find(
+            (n) => n.id === edge.sourceNodeId
+          );
+          const tgtNode = diagram.nodes.find(
+            (n) => n.id === edge.targetNodeId
+          );
+          if (srcNode && tgtNode) {
+            const src = getAnchorWorldPosition(srcNode, edge.sourceAnchor);
+            const tgt = getAnchorWorldPosition(tgtNode, edge.targetAnchor);
+            const cp = getAutoBezierControls(
+              src,
+              tgt,
+              edge.sourceAnchor,
+              edge.targetAnchor
+            );
+            dispatch({
+              type: "UPDATE_EDGE",
+              payload: {
+                id: edge.id,
+                controlPoints: [
+                  { x: cp.cp1x, y: cp.cp1y },
+                  { x: cp.cp2x, y: cp.cp2y },
+                ],
+              },
+            });
+          }
         }
         return;
       }
@@ -295,8 +351,9 @@ export function SvgCanvas({ state, dispatch }: SvgCanvasProps) {
         const origPositions = new Map<string, { x: number; y: number }>();
         for (const id of idsToMove) {
           const n = diagram.nodes.find((n) => n.id === id);
-          if (n) origPositions.set(id, { x: n.x, y: n.y });
+          if (n && !n.locked) origPositions.set(id, { x: n.x, y: n.y });
         }
+        if (origPositions.size === 0) return;
         setIsDraggingNode(true);
         dragRef.current = {
           startX: world.x,
@@ -467,6 +524,21 @@ export function SvgCanvas({ state, dispatch }: SvgCanvasProps) {
         return;
       }
 
+      // Control point dragging
+      if (isDraggingCP && cpDragRef.current) {
+        const world = getWorldCoords(e);
+        dispatch({
+          type: "MOVE_CONTROL_POINT",
+          payload: {
+            edgeId: cpDragRef.current.edgeId,
+            cpIndex: cpDragRef.current.cpIndex,
+            x: diagram.gridSnap ? snapToGrid(world.x, diagram.gridSize) : world.x,
+            y: diagram.gridSnap ? snapToGrid(world.y, diagram.gridSize) : world.y,
+          },
+        });
+        return;
+      }
+
       // Node dragging
       if (isDraggingNode && dragRef.current) {
         const world = getWorldCoords(e);
@@ -555,6 +627,7 @@ export function SvgCanvas({ state, dispatch }: SvgCanvasProps) {
       isResizing,
       isRotating,
       isDraggingNode,
+      isDraggingCP,
       state.marquee,
       state.isConnecting,
       state.connectDraft,
@@ -585,6 +658,12 @@ export function SvgCanvas({ state, dispatch }: SvgCanvasProps) {
       if (isRotating) {
         setIsRotating(false);
         rotateRef.current = null;
+        return;
+      }
+
+      if (isDraggingCP) {
+        setIsDraggingCP(false);
+        cpDragRef.current = null;
         return;
       }
 
@@ -672,6 +751,7 @@ export function SvgCanvas({ state, dispatch }: SvgCanvasProps) {
       isResizing,
       isRotating,
       isDraggingNode,
+      isDraggingCP,
       state.marquee,
       state.isConnecting,
       state.connectDraft,
@@ -702,6 +782,10 @@ export function SvgCanvas({ state, dispatch }: SvgCanvasProps) {
       setIsRotating(false);
       rotateRef.current = null;
     }
+    if (isDraggingCP) {
+      setIsDraggingCP(false);
+      cpDragRef.current = null;
+    }
     if (state.marquee) {
       dispatch({ type: "END_MARQUEE" });
     }
@@ -713,6 +797,7 @@ export function SvgCanvas({ state, dispatch }: SvgCanvasProps) {
   }, [
     isPanning,
     isDraggingNode,
+    isDraggingCP,
     isResizing,
     isRotating,
     state.marquee,
@@ -749,7 +834,7 @@ export function SvgCanvas({ state, dispatch }: SvgCanvasProps) {
         ? "nwse-resize"
         : isRotating
           ? "grabbing"
-          : isDraggingNode
+          : isDraggingNode || isDraggingCP
             ? "move"
             : state.activeTool === "connect"
               ? "crosshair"

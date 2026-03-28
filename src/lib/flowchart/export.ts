@@ -76,36 +76,47 @@ function getDiagramBounds(diagram: FlowchartDiagram, padding: number = 40): Boun
 
 // ── Arrow marker defs for standalone SVG ────────────────────
 
-function buildMarkerDefs(): string {
+function buildMarkerDefs(diagram: FlowchartDiagram): string {
   const markers: string[] = [];
 
-  // Filled arrow
-  markers.push(
-    `<marker id="fc-exp-filled-arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto-start-reverse">`,
-    `  <path d="M 2 2 L 10 6 L 2 10 Z" fill="#374151"/>`,
-    `</marker>`
-  );
+  // Collect unique edge colors to generate per-color markers
+  const colors = new Set<string>();
+  for (const edge of diagram.edges) {
+    colors.add(edge.style.stroke);
+  }
 
-  // Open arrow
-  markers.push(
-    `<marker id="fc-exp-arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto-start-reverse">`,
-    `  <path d="M 2 2 L 10 6 L 2 10" fill="none" stroke="#374151" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>`,
-    `</marker>`
-  );
+  for (const color of colors) {
+    const cid = color.replace(/[^a-zA-Z0-9]/g, "_");
+    const sz = 8;
 
-  // Diamond
-  markers.push(
-    `<marker id="fc-exp-diamond" viewBox="0 0 12 12" refX="6" refY="6" markerWidth="8" markerHeight="8" orient="auto-start-reverse">`,
-    `  <path d="M 1 6 L 6 2 L 11 6 L 6 10 Z" fill="#374151"/>`,
-    `</marker>`
-  );
+    // Filled arrow
+    markers.push(
+      `<marker id="fc-exp-filled-arrow-${cid}" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="${sz}" markerHeight="${sz}" orient="auto-start-reverse">`,
+      `  <path d="M 2 2 L 10 6 L 2 10 Z" fill="${color}"/>`,
+      `</marker>`
+    );
 
-  // Circle
-  markers.push(
-    `<marker id="fc-exp-circle" viewBox="0 0 12 12" refX="6" refY="6" markerWidth="8" markerHeight="8" orient="auto-start-reverse">`,
-    `  <circle cx="6" cy="6" r="4" fill="#374151"/>`,
-    `</marker>`
-  );
+    // Open arrow
+    markers.push(
+      `<marker id="fc-exp-arrow-${cid}" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="${sz}" markerHeight="${sz}" orient="auto-start-reverse">`,
+      `  <path d="M 2 2 L 10 6 L 2 10" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>`,
+      `</marker>`
+    );
+
+    // Diamond
+    markers.push(
+      `<marker id="fc-exp-diamond-${cid}" viewBox="0 0 12 12" refX="6" refY="6" markerWidth="${sz}" markerHeight="${sz}" orient="auto-start-reverse">`,
+      `  <path d="M 1 6 L 6 2 L 11 6 L 6 10 Z" fill="${color}"/>`,
+      `</marker>`
+    );
+
+    // Circle
+    markers.push(
+      `<marker id="fc-exp-circle-${cid}" viewBox="0 0 12 12" refX="6" refY="6" markerWidth="${sz}" markerHeight="${sz}" orient="auto-start-reverse">`,
+      `  <circle cx="6" cy="6" r="4" fill="${color}"/>`,
+      `</marker>`
+    );
+  }
 
   return `<defs>\n${markers.join("\n")}\n</defs>`;
 }
@@ -149,7 +160,7 @@ function buildNodeSvg(node: FlowchartNode, offsetX: number, offsetY: number): st
   if (node.text) {
     const cx = x + node.width / 2;
     const cy = y + node.height / 2;
-    const maxChars = Math.floor(node.width / (node.style.fontSize * 0.55));
+    const maxChars = Math.max(4, Math.floor((node.width - 20) / (node.style.fontSize * 0.55)));
     const words = node.text.split(" ");
     const lines: string[] = [];
     let current = "";
@@ -205,13 +216,14 @@ function buildEdgeSvg(
   // Offset the path by translating coordinates
   const parts: string[] = [];
 
+  const cid = edge.style.stroke.replace(/[^a-zA-Z0-9]/g, "_");
   const markerEnd =
     edge.style.arrowHead !== "none"
-      ? ` marker-end="url(#fc-exp-${edge.style.arrowHead})"`
+      ? ` marker-end="url(#fc-exp-${edge.style.arrowHead}-${cid})"`
       : "";
   const markerStart =
     edge.style.arrowTail !== "none"
-      ? ` marker-start="url(#fc-exp-${edge.style.arrowTail})"`
+      ? ` marker-start="url(#fc-exp-${edge.style.arrowTail}-${cid})"`
       : "";
 
   parts.push(
@@ -258,8 +270,8 @@ export function buildSvgString(
     `<svg xmlns="http://www.w3.org/2000/svg" width="${bounds.width}" height="${bounds.height}" viewBox="0 0 ${bounds.width} ${bounds.height}">`
   );
 
-  // Marker defs
-  parts.push(buildMarkerDefs());
+  // Marker defs (per-color)
+  parts.push(buildMarkerDefs(diagram));
 
   // Background
   const bg = options.background ?? "#ffffff";
