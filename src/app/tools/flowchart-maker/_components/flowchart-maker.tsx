@@ -304,6 +304,22 @@ function flowchartReducer(
         },
       };
 
+    case "MOVE_CONTROL_POINT": {
+      const { edgeId, cpIndex, x, y } = action.payload;
+      return {
+        ...state,
+        diagram: {
+          ...state.diagram,
+          edges: state.diagram.edges.map((e) => {
+            if (e.id !== edgeId) return e;
+            const newCps = [...e.controlPoints];
+            newCps[cpIndex] = { x, y };
+            return { ...e, controlPoints: newCps };
+          }),
+        },
+      };
+    }
+
     case "REMOVE_EDGES":
       return {
         ...withUndo(state),

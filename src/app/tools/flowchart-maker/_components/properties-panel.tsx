@@ -189,6 +189,21 @@ export function PropertiesPanel({ state, dispatch }: PropertiesPanelProps) {
               </select>
             </div>
 
+            {/* Reset curve (only for bezier with custom control points) */}
+            {edge.routeType === "bezier" && edge.controlPoints.length > 0 && (
+              <button
+                onClick={() =>
+                  dispatch({
+                    type: "UPDATE_EDGE",
+                    payload: { id: edge.id, controlPoints: [] },
+                  })
+                }
+                className="w-full rounded-md border border-border px-3 py-1.5 text-xs hover:bg-accent"
+              >
+                Reset Curve
+              </button>
+            )}
+
             <Separator />
 
             {/* Stroke color */}
@@ -226,9 +241,9 @@ export function PropertiesPanel({ state, dispatch }: PropertiesPanelProps) {
               </Label>
               <input
                 type="range"
-                min={1}
-                max={6}
-                step={0.5}
+                min={2}
+                max={12}
+                step={2}
                 value={edge.style.strokeWidth}
                 onChange={(e) =>
                   dispatch({
@@ -572,8 +587,8 @@ export function PropertiesPanel({ state, dispatch }: PropertiesPanelProps) {
             <input
               type="range"
               min={0}
-              max={6}
-              step={0.5}
+              max={12}
+              step={2}
               value={node.style.strokeWidth}
               onChange={(e) =>
                 dispatch({

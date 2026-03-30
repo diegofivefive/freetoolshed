@@ -83,7 +83,11 @@ function computeStraightPath(
 
 // ── Smooth bezier curve (Coggle-style) ───────────────────────
 
-function getAutoBezierControls(
+/**
+ * Compute the two auto-generated bezier control points for a source/target pair.
+ * Exported so that svg-canvas can initialize draggable control points.
+ */
+export function getAutoBezierControls(
   src: { x: number; y: number },
   tgt: { x: number; y: number },
   srcAnchor: AnchorPosition,

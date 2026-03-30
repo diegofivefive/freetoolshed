@@ -22,8 +22,83 @@ export const EdgeRenderer = memo(function EdgeRenderer({
   const route = computeEdgePath(edge, sourceNode, targetNode);
   const hitAreaWidth = Math.max(16, 12 / zoom);
 
+  // Use brand color when selected, otherwise edge's own stroke color
+  const activeColor = isSelected ? "var(--color-brand)" : edge.style.stroke;
+  const markerId = `fc-edge-${edge.id.slice(0, 8)}`;
+
+  // Marker pixel size scales with stroke width for proportional arrows.
+  // Using userSpaceOnUse so sizes are in absolute pixels — no gap.
+  const sw = edge.style.strokeWidth;
+  const markerPx = Math.max(10, sw * 4);
+
   return (
     <g data-edge-id={edge.id}>
+      {/* Per-edge marker defs — userSpaceOnUse for seamless line integration */}
+      <defs>
+        {/* Arrow (open) */}
+        <marker
+          id={`${markerId}-arrow`}
+          viewBox="0 0 10 10"
+          refX="9"
+          refY="5"
+          markerWidth={markerPx}
+          markerHeight={markerPx}
+          markerUnits="userSpaceOnUse"
+          orient="auto-start-reverse"
+        >
+          <path
+            d="M 1 1.5 L 9 5 L 1 8.5"
+            fill="none"
+            stroke={activeColor}
+            strokeWidth="1.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </marker>
+
+        {/* Filled arrow */}
+        <marker
+          id={`${markerId}-filled-arrow`}
+          viewBox="0 0 10 10"
+          refX="9"
+          refY="5"
+          markerWidth={markerPx}
+          markerHeight={markerPx}
+          markerUnits="userSpaceOnUse"
+          orient="auto-start-reverse"
+        >
+          <path d="M 1 1.5 L 9 5 L 1 8.5 Z" fill={activeColor} />
+        </marker>
+
+        {/* Diamond */}
+        <marker
+          id={`${markerId}-diamond`}
+          viewBox="0 0 10 10"
+          refX="5"
+          refY="5"
+          markerWidth={markerPx}
+          markerHeight={markerPx}
+          markerUnits="userSpaceOnUse"
+          orient="auto-start-reverse"
+        >
+          <path d="M 0 5 L 5 1 L 10 5 L 5 9 Z" fill={activeColor} />
+        </marker>
+
+        {/* Circle */}
+        <marker
+          id={`${markerId}-circle`}
+          viewBox="0 0 10 10"
+          refX="5"
+          refY="5"
+          markerWidth={markerPx}
+          markerHeight={markerPx}
+          markerUnits="userSpaceOnUse"
+          orient="auto-start-reverse"
+        >
+          <circle cx="5" cy="5" r="4" fill={activeColor} />
+        </marker>
+      </defs>
+
       {/* Invisible wide hit area for click detection */}
       <path
         d={route.path}
@@ -37,7 +112,7 @@ export const EdgeRenderer = memo(function EdgeRenderer({
       <path
         d={route.path}
         fill="none"
-        stroke={isSelected ? "var(--color-brand)" : edge.style.stroke}
+        stroke={activeColor}
         strokeWidth={edge.style.strokeWidth}
         strokeDasharray={edge.style.dashArray || undefined}
         strokeLinecap="round"
@@ -45,12 +120,12 @@ export const EdgeRenderer = memo(function EdgeRenderer({
         opacity={edge.style.opacity}
         markerEnd={
           edge.style.arrowHead !== "none"
-            ? `url(#fc-arrow-${edge.style.arrowHead}${isSelected ? "-selected" : ""})`
+            ? `url(#${markerId}-${edge.style.arrowHead})`
             : undefined
         }
         markerStart={
           edge.style.arrowTail !== "none"
-            ? `url(#fc-arrow-${edge.style.arrowTail}${isSelected ? "-selected" : ""})`
+            ? `url(#${markerId}-${edge.style.arrowTail})`
             : undefined
         }
         style={{ pointerEvents: "none" }}
@@ -69,6 +144,24 @@ export const EdgeRenderer = memo(function EdgeRenderer({
           style={{ pointerEvents: "none" }}
         />
       )}
+
+      {/* Control point handles (visible when selected, for bezier edges) */}
+      {isSelected &&
+        edge.controlPoints.length > 0 &&
+        edge.controlPoints.map((cp, i) => (
+          <circle
+            key={`cp-${i}`}
+            data-edge-cp={edge.id}
+            data-cp-index={i}
+            cx={cp.x}
+            cy={cp.y}
+            r={5 / zoom}
+            fill="var(--color-brand)"
+            stroke="var(--color-card)"
+            strokeWidth={1.5 / zoom}
+            style={{ cursor: "move" }}
+          />
+        ))}
 
       {/* Edge label */}
       {edge.label && (
@@ -98,122 +191,25 @@ export const EdgeRenderer = memo(function EdgeRenderer({
   );
 });
 
-// ── Arrow marker defs ──────────────────────────────────────────
+// ── Arrow marker defs (kept for draft connection line) ─────────────
 
 export function ArrowMarkerDefs() {
-  const defaultColor = "#374151";
   const selectedColor = "var(--color-brand)";
 
   return (
     <defs>
-      {/* Arrow (open) */}
-      <marker
-        id="fc-arrow-arrow"
-        viewBox="0 0 12 12"
-        refX="10"
-        refY="6"
-        markerWidth="8"
-        markerHeight="8"
-        orient="auto-start-reverse"
-      >
-        <path
-          d="M 2 2 L 10 6 L 2 10"
-          fill="none"
-          stroke={defaultColor}
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </marker>
-      <marker
-        id="fc-arrow-arrow-selected"
-        viewBox="0 0 12 12"
-        refX="10"
-        refY="6"
-        markerWidth="8"
-        markerHeight="8"
-        orient="auto-start-reverse"
-      >
-        <path
-          d="M 2 2 L 10 6 L 2 10"
-          fill="none"
-          stroke={selectedColor}
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </marker>
-
-      {/* Filled arrow */}
-      <marker
-        id="fc-arrow-filled-arrow"
-        viewBox="0 0 12 12"
-        refX="10"
-        refY="6"
-        markerWidth="8"
-        markerHeight="8"
-        orient="auto-start-reverse"
-      >
-        <path d="M 2 2 L 10 6 L 2 10 Z" fill={defaultColor} />
-      </marker>
+      {/* Draft connection line arrow — userSpaceOnUse, fixed 10px */}
       <marker
         id="fc-arrow-filled-arrow-selected"
-        viewBox="0 0 12 12"
-        refX="10"
-        refY="6"
-        markerWidth="8"
-        markerHeight="8"
+        viewBox="0 0 10 10"
+        refX="9"
+        refY="5"
+        markerWidth="10"
+        markerHeight="10"
+        markerUnits="userSpaceOnUse"
         orient="auto-start-reverse"
       >
-        <path d="M 2 2 L 10 6 L 2 10 Z" fill={selectedColor} />
-      </marker>
-
-      {/* Diamond */}
-      <marker
-        id="fc-arrow-diamond"
-        viewBox="0 0 12 12"
-        refX="6"
-        refY="6"
-        markerWidth="8"
-        markerHeight="8"
-        orient="auto-start-reverse"
-      >
-        <path d="M 1 6 L 6 2 L 11 6 L 6 10 Z" fill={defaultColor} />
-      </marker>
-      <marker
-        id="fc-arrow-diamond-selected"
-        viewBox="0 0 12 12"
-        refX="6"
-        refY="6"
-        markerWidth="8"
-        markerHeight="8"
-        orient="auto-start-reverse"
-      >
-        <path d="M 1 6 L 6 2 L 11 6 L 6 10 Z" fill={selectedColor} />
-      </marker>
-
-      {/* Circle */}
-      <marker
-        id="fc-arrow-circle"
-        viewBox="0 0 12 12"
-        refX="6"
-        refY="6"
-        markerWidth="8"
-        markerHeight="8"
-        orient="auto-start-reverse"
-      >
-        <circle cx="6" cy="6" r="4" fill={defaultColor} />
-      </marker>
-      <marker
-        id="fc-arrow-circle-selected"
-        viewBox="0 0 12 12"
-        refX="6"
-        refY="6"
-        markerWidth="8"
-        markerHeight="8"
-        orient="auto-start-reverse"
-      >
-        <circle cx="6" cy="6" r="4" fill={selectedColor} />
+        <path d="M 1 1.5 L 9 5 L 1 8.5 Z" fill={selectedColor} />
       </marker>
     </defs>
   );
