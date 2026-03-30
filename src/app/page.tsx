@@ -16,6 +16,15 @@ const TOOLS: Tool[] = [
     paidAlternative: "FreshBooks",
   },
   {
+    name: "Pay Stub Generator",
+    slug: "pay-stub-generator",
+    description:
+      "Generate professional pay stubs with earnings, deductions, YTD tracking, and instant PDF export.",
+    category: "Business",
+    icon: "Receipt",
+    paidAlternative: "PayStubCreator",
+  },
+  {
     name: "Resume Builder",
     slug: "resume-builder",
     description:
