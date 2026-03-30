@@ -147,6 +147,22 @@ export interface ExportEnvelope {
   stubs: SavedPayStub[];
 }
 
+// ── Roster ──
+
+export interface DeductionTemplate {
+  label: string;
+  category: DeductionCategory;
+  type: DeductionType;
+}
+
+export interface RosterEmployee {
+  id: string;
+  employee: EmployeeInfo;
+  deductionTemplates: DeductionTemplate[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 // ── Validation ──
 
 export interface PayStubValidationError {
@@ -172,5 +188,6 @@ export type PayStubAction =
     }
   | { type: "SET_LOGO"; payload: string | null }
   | { type: "APPLY_PRESET_DEDUCTIONS" }
+  | { type: "APPLY_ROSTER_EMPLOYEE"; payload: RosterEmployee }
   | { type: "LOAD_DRAFT"; payload: PayStubData }
   | { type: "RESET" };

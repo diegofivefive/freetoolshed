@@ -3,6 +3,10 @@ import type {
   PayStubDefaults,
   SavedPayStub,
   ExportEnvelope,
+  RosterEmployee,
+  DeductionTemplate,
+  EmployeeInfo,
+  DeductionEntry,
 } from "./types";
 import { createDefaultPayStubData } from "./constants";
 
@@ -10,6 +14,7 @@ import { createDefaultPayStubData } from "./constants";
 const DRAFT_KEY = "freetoolshed-paystub-draft";
 const HISTORY_KEY = "freetoolshed-paystub-history";
 const DEFAULTS_KEY = "freetoolshed-paystub-defaults";
+const ROSTER_KEY = "freetoolshed-paystub-roster";
 
 // ── Migration ─────────────────────────────────────────────────
 // Fills missing fields so old localStorage drafts still load.
@@ -282,4 +287,104 @@ export function parseImportedJson(
       error: "Could not read the file. Make sure it is a valid JSON file.",
     };
   }
+}
+
+// ── Employee roster ──────────────────────────────────────────
+
+function persistRoster(roster: RosterEmployee[]): void {
+  try {
+    localStorage.setItem(ROSTER_KEY, JSON.stringify(roster));
+  } catch {
+    // QuotaExceededError — silently fail
+  }
+}
+
+export function loadRoster(): RosterEmployee[] {
+  try {
+    const raw = localStorage.getItem(ROSTER_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as RosterEmployee[];
+    // Sort newest first
+    return parsed.sort(
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    );
+  } catch {
+    return [];
+  }
+}
+
+export function saveToRoster(
+  employee: EmployeeInfo,
+  deductions: DeductionEntry[]
+): RosterEmployee {
+  const roster = loadRoster();
+  const now = new Date().toISOString();
+
+  const templates: DeductionTemplate[] = deductions.map((d) => ({
+    label: d.label,
+    category: d.category,
+    type: d.type,
+  }));
+
+  const saved: RosterEmployee = {
+    id: crypto.randomUUID(),
+    employee: { ...employee },
+    deductionTemplates: templates,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  roster.unshift(saved);
+  persistRoster(roster);
+  return saved;
+}
+
+export function updateInRoster(
+  id: string,
+  employee: EmployeeInfo,
+  deductions: DeductionEntry[]
+): void {
+  const roster = loadRoster();
+  const index = roster.findIndex((r) => r.id === id);
+  if (index === -1) return;
+
+  const templates: DeductionTemplate[] = deductions.map((d) => ({
+    label: d.label,
+    category: d.category,
+    type: d.type,
+  }));
+
+  roster[index] = {
+    ...roster[index],
+    employee: { ...employee },
+    deductionTemplates: templates,
+    updatedAt: new Date().toISOString(),
+  };
+
+  persistRoster(roster);
+}
+
+export function deleteFromRoster(id: string): void {
+  const roster = loadRoster().filter((r) => r.id !== id);
+  persistRoster(roster);
+}
+
+export function rosterEmployeeToPartialState(
+  rosterEmployee: RosterEmployee
+): { employee: EmployeeInfo; deductions: DeductionEntry[] } {
+  const deductions: DeductionEntry[] =
+    rosterEmployee.deductionTemplates.map((t) => ({
+      id: crypto.randomUUID(),
+      label: t.label,
+      category: t.category,
+      type: t.type,
+      currentAmount: 0,
+      ytdAmount: 0,
+    }));
+
+  return {
+    employee: { ...rosterEmployee.employee },
+    deductions,
+  };
 }

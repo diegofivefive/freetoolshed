@@ -10,20 +10,39 @@ import {
   TooltipProvider,
 } from "@/components/ui/tooltip";
 import { Info } from "lucide-react";
-import type { EmployeeInfo, PayStubAction } from "@/lib/pay-stub/types";
+import type {
+  EmployeeInfo,
+  DeductionEntry,
+  PayStubAction,
+} from "@/lib/pay-stub/types";
+import { EmployeeRoster } from "./employee-roster";
 
 interface EmployeeFieldsProps {
   employee: EmployeeInfo;
+  deductions: DeductionEntry[];
   dispatch: Dispatch<PayStubAction>;
 }
 
-export function EmployeeFields({ employee, dispatch }: EmployeeFieldsProps) {
+export function EmployeeFields({
+  employee,
+  deductions,
+  dispatch,
+}: EmployeeFieldsProps) {
   const update = (payload: Partial<EmployeeInfo>) =>
     dispatch({ type: "SET_EMPLOYEE", payload });
 
   return (
     <div className="space-y-4">
-      <h3 className="text-sm font-semibold">Employee</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold">Employee</h3>
+        <EmployeeRoster
+          currentEmployee={employee}
+          currentDeductions={deductions}
+          onApply={(rosterEmp) =>
+            dispatch({ type: "APPLY_ROSTER_EMPLOYEE", payload: rosterEmp })
+          }
+        />
+      </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="col-span-2 space-y-1.5">
           <Label htmlFor="employee-name">Employee Name *</Label>

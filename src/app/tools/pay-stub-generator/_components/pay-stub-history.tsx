@@ -26,6 +26,8 @@ import {
   Upload,
   Download,
   Save,
+  FileText,
+  Loader2,
 } from "lucide-react";
 import type { SavedPayStub, PayStubData } from "@/lib/pay-stub/types";
 import {
@@ -40,6 +42,7 @@ import {
 } from "@/lib/pay-stub/storage";
 import { formatCurrency } from "@/lib/pay-stub/format";
 import { calculatePayStub } from "@/lib/pay-stub/calculations";
+import { generateBulkPdf } from "./pdf-export";
 
 interface PayStubHistoryProps {
   currentState: PayStubData;
@@ -53,6 +56,8 @@ export function PayStubHistory({
   const [open, setOpen] = useState(false);
   const [history, setHistory] = useState<SavedPayStub[]>([]);
   const [importError, setImportError] = useState<string | null>(null);
+  const [bulkPdfError, setBulkPdfError] = useState<string | null>(null);
+  const [bulkPdfLoading, setBulkPdfLoading] = useState(false);
   const [defaultsSaved, setDefaultsSaved] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -64,6 +69,7 @@ export function PayStubHistory({
     if (open) {
       refreshHistory();
       setImportError(null);
+      setBulkPdfError(null);
       setDefaultsSaved(false);
     }
   }, [open, refreshHistory]);
@@ -142,6 +148,23 @@ export function PayStubHistory({
     setDefaultsSaved(true);
   }, [currentState]);
 
+  const handleBulkPdf = useCallback(async () => {
+    setBulkPdfLoading(true);
+    setBulkPdfError(null);
+    try {
+      const all = loadHistory();
+      if (all.length === 0) return;
+      const result = await generateBulkPdf(all);
+      if (!result.success) {
+        setBulkPdfError(result.errors.join("; "));
+      }
+    } catch {
+      setBulkPdfError("Failed to generate bulk PDF. Please try again.");
+    } finally {
+      setBulkPdfLoading(false);
+    }
+  }, []);
+
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
@@ -193,6 +216,9 @@ export function PayStubHistory({
           {importError && (
             <p className="text-xs text-pink-400">{importError}</p>
           )}
+          {bulkPdfError && (
+            <p className="text-xs text-pink-400">{bulkPdfError}</p>
+          )}
           <TooltipProvider>
             <div className="flex flex-wrap gap-2">
               <Tooltip>
@@ -228,6 +254,36 @@ export function PayStubHistory({
                   />
                   <TooltipContent side="bottom">
                     Download all saved pay stubs as a single JSON file
+                  </TooltipContent>
+                </Tooltip>
+              )}
+              {history.length > 0 && (
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleBulkPdf}
+                        disabled={bulkPdfLoading}
+                      >
+                        {bulkPdfLoading ? (
+                          <Loader2
+                            className="size-3.5 animate-spin"
+                            data-icon="inline-start"
+                          />
+                        ) : (
+                          <FileText
+                            className="size-3.5"
+                            data-icon="inline-start"
+                          />
+                        )}
+                        Download All PDF
+                      </Button>
+                    }
+                  />
+                  <TooltipContent side="bottom">
+                    Download all saved pay stubs as a single multi-page PDF
                   </TooltipContent>
                 </Tooltip>
               )}

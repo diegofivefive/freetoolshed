@@ -14,7 +14,12 @@ import {
   STANDARD_DEDUCTION_PRESET,
 } from "@/lib/pay-stub/constants";
 import { calculatePayStub, calculateEarningAmount } from "@/lib/pay-stub/calculations";
-import { saveDraft, loadDraft, loadDefaults } from "@/lib/pay-stub/storage";
+import {
+  saveDraft,
+  loadDraft,
+  loadDefaults,
+  rosterEmployeeToPartialState,
+} from "@/lib/pay-stub/storage";
 import { ToolGuide } from "@/components/shared/tool-guide";
 import type { ToolGuideSection } from "@/components/shared/tool-guide";
 
@@ -98,7 +103,20 @@ const PAY_STUB_GUIDE_SECTIONS: ToolGuideSection[] = [
       "Click a saved stub to reload it into the editor",
       "Duplicate a stub for the next pay period (resets amounts)",
       "Export/Import as JSON for backup or transfer",
+      "\"Download All PDF\" exports every saved stub as one multi-page PDF",
       "\"Save Employer as Default\" pre-fills future new stubs",
+    ],
+  },
+  {
+    title: "Employee Roster",
+    content:
+      "Save employee profiles to quickly switch between workers each pay period without re-entering their details.",
+    steps: [
+      "Click the \"Roster\" button next to the Employee heading",
+      "\"Save Current Employee\" stores name, address, ID, SSN, department, and deduction structure",
+      "Select a saved employee to pre-fill their info and deductions",
+      "Current amounts reset to zero — only the structure carries over",
+      "Delete employees from the roster with the trash icon",
     ],
   },
   {
@@ -107,6 +125,7 @@ const PAY_STUB_GUIDE_SECTIONS: ToolGuideSection[] = [
       "Helpful shortcuts for faster pay stub generation.",
     steps: [
       "Save your employer as default to skip re-entering info",
+      "Save employees to the roster to skip re-entering their info",
       "Use \"New Stub\" to start fresh (clears the draft)",
       "Duplicate from History to carry over employee and deductions",
       "All data stays in your browser — nothing is uploaded",
@@ -206,6 +225,14 @@ function payStubReducer(
       return {
         ...state,
         deductions: [...state.deductions, ...newDeductions],
+      };
+    }
+    case "APPLY_ROSTER_EMPLOYEE": {
+      const partial = rosterEmployeeToPartialState(action.payload);
+      return {
+        ...state,
+        employee: partial.employee,
+        deductions: partial.deductions,
       };
     }
     case "LOAD_DRAFT":
