@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useCallback, useState, type Dispatch } from "react";
+import { useRef, useCallback, useState, useEffect, type Dispatch } from "react";
 import type {
   EditorState,
   FlowchartAction,
@@ -125,22 +125,25 @@ export function SvgCanvas({ state, dispatch }: SvgCanvasProps) {
 
   // ── Zoom via scroll wheel ───────────────────────────────────
 
-  const handleWheel = useCallback(
-    (e: React.WheelEvent<SVGSVGElement>) => {
-      e.preventDefault();
-      const svg = svgRef.current;
-      if (!svg) return;
-      const rect = svg.getBoundingClientRect();
+  // Attach wheel handler as a non-passive native listener so preventDefault
+  // actually stops the page from scrolling while zooming the canvas.
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
 
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const rect = svg.getBoundingClientRect();
       const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
       const newZoom = clamp(viewport.zoom + delta, ZOOM_MIN, ZOOM_MAX);
       if (newZoom === viewport.zoom) return;
-
       const result = zoomAtPoint(viewport, newZoom, e.clientX, e.clientY, rect);
       dispatch({ type: "SET_VIEWPORT", payload: result });
-    },
-    [viewport, dispatch]
-  );
+    };
+
+    svg.addEventListener("wheel", onWheel, { passive: false });
+    return () => svg.removeEventListener("wheel", onWheel);
+  }, [viewport, dispatch]);
 
   // ── Handle mouse down on resize/rotate handles ──────────────
 
@@ -866,7 +869,6 @@ export function SvgCanvas({ state, dispatch }: SvgCanvasProps) {
       className="h-full w-full outline-none"
       style={{ cursor: cursorStyle }}
       tabIndex={0}
-      onWheel={handleWheel}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}

@@ -114,7 +114,14 @@ export const EdgeRenderer = memo(function EdgeRenderer({
         fill="none"
         stroke={activeColor}
         strokeWidth={edge.style.strokeWidth}
-        strokeDasharray={edge.style.dashArray || undefined}
+        strokeDasharray={
+          edge.style.dashArray
+            ? edge.style.dashArray
+                .split(/\s+/)
+                .map((v) => String(Number(v) * Math.max(1, sw / 2)))
+                .join(" ")
+            : undefined
+        }
         strokeLinecap="round"
         strokeLinejoin="round"
         opacity={edge.style.opacity}
