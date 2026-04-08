@@ -101,7 +101,11 @@ export function PayStubForm({
             <Separator />
             <EmployerFields employer={state.employer} dispatch={dispatch} />
             <Separator />
-            <EmployeeFields employee={state.employee} dispatch={dispatch} />
+            <EmployeeFields
+              employee={state.employee}
+              deductions={state.deductions}
+              dispatch={dispatch}
+            />
           </div>
         </TabsContent>
 

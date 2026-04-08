@@ -40,6 +40,8 @@ export function SeoContent() {
             "Export and import stubs as JSON for backup",
             "Save employer defaults for faster stub creation",
             "SSN last-4 display with privacy toggle",
+            "Employee roster — save profiles and switch employees without re-entering info",
+            "Bulk PDF export — download all saved stubs as one multi-page PDF",
             "Print directly from the browser or download PDF",
           ].map((feature) => (
             <li key={feature} className="flex items-start gap-2">
@@ -125,7 +127,8 @@ export function SeoContent() {
                 ["Accent Color", "Yes", "No", "No", "No"],
                 ["JSON Export", "Yes", "No", "No", "No"],
                 ["Client-Side Privacy", "Yes", "No", "No", "No"],
-                ["Bulk Generation", "No", "Yes", "Yes", "Yes"],
+                ["Bulk PDF Export", "Yes", "Yes", "Yes", "Yes"],
+                ["Employee Roster", "Yes", "No", "No", "No"],
               ].map(([feature, fts, psc, tps, ops]) => (
                 <tr key={feature}>
                   <td className="py-2.5 pr-4 font-medium">{feature}</td>
@@ -182,7 +185,7 @@ export function SeoContent() {
             },
             {
               q: "Can I save and reuse pay stubs?",
-              a: "Yes. Your current draft auto-saves every second. You can also save completed stubs to a history panel, then load or duplicate them for future pay periods. Duplicating resets current amounts but preserves employee info, deductions, and YTD values.",
+              a: "Yes. Your current draft auto-saves every second. Save completed stubs to a history panel, then load or duplicate them for future pay periods. You can also save employee profiles to a roster — select an employee and their info and deduction structure pre-fill instantly, so you only enter what changes each period.",
             },
             {
               q: "Can I add my company logo?",
