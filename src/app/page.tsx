@@ -61,6 +61,15 @@ const TOOLS: Tool[] = [
     icon: "GitBranch",
     paidAlternative: "Lucidchart",
   },
+  {
+    name: "OCR Scanner",
+    slug: "ocr-scanner",
+    description:
+      "Extract text from images and scanned PDFs with browser-based OCR. Export as .txt, .docx, or searchable PDF.",
+    category: "Document",
+    icon: "ScanText",
+    paidAlternative: "Adobe Acrobat",
+  },
 ];
 
 export default function HomePage() {
