@@ -9,8 +9,11 @@ import {
   Loader2,
   RotateCcw,
   FileText,
+  ZoomIn,
+  SlidersHorizontal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileUpload } from "@/components/shared/file-upload";
 import { ocrReducer } from "@/lib/ocr/reducer";
 import {
@@ -20,19 +23,25 @@ import {
   MAX_PDF_PAGES,
   IMAGE_MIME_TYPES,
   LANGUAGE_LABELS,
+  DEFAULT_FILTERS,
 } from "@/lib/ocr/constants";
 import { loadPrefs, savePrefs } from "@/lib/ocr/storage";
 import {
   initWorker,
   recognizeImage,
   terminateWorker,
-  getWorkerLanguage,
 } from "@/lib/ocr/ocr-engine";
 import { renderPdfPages } from "@/lib/ocr/pdf-renderer";
+import {
+  getCssFilterString,
+  filtersAreDefault,
+  applyFiltersToImage,
+} from "@/lib/ocr/image-filters";
 import { ExportPanel } from "./export-panel";
+import { ImagePreview } from "./image-preview";
 import { ToolGuide } from "@/components/shared/tool-guide";
 import type { ToolGuideSection } from "@/components/shared/tool-guide";
-import type { OcrFile, OcrPage, OcrLanguage, ExportFormat } from "@/lib/ocr/types";
+import type { OcrFile, OcrPage, OcrLanguage, ExportFormat, TextViewMode, ImageFilters } from "@/lib/ocr/types";
 import type { SearchablePdfPage } from "@/lib/ocr/export";
 
 const OCR_GUIDE_SECTIONS: ToolGuideSection[] = [
@@ -65,6 +74,21 @@ const OCR_GUIDE_SECTIONS: ToolGuideSection[] = [
     title: "Batch Processing",
     content:
       "Add multiple files at once — images and PDFs can be mixed. Each page is processed sequentially. Use 'Add Files' to append more files to an existing session.",
+  },
+  {
+    title: "Page View",
+    content:
+      "Switch between 'All Pages' (combined text) and 'Selected Page' to view or edit text for a single page. Click a page in the sidebar to select it. Per-page edits automatically update the combined text.",
+  },
+  {
+    title: "Image Preview",
+    content:
+      "Hover over a thumbnail and click the magnifying glass to open a full-size preview. Zoom in/out with toolbar buttons or scroll wheel. Drag to pan when zoomed in. Use arrow keys or nav buttons to move between pages.",
+  },
+  {
+    title: "Image Preprocessing",
+    content:
+      "Click 'Image Settings' to adjust brightness, contrast, and threshold before OCR. Thumbnails show a live CSS preview. Click 'Apply & Re-OCR' to process images with the new settings. Threshold converts to black and white — useful for faded or noisy scans.",
   },
   {
     title: "Re-OCR",
@@ -109,6 +133,7 @@ export function OcrScanner() {
   const processingRef = useRef(false);
   const abortRef = useRef(false);
   const [pdfRenderingCount, setPdfRenderingCount] = useState(0);
+  const [previewPageId, setPreviewPageId] = useState<string | null>(null);
 
   // Save preferences when they change
   useEffect(() => {
@@ -149,19 +174,14 @@ export function OcrScanner() {
         const nextPending = currentPages.find((p) => p.status === "pending");
         if (!nextPending) break;
 
-        // Init or reinit worker if language changed
-        if (getWorkerLanguage() !== language) {
-          dispatch({ type: "SET_WORKER_READY", payload: false });
-          await initWorker(language);
-          dispatch({ type: "SET_WORKER_READY", payload: true });
-        }
-
         dispatch({
           type: "SET_PAGE_STATUS",
           payload: { pageId: nextPending.id, status: "processing" },
         });
 
         try {
+          // Init/reinit worker (handles language change + dedup internally).
+          // Progress callback is always updated so recognition events fire.
           await initWorker(language, (progress) => {
             dispatch({
               type: "SET_PAGE_PROGRESS",
@@ -224,6 +244,7 @@ export function OcrScanner() {
         fileId,
         pageNumber: 0,
         imageUrl,
+        originalImageUrl: imageUrl,
         width: img.naturalWidth,
         height: img.naturalHeight,
         status: "pending",
@@ -271,6 +292,7 @@ export function OcrScanner() {
           fileId,
           pageNumber: rp.pageNumber,
           imageUrl: rp.imageUrl,
+          originalImageUrl: rp.imageUrl,
           width: rp.width,
           height: rp.height,
           status: "pending" as const,
@@ -338,15 +360,48 @@ export function OcrScanner() {
     dispatch({ type: "CLEAR_ALL" });
   }, []);
 
-  const handleReOcr = useCallback(() => {
-    // Abort current processing, terminate worker (forces reinit with current language)
+  const handleReOcr = useCallback(async () => {
     abortRef.current = true;
-    terminateWorker();
-    // Small delay to let abort take effect, then reset all pages to pending
-    setTimeout(() => {
-      dispatch({ type: "RESET_ALL_PAGES_PENDING" });
-    }, 100);
+    await terminateWorker();
+    dispatch({ type: "RESET_ALL_PAGES_PENDING" });
   }, []);
+
+  const handleApplyFiltersAndReOcr = useCallback(async () => {
+    abortRef.current = true;
+    await terminateWorker();
+
+    const pages = pagesRef.current;
+    const filters = state.filters;
+
+    for (const page of pages) {
+      // Revoke old filtered URL (only if it differs from original)
+      if (page.imageUrl !== page.originalImageUrl) {
+        URL.revokeObjectURL(page.imageUrl);
+        objectUrlsRef.current.delete(page.id);
+      }
+
+      if (filtersAreDefault(filters)) {
+        // Reset to original
+        dispatch({
+          type: "SET_PAGE_IMAGE_URL",
+          payload: { pageId: page.id, imageUrl: page.originalImageUrl },
+        });
+        objectUrlsRef.current.set(page.id, page.originalImageUrl);
+      } else {
+        const filteredUrl = await applyFiltersToImage(
+          page.originalImageUrl,
+          filters,
+        );
+        dispatch({
+          type: "SET_PAGE_IMAGE_URL",
+          payload: { pageId: page.id, imageUrl: filteredUrl },
+        });
+        objectUrlsRef.current.set(page.id, filteredUrl);
+      }
+    }
+
+    dispatch({ type: "RESET_ALL_PAGES_PENDING" });
+  }, [state.filters]);
 
   const hasFiles = state.files.length > 0;
   const totalPages = state.pages.length;
@@ -360,15 +415,63 @@ export function OcrScanner() {
         )
       : 0;
 
-  // Build searchable PDF page data for export (only done pages with images)
-  const searchablePdfPages: SearchablePdfPage[] = state.pages
-    .filter((p) => p.status === "done")
-    .map((p) => ({
-      imageUrl: p.imageUrl,
-      width: p.width,
-      height: p.height,
-      text: p.text,
-    }));
+  // Per-page text view support
+  const selectedPage = state.pages.find((p) => p.id === state.selectedPageId);
+  const displayedText =
+    state.viewMode === "combined"
+      ? state.editedText
+      : (selectedPage?.text ?? "");
+
+  const handleTextChange = (value: string) => {
+    if (state.viewMode === "combined") {
+      dispatch({ type: "SET_EDITED_TEXT", payload: value });
+    } else if (state.selectedPageId) {
+      dispatch({
+        type: "SET_PAGE_TEXT",
+        payload: { pageId: state.selectedPageId, text: value },
+      });
+    }
+  };
+
+  // Build searchable PDF page data for export
+  const searchablePdfPages: SearchablePdfPage[] =
+    state.viewMode === "combined"
+      ? state.pages
+          .filter((p) => p.status === "done")
+          .map((p) => ({
+            imageUrl: p.imageUrl,
+            width: p.width,
+            height: p.height,
+            text: p.text,
+          }))
+      : selectedPage && selectedPage.status === "done"
+        ? [
+            {
+              imageUrl: selectedPage.imageUrl,
+              width: selectedPage.width,
+              height: selectedPage.height,
+              text: selectedPage.text,
+            },
+          ]
+        : [];
+
+  // Image preview navigation
+  const previewPage = state.pages.find((p) => p.id === previewPageId) ?? null;
+  const previewIndex = previewPageId
+    ? state.pages.findIndex((p) => p.id === previewPageId)
+    : -1;
+  const handlePreviewNavigate = useCallback(
+    (direction: "prev" | "next") => {
+      const pages = pagesRef.current;
+      const idx = pages.findIndex((p) => p.id === previewPageId);
+      if (idx === -1) return;
+      const newIdx = direction === "prev" ? idx - 1 : idx + 1;
+      if (newIdx >= 0 && newIdx < pages.length) {
+        setPreviewPageId(pages[newIdx].id);
+      }
+    },
+    [previewPageId],
+  );
 
   // Empty state — full-width drop zone
   if (!hasFiles) {
@@ -445,6 +548,14 @@ export function OcrScanner() {
             Re-OCR All
           </Button>
         )}
+        <Button
+          variant={state.showFilters ? "default" : "outline"}
+          size="sm"
+          onClick={() => dispatch({ type: "TOGGLE_FILTERS_PANEL" })}
+        >
+          <SlidersHorizontal className="mr-1.5 size-4" />
+          Image Settings
+        </Button>
 
         {/* Processing status */}
         {pdfRenderingCount > 0 && (
@@ -489,6 +600,102 @@ export function OcrScanner() {
           </select>
         </div>
       </div>
+
+      {/* Image preprocessing filters */}
+      {state.showFilters && (
+        <div className="rounded-lg border border-border bg-card p-4">
+          <div className="grid gap-4 sm:grid-cols-3">
+            <label className="space-y-1.5">
+              <span className="text-xs font-medium text-muted-foreground">
+                Brightness ({state.filters.brightness}%)
+              </span>
+              <input
+                type="range"
+                min={0}
+                max={200}
+                step={5}
+                value={state.filters.brightness}
+                onChange={(e) =>
+                  dispatch({
+                    type: "SET_FILTERS",
+                    payload: {
+                      ...state.filters,
+                      brightness: Number(e.target.value),
+                    },
+                  })
+                }
+                className="w-full accent-brand"
+              />
+            </label>
+            <label className="space-y-1.5">
+              <span className="text-xs font-medium text-muted-foreground">
+                Contrast ({state.filters.contrast}%)
+              </span>
+              <input
+                type="range"
+                min={0}
+                max={200}
+                step={5}
+                value={state.filters.contrast}
+                onChange={(e) =>
+                  dispatch({
+                    type: "SET_FILTERS",
+                    payload: {
+                      ...state.filters,
+                      contrast: Number(e.target.value),
+                    },
+                  })
+                }
+                className="w-full accent-brand"
+              />
+            </label>
+            <label className="space-y-1.5">
+              <span className="text-xs font-medium text-muted-foreground">
+                Threshold ({state.filters.threshold === 0 ? "Off" : state.filters.threshold})
+              </span>
+              <input
+                type="range"
+                min={0}
+                max={255}
+                step={5}
+                value={state.filters.threshold}
+                onChange={(e) =>
+                  dispatch({
+                    type: "SET_FILTERS",
+                    payload: {
+                      ...state.filters,
+                      threshold: Number(e.target.value),
+                    },
+                  })
+                }
+                className="w-full accent-brand"
+              />
+            </label>
+          </div>
+          <div className="mt-3 flex items-center gap-2">
+            <Button
+              size="sm"
+              onClick={handleApplyFiltersAndReOcr}
+              disabled={state.isProcessing || filtersAreDefault(state.filters)}
+            >
+              Apply & Re-OCR
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => dispatch({ type: "RESET_FILTERS" })}
+              disabled={filtersAreDefault(state.filters)}
+            >
+              Reset
+            </Button>
+            {!filtersAreDefault(state.filters) && (
+              <p className="text-xs text-muted-foreground">
+                Thumbnails show a live preview. Click &quot;Apply & Re-OCR&quot; to process.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Two-panel layout */}
       <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
@@ -546,11 +753,27 @@ export function OcrScanner() {
                             : "text-muted-foreground hover:bg-muted"
                         }`}
                       >
-                        <img
-                          src={page.imageUrl}
-                          alt={`Page ${page.pageNumber + 1}`}
-                          className="size-8 shrink-0 rounded border border-border object-cover"
-                        />
+                        <div className="group/thumb relative size-8 shrink-0">
+                          <img
+                            src={page.originalImageUrl}
+                            alt={`Page ${page.pageNumber + 1}`}
+                            className="size-full rounded border border-border object-cover"
+                            style={{
+                              filter: filtersAreDefault(state.filters)
+                                ? undefined
+                                : getCssFilterString(state.filters),
+                            }}
+                          />
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPreviewPageId(page.id);
+                            }}
+                            className="absolute inset-0 flex items-center justify-center rounded bg-black/50 opacity-0 transition-opacity group-hover/thumb:opacity-100"
+                          >
+                            <ZoomIn className="size-3.5 text-white" />
+                          </button>
+                        </div>
                         <div className="min-w-0 flex-1">
                           <p className="truncate">
                             {file.type === "pdf"
@@ -594,17 +817,94 @@ export function OcrScanner() {
         <div className="flex flex-col rounded-lg border border-border">
           <div className="border-b border-border px-4 py-2">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium">Extracted Text</p>
-              {state.editedText && (
+              <Tabs
+                value={state.viewMode}
+                onValueChange={(v: string) =>
+                  dispatch({ type: "SET_VIEW_MODE", payload: v as TextViewMode })
+                }
+              >
+                <TabsList variant="line">
+                  <TabsTrigger value="combined">All Pages</TabsTrigger>
+                  <TabsTrigger value="page">Selected Page</TabsTrigger>
+                </TabsList>
+              </Tabs>
+              {displayedText && (
                 <p className="text-xs text-muted-foreground">
-                  {state.editedText.split(/\s+/).filter(Boolean).length} words
+                  {displayedText.split(/\s+/).filter(Boolean).length} words
                   {" / "}
-                  {state.editedText.length} chars
+                  {displayedText.length} chars
                 </p>
               )}
             </div>
           </div>
-          {(state.isProcessing || pdfRenderingCount > 0) &&
+
+          {/* Amber info bar: combined text was manually edited */}
+          {state.viewMode === "page" && state.isTextEdited && (
+            <div className="flex items-center gap-2 border-b border-amber-500/30 bg-amber-500/10 px-4 py-1.5 text-xs text-amber-400">
+              <span>Combined text was manually edited.</span>
+              <button
+                className="underline"
+                onClick={() =>
+                  dispatch({ type: "REBUILD_COMBINED_FROM_PAGES" })
+                }
+              >
+                Rebuild from pages
+              </button>
+            </div>
+          )}
+
+          {/* Page mode: no page selected */}
+          {state.viewMode === "page" && !selectedPage && (
+            <div className="flex flex-1 items-center justify-center py-20">
+              <p className="text-sm text-muted-foreground">
+                Select a page from the sidebar to view its text.
+              </p>
+            </div>
+          )}
+
+          {/* Page mode: selected page is pending/processing */}
+          {state.viewMode === "page" &&
+            selectedPage &&
+            (selectedPage.status === "pending" ||
+              selectedPage.status === "processing") && (
+              <div className="flex flex-1 items-center justify-center py-20">
+                <div className="text-center">
+                  <Loader2 className="mx-auto mb-3 size-8 animate-spin text-brand" />
+                  <p className="text-sm text-muted-foreground">
+                    {selectedPage.status === "pending"
+                      ? "Waiting to process..."
+                      : "Extracting text..."}
+                  </p>
+                </div>
+              </div>
+            )}
+
+          {/* Page mode: selected page errored */}
+          {state.viewMode === "page" &&
+            selectedPage &&
+            selectedPage.status === "error" && (
+              <div className="flex flex-1 items-center justify-center py-20">
+                <p className="text-sm text-pink-400">
+                  {selectedPage.errorMessage ?? "OCR failed for this page"}
+                </p>
+              </div>
+            )}
+
+          {/* Page mode: selected page done — editable text */}
+          {state.viewMode === "page" &&
+            selectedPage &&
+            selectedPage.status === "done" && (
+              <textarea
+                value={selectedPage.text}
+                onChange={(e) => handleTextChange(e.target.value)}
+                placeholder="No text detected on this page."
+                className="min-h-[400px] flex-1 resize-none bg-transparent px-4 py-3 text-sm leading-relaxed focus:outline-none"
+              />
+            )}
+
+          {/* Combined mode: loading spinner when no text yet */}
+          {state.viewMode === "combined" &&
+            (state.isProcessing || pdfRenderingCount > 0) &&
             !state.editedText && (
               <div className="flex flex-1 items-center justify-center py-20">
                 <div className="text-center">
@@ -617,26 +917,24 @@ export function OcrScanner() {
                 </div>
               </div>
             )}
-          {((!state.isProcessing && pdfRenderingCount === 0) ||
-            state.editedText) && (
-            <textarea
-              value={state.editedText}
-              onChange={(e) =>
-                dispatch({
-                  type: "SET_EDITED_TEXT",
-                  payload: e.target.value,
-                })
-              }
-              placeholder="Extracted text will appear here..."
-              className="min-h-[400px] flex-1 resize-none bg-transparent px-4 py-3 text-sm leading-relaxed focus:outline-none"
-            />
-          )}
+
+          {/* Combined mode: editable text */}
+          {state.viewMode === "combined" &&
+            ((!state.isProcessing && pdfRenderingCount === 0) ||
+              state.editedText) && (
+              <textarea
+                value={state.editedText}
+                onChange={(e) => handleTextChange(e.target.value)}
+                placeholder="Extracted text will appear here..."
+                className="min-h-[400px] flex-1 resize-none bg-transparent px-4 py-3 text-sm leading-relaxed focus:outline-none"
+              />
+            )}
         </div>
       </div>
 
       {/* Export bar */}
       <ExportPanel
-        text={state.editedText}
+        text={displayedText}
         format={state.exportFormat}
         onFormatChange={(f: ExportFormat) =>
           dispatch({ type: "SET_EXPORT_FORMAT", payload: f })
@@ -645,6 +943,14 @@ export function OcrScanner() {
         disabled={state.isProcessing || pdfRenderingCount > 0}
       />
     </div>
+    <ImagePreview
+      page={previewPage}
+      open={previewPageId !== null}
+      onClose={() => setPreviewPageId(null)}
+      onNavigate={handlePreviewNavigate}
+      hasPrev={previewIndex > 0}
+      hasNext={previewIndex < state.pages.length - 1}
+    />
     <ToolGuide sections={OCR_GUIDE_SECTIONS} />
     </>
   );

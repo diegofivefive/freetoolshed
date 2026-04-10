@@ -1,4 +1,4 @@
-import type { OcrState, OcrLanguage, ExportFormat } from "./types";
+import type { OcrState, OcrLanguage, ExportFormat, ImageFilters } from "./types";
 
 /** Human-readable language labels */
 export const LANGUAGE_LABELS: Record<OcrLanguage, string> = {
@@ -48,11 +48,19 @@ export const IMAGE_MIME_TYPES = new Set([
   "image/webp",
 ]);
 
+/** Default image filter values (no-op) */
+export const DEFAULT_FILTERS: ImageFilters = {
+  brightness: 100,
+  contrast: 100,
+  threshold: 0,
+};
+
 /** Default state */
 export const INITIAL_OCR_STATE: OcrState = {
   files: [],
   pages: [],
   selectedPageId: null,
+  viewMode: "combined",
   language: "eng",
   isProcessing: false,
   combinedText: "",
@@ -61,4 +69,6 @@ export const INITIAL_OCR_STATE: OcrState = {
   exportFormat: "txt",
   isWorkerReady: false,
   errorMessage: null,
+  filters: DEFAULT_FILTERS,
+  showFilters: false,
 };

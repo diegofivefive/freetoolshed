@@ -12,11 +12,16 @@ interface TesseractWorker {
 let worker: TesseractWorker | null = null;
 let currentLanguage: string | null = null;
 let initPromise: Promise<void> | null = null;
+/** Mutable ref so the logger always uses the latest callback */
+let activeProgressCb: ProgressCallback | null = null;
 
 export async function initWorker(
   language: OcrLanguage,
   onProgress?: ProgressCallback,
 ): Promise<void> {
+  // Always update the progress callback so recognition events use the latest
+  activeProgressCb = onProgress ?? null;
+
   // If already initializing with same language, wait for it
   if (initPromise && currentLanguage === language) {
     await initPromise;
@@ -37,8 +42,8 @@ export async function initWorker(
     const { createWorker } = await import("tesseract.js");
     worker = (await createWorker(language, 1, {
       logger: (m: { status: string; progress: number }) => {
-        if (m.status === "recognizing text" && onProgress) {
-          onProgress(Math.round(m.progress * 100));
+        if (m.status === "recognizing text" && activeProgressCb) {
+          activeProgressCb(Math.round(m.progress * 100));
         }
       },
     })) as unknown as TesseractWorker;

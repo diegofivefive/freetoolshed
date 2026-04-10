@@ -41,7 +41,15 @@ export function ocrReducer(state: OcrState, action: OcrAction): OcrState {
     }
 
     case "CLEAR_ALL":
-      return { ...INITIAL_OCR_STATE, isWorkerReady: state.isWorkerReady };
+      return {
+        ...INITIAL_OCR_STATE,
+        isWorkerReady: state.isWorkerReady,
+        language: state.language,
+        exportFormat: state.exportFormat,
+        viewMode: state.viewMode,
+        filters: state.filters,
+        showFilters: state.showFilters,
+      };
 
     case "SET_PAGE_STATUS":
       return {
@@ -157,6 +165,53 @@ export function ocrReducer(state: OcrState, action: OcrAction): OcrState {
           f.id === action.payload.fileId
             ? { ...f, pageCount: action.payload.pageCount }
             : f,
+        ),
+      };
+
+    case "SET_VIEW_MODE":
+      return { ...state, viewMode: action.payload };
+
+    case "SET_PAGE_TEXT": {
+      const newPages = state.pages.map((p) =>
+        p.id === action.payload.pageId
+          ? { ...p, text: action.payload.text }
+          : p,
+      );
+      const newCombined = buildCombinedText(newPages);
+      return {
+        ...state,
+        pages: newPages,
+        combinedText: newCombined,
+        editedText: state.isTextEdited ? state.editedText : newCombined,
+      };
+    }
+
+    case "REBUILD_COMBINED_FROM_PAGES": {
+      const rebuilt = buildCombinedText(state.pages);
+      return {
+        ...state,
+        combinedText: rebuilt,
+        editedText: rebuilt,
+        isTextEdited: false,
+      };
+    }
+
+    case "SET_FILTERS":
+      return { ...state, filters: action.payload };
+
+    case "TOGGLE_FILTERS_PANEL":
+      return { ...state, showFilters: !state.showFilters };
+
+    case "RESET_FILTERS":
+      return { ...state, filters: INITIAL_OCR_STATE.filters };
+
+    case "SET_PAGE_IMAGE_URL":
+      return {
+        ...state,
+        pages: state.pages.map((p) =>
+          p.id === action.payload.pageId
+            ? { ...p, imageUrl: action.payload.imageUrl }
+            : p,
         ),
       };
 

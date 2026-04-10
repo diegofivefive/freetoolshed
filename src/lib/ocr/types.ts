@@ -7,6 +7,16 @@ export type OcrStatus = "pending" | "processing" | "done" | "error";
 /** Export format options */
 export type ExportFormat = "txt" | "docx" | "pdf";
 
+/** Text panel view mode */
+export type TextViewMode = "combined" | "page";
+
+/** Image preprocessing filter values */
+export interface ImageFilters {
+  brightness: number; // 0–200, default 100
+  contrast: number; // 0–200, default 100
+  threshold: number; // 0–255, default 0 (off)
+}
+
 /** Supported OCR languages (subset of tesseract's ~100 languages) */
 export type OcrLanguage =
   | "eng"
@@ -31,6 +41,7 @@ export interface OcrPage {
   fileId: string;
   pageNumber: number;
   imageUrl: string;
+  originalImageUrl: string;
   width: number;
   height: number;
   status: OcrStatus;
@@ -55,6 +66,7 @@ export interface OcrState {
   files: OcrFile[];
   pages: OcrPage[];
   selectedPageId: string | null;
+  viewMode: TextViewMode;
   language: OcrLanguage;
   isProcessing: boolean;
   combinedText: string;
@@ -63,6 +75,8 @@ export interface OcrState {
   exportFormat: ExportFormat;
   isWorkerReady: boolean;
   errorMessage: string | null;
+  filters: ImageFilters;
+  showFilters: boolean;
 }
 
 /** Reducer actions */
@@ -91,4 +105,11 @@ export type OcrAction =
   | { type: "SET_WORKER_READY"; payload: boolean }
   | { type: "SET_ERROR"; payload: string | null }
   | { type: "RESET_ALL_PAGES_PENDING" }
-  | { type: "UPDATE_FILE_PAGE_COUNT"; payload: { fileId: string; pageCount: number } };
+  | { type: "UPDATE_FILE_PAGE_COUNT"; payload: { fileId: string; pageCount: number } }
+  | { type: "SET_VIEW_MODE"; payload: TextViewMode }
+  | { type: "SET_PAGE_TEXT"; payload: { pageId: string; text: string } }
+  | { type: "REBUILD_COMBINED_FROM_PAGES" }
+  | { type: "SET_FILTERS"; payload: ImageFilters }
+  | { type: "TOGGLE_FILTERS_PANEL" }
+  | { type: "RESET_FILTERS" }
+  | { type: "SET_PAGE_IMAGE_URL"; payload: { pageId: string; imageUrl: string } };
