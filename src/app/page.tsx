@@ -70,6 +70,15 @@ const TOOLS: Tool[] = [
     icon: "ScanText",
     paidAlternative: "Adobe Acrobat",
   },
+  {
+    name: "Interactive Periodic Table",
+    slug: "periodic-table",
+    description:
+      "Explore all 118 elements with temperature phase changes, property heatmaps, molar mass calculator, and data export.",
+    category: "Education",
+    icon: "Atom",
+    paidAlternative: "Merck PTE",
+  },
 ];
 
 export default function HomePage() {
