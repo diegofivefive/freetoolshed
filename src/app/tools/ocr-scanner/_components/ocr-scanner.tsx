@@ -42,7 +42,6 @@ import { ImagePreview } from "./image-preview";
 import { ToolGuide } from "@/components/shared/tool-guide";
 import type { ToolGuideSection } from "@/components/shared/tool-guide";
 import type { OcrFile, OcrPage, OcrLanguage, ExportFormat, TextViewMode, ImageFilters } from "@/lib/ocr/types";
-import type { SearchablePdfPage } from "@/lib/ocr/export";
 
 const OCR_GUIDE_SECTIONS: ToolGuideSection[] = [
   {
@@ -432,28 +431,6 @@ export function OcrScanner() {
       });
     }
   };
-
-  // Build searchable PDF page data for export
-  const searchablePdfPages: SearchablePdfPage[] =
-    state.viewMode === "combined"
-      ? state.pages
-          .filter((p) => p.status === "done")
-          .map((p) => ({
-            imageUrl: p.imageUrl,
-            width: p.width,
-            height: p.height,
-            text: p.text,
-          }))
-      : selectedPage && selectedPage.status === "done"
-        ? [
-            {
-              imageUrl: selectedPage.imageUrl,
-              width: selectedPage.width,
-              height: selectedPage.height,
-              text: selectedPage.text,
-            },
-          ]
-        : [];
 
   // Image preview navigation
   const previewPage = state.pages.find((p) => p.id === previewPageId) ?? null;
@@ -939,7 +916,6 @@ export function OcrScanner() {
         onFormatChange={(f: ExportFormat) =>
           dispatch({ type: "SET_EXPORT_FORMAT", payload: f })
         }
-        pages={searchablePdfPages}
         disabled={state.isProcessing || pdfRenderingCount > 0}
         defaultFilename={
           state.files.length === 1

@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { EXPORT_FORMAT_LABELS } from "@/lib/ocr/constants";
 import { exportOcrResult, copyTextToClipboard } from "@/lib/ocr/export";
 import type { ExportFormat } from "@/lib/ocr/types";
-import type { SearchablePdfPage } from "@/lib/ocr/export";
 
 type ExportStatus = "idle" | "exporting" | "success" | "error";
 
@@ -14,7 +13,6 @@ interface ExportPanelProps {
   text: string;
   format: ExportFormat;
   onFormatChange: (format: ExportFormat) => void;
-  pages: SearchablePdfPage[];
   disabled?: boolean;
   defaultFilename?: string;
 }
@@ -23,7 +21,6 @@ export function ExportPanel({
   text,
   format,
   onFormatChange,
-  pages,
   disabled = false,
   defaultFilename = "ocr-result",
 }: ExportPanelProps) {
@@ -48,7 +45,6 @@ export function ExportPanel({
         format,
         text,
         filename: filename || "ocr-result",
-        pages: format === "pdf" ? pages : undefined,
       });
       setExportStatus("success");
       setTimeout(() => setExportStatus("idle"), 2500);
@@ -137,12 +133,6 @@ export function ExportPanel({
             : "Copy Text"}
       </Button>
 
-      {/* Hint for PDF export */}
-      {format === "pdf" && hasText && (
-        <p className="text-xs text-muted-foreground">
-          Creates a searchable PDF with invisible text over the scanned image
-        </p>
-      )}
     </div>
   );
 }

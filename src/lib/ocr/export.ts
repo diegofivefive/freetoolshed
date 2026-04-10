@@ -106,135 +106,40 @@ export async function exportAsDocx(
 }
 
 /* ------------------------------------------------------------------ */
-/*  Export as searchable PDF                                           */
+/*  Export as text PDF                                                  */
 /* ------------------------------------------------------------------ */
 
-/** Page data needed for searchable PDF export */
-export interface SearchablePdfPage {
-  imageUrl: string;
-  width: number;
-  height: number;
-  text: string;
-}
-
-export async function exportAsSearchablePdf(
-  pages: SearchablePdfPage[],
+export async function exportAsTextPdf(
+  text: string,
   filename: string,
 ): Promise<void> {
-  if (pages.length === 0) return;
-
   const { default: jsPDF } = await import("jspdf");
 
-  // Determine page size from first page aspect ratio
-  const first = pages[0];
-  const isLandscape = first.width > first.height;
+  const doc = new jsPDF({ unit: "pt", format: "a4" });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 40;
+  const usableWidth = pageWidth - margin * 2;
+  const lineHeight = 18;
+  const fontSize = 12;
 
-  const doc = new jsPDF({
-    orientation: isLandscape ? "landscape" : "portrait",
-    unit: "pt",
-    format: "a4",
-  });
+  doc.setFontSize(fontSize);
+  doc.setTextColor(0, 0, 0);
+  doc.setFont("helvetica", "normal");
 
-  for (let i = 0; i < pages.length; i++) {
-    if (i > 0) {
-      const pg = pages[i];
-      const landscape = pg.width > pg.height;
-      doc.addPage("a4", landscape ? "landscape" : "portrait");
+  const wrapped = doc.splitTextToSize(text, usableWidth) as string[];
+  let y = margin + fontSize;
+
+  for (const line of wrapped) {
+    if (y + lineHeight > pageHeight - margin) {
+      doc.addPage("a4", "portrait");
+      y = margin + fontSize;
     }
-
-    const page = pages[i];
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-
-    // Load the scanned image and embed it as the background
-    try {
-      const imgData = await loadImageAsDataUrl(page.imageUrl);
-      const aspect = page.width / page.height;
-      let imgW = pageWidth;
-      let imgH = pageWidth / aspect;
-
-      if (imgH > pageHeight) {
-        imgH = pageHeight;
-        imgW = pageHeight * aspect;
-      }
-
-      const x = (pageWidth - imgW) / 2;
-      const y = (pageHeight - imgH) / 2;
-
-      doc.addImage(imgData, "PNG", x, y, imgW, imgH);
-
-      // Add invisible text layer on top for searchability
-      if (page.text.trim()) {
-        doc.setTextColor(0, 0, 0);
-        // Render text invisibly (opacity 0) — this makes the PDF searchable/selectable
-        // while the scan image is what the user sees
-        doc.setFontSize(1);
-        doc.setFont("helvetica", "normal");
-
-        // We can't make text truly invisible in jsPDF, but we can make it
-        // extremely small and positioned at top-left. A better approach:
-        // place text at proper positions with transparent rendering mode.
-        doc.saveGraphicsState();
-        // Set text rendering mode to invisible (mode 3)
-        // jsPDF types don't expose write(), but it's a valid API call
-        (doc.internal as unknown as { write: (s: string) => void }).write(
-          "3 Tr",
-        );
-
-        const lines = page.text.split("\n");
-        const lineHeight = imgH / Math.max(lines.length, 1);
-        const fontSize = Math.max(4, Math.min(12, lineHeight * 0.8));
-        doc.setFontSize(fontSize);
-
-        lines.forEach((line, lineIdx) => {
-          if (line.trim()) {
-            const lineY = y + lineHeight * (lineIdx + 0.8);
-            if (lineY < y + imgH) {
-              doc.text(line, x + 4, lineY);
-            }
-          }
-        });
-
-        doc.restoreGraphicsState();
-      }
-    } catch {
-      // If image loading fails, just add the text
-      doc.setFontSize(12);
-      doc.setTextColor(0, 0, 0);
-      const lines = doc.splitTextToSize(page.text, pageWidth - 80);
-      doc.text(lines, 40, 40);
-    }
+    doc.text(line, margin, y);
+    y += lineHeight;
   }
 
   doc.save(`${sanitizeFilename(filename)}.pdf`);
-}
-
-/** Load an image URL (object URL or data URL) as a data URL for jsPDF */
-async function loadImageAsDataUrl(imageUrl: string): Promise<string> {
-  // If already a data URL, return as-is
-  if (imageUrl.startsWith("data:")) return imageUrl;
-
-  // Convert object URL → data URL via canvas
-  return new Promise<string>((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) {
-        reject(new Error("Failed to get canvas context"));
-        return;
-      }
-      ctx.drawImage(img, 0, 0);
-      resolve(canvas.toDataURL("image/png"));
-      canvas.width = 0;
-      canvas.height = 0;
-    };
-    img.onerror = () => reject(new Error("Failed to load image"));
-    img.src = imageUrl;
-  });
 }
 
 /* ------------------------------------------------------------------ */
@@ -245,12 +150,10 @@ export interface ExportOptions {
   format: ExportFormat;
   text: string;
   filename: string;
-  /** Required for searchable PDF export */
-  pages?: SearchablePdfPage[];
 }
 
 export async function exportOcrResult(options: ExportOptions): Promise<void> {
-  const { format, text, filename, pages } = options;
+  const { format, text, filename } = options;
 
   switch (format) {
     case "txt":
@@ -260,19 +163,7 @@ export async function exportOcrResult(options: ExportOptions): Promise<void> {
       await exportAsDocx(text, filename);
       break;
     case "pdf":
-      if (pages && pages.length > 0) {
-        await exportAsSearchablePdf(pages, filename);
-      } else {
-        // Fallback: export text-only PDF if no pages available
-        const { default: jsPDF } = await import("jspdf");
-        const doc = new jsPDF({ unit: "pt", format: "a4" });
-        const pageWidth = doc.internal.pageSize.getWidth();
-        doc.setFontSize(12);
-        doc.setTextColor(0, 0, 0);
-        const lines = doc.splitTextToSize(text, pageWidth - 80);
-        doc.text(lines, 40, 40);
-        doc.save(`${sanitizeFilename(filename)}.pdf`);
-      }
+      await exportAsTextPdf(text, filename);
       break;
   }
 }
