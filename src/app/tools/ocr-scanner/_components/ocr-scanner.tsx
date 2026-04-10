@@ -432,6 +432,42 @@ export function OcrScanner() {
     }
   };
 
+  // Drag-and-drop into file list
+  const [fileListDragOver, setFileListDragOver] = useState(false);
+  const fileListDragCounter = useRef(0);
+
+  const handleFileListDragEnter = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    fileListDragCounter.current++;
+    if (e.dataTransfer.types.includes("Files")) {
+      setFileListDragOver(true);
+    }
+  }, []);
+
+  const handleFileListDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    fileListDragCounter.current--;
+    if (fileListDragCounter.current === 0) {
+      setFileListDragOver(false);
+    }
+  }, []);
+
+  const handleFileListDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+  }, []);
+
+  const handleFileListDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      fileListDragCounter.current = 0;
+      setFileListDragOver(false);
+      if (e.dataTransfer.files.length > 0) {
+        handleFiles(Array.from(e.dataTransfer.files));
+      }
+    },
+    [handleFiles],
+  );
+
   // Image preview navigation
   const previewPage = state.pages.find((p) => p.id === previewPageId) ?? null;
   const previewIndex = previewPageId
@@ -678,8 +714,16 @@ export function OcrScanner() {
       <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
         {/* Left: File list */}
         <div
-          className="space-y-2 overflow-y-auto rounded-lg border border-border p-3"
+          className={`space-y-2 overflow-y-auto rounded-lg border p-3 transition-colors ${
+            fileListDragOver
+              ? "border-brand bg-brand/5"
+              : "border-border"
+          }`}
           style={{ maxHeight: "500px" }}
+          onDragEnter={handleFileListDragEnter}
+          onDragLeave={handleFileListDragLeave}
+          onDragOver={handleFileListDragOver}
+          onDrop={handleFileListDrop}
         >
           {state.files.map((file) => {
             const filePages = state.pages.filter(
@@ -788,6 +832,9 @@ export function OcrScanner() {
               </div>
             );
           })}
+          <p className="py-2 text-center text-xs text-muted-foreground/50">
+            Drop files here to add more
+          </p>
         </div>
 
         {/* Right: Text output */}
