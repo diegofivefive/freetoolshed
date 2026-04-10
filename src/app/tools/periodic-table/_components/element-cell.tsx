@@ -14,6 +14,8 @@ interface ElementCellProps {
   viewMode: ViewMode;
   cellColor?: string;
   cellColorDark?: string;
+  column: number;
+  row: number;
   onClick: (element: Element) => void;
 }
 
@@ -37,6 +39,8 @@ function ElementCellInner({
   viewMode,
   cellColor,
   cellColorDark,
+  column,
+  row,
   onClick,
 }: ElementCellProps) {
   const [isHovered, setIsHovered] = useState(false);
@@ -102,11 +106,20 @@ function ElementCellInner({
         {element.atomicMass.toFixed(element.atomicMass < 10 ? 3 : 2)}
       </span>
 
-      {/* Tooltip on hover */}
+      {/* Tooltip on hover — edge-aware positioning */}
       {isHovered && !isDimmed && (
         <div
-          className="pointer-events-none absolute -top-20 left-1/2 z-50 w-44 -translate-x-1/2 rounded-lg border border-border bg-popover px-3 py-2 text-popover-foreground shadow-xl"
+          className="pointer-events-none absolute z-50 w-44 rounded-lg border border-border bg-popover px-3 py-2 text-popover-foreground shadow-xl"
           role="tooltip"
+          style={{
+            top: row <= 2 ? "100%" : undefined,
+            bottom: row > 2 ? "100%" : undefined,
+            marginTop: row <= 2 ? "4px" : undefined,
+            marginBottom: row > 2 ? "4px" : undefined,
+            left: column <= 2 ? "0" : column >= 17 ? "auto" : "50%",
+            right: column >= 17 ? "0" : "auto",
+            transform: column > 2 && column < 17 ? "translateX(-50%)" : undefined,
+          }}
         >
           <p className="text-xs font-bold">
             {element.name} ({element.symbol})

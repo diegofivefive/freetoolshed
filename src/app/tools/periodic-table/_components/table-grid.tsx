@@ -153,13 +153,12 @@ export function TableGrid({ state, dispatch }: TableGridProps) {
   return (
     <div className="space-y-3" data-periodic-grid>
       {/* Main table — scrollable on smaller screens */}
-      <div className="overflow-x-auto pb-2">
+      <div className="overflow-x-auto overflow-y-visible pb-2">
         <div
           className="mx-auto grid gap-[2px]"
           style={{
             gridTemplateColumns: `repeat(${TABLE_COLS}, minmax(42px, 1fr))`,
             minWidth: "760px",
-            maxWidth: "1300px",
           }}
         >
           {/* Rows 0-6: Main table (periods 1-7) */}
@@ -238,6 +237,8 @@ export function TableGrid({ state, dispatch }: TableGridProps) {
                     viewMode={state.viewMode}
                     cellColor={cellColor}
                     cellColorDark={cellColorDark}
+                    column={colIdx + 1}
+                    row={rowIdx + 1}
                     onClick={handleElementClick}
                   />
                 </div>
@@ -261,7 +262,6 @@ export function TableGrid({ state, dispatch }: TableGridProps) {
           style={{
             gridTemplateColumns: `repeat(${TABLE_COLS}, minmax(42px, 1fr))`,
             minWidth: "760px",
-            maxWidth: "1300px",
           }}
         >
           {gridMap.slice(8, 10).flatMap((row, rowOffset) =>
@@ -346,6 +346,8 @@ export function TableGrid({ state, dispatch }: TableGridProps) {
                     viewMode={state.viewMode}
                     cellColor={cellColor}
                     cellColorDark={cellColorDark}
+                    column={colIdx + 1}
+                    row={rowOffset + 9}
                     onClick={handleElementClick}
                   />
                 </div>

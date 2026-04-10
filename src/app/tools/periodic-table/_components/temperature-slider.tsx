@@ -91,7 +91,7 @@ export function TemperatureSlider({
         </div>
 
         {/* Custom slider with gradient track */}
-        <div className="relative mb-2">
+        <div className="relative mb-2 h-6">
           {/* Track background — gradient from blue (cold) through green (mid) to orange (hot) */}
           <div
             className="absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 rounded-full"
@@ -130,7 +130,7 @@ export function TemperatureSlider({
                 payload: Number(e.target.value),
               })
             }
-            className="temp-slider relative z-10 h-6 w-full cursor-pointer appearance-none bg-transparent"
+            className="temp-slider absolute inset-x-0 top-1/2 z-10 h-6 w-full -translate-y-1/2 cursor-pointer appearance-none bg-transparent"
             aria-label="Temperature in Kelvin"
           />
         </div>

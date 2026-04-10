@@ -135,7 +135,7 @@ export function SeoContent() {
                 ["Element comparison", "Up to 4", "Yes", "No"],
                 ["Data export (CSV/JSON/PDF)", "Yes", "No", "No"],
                 ["Dark mode", "Yes", "No", "No"],
-                ["No sign-up required", "Yes", "App Store", "Yes"],
+                ["Sign-up required", "No", "App Store", "No"],
                 ["Works offline", "Yes (cached)", "Yes", "No"],
                 ["Bohr model visualization", "Animated SVG", "Static", "No"],
                 ["Open in browser", "Yes", "iOS/Android only", "Yes"],

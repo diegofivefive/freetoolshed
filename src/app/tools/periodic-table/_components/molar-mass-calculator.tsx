@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { FlaskConical, X, ArrowRight, Beaker } from "lucide-react";
+import { MolecularViewerSection } from "./molecular-viewer-section";
 import type { PeriodicTableAction } from "@/lib/periodic-table/types";
 import {
   parseFormula,
@@ -230,6 +231,9 @@ export function MolarMassCalculator({ dispatch }: MolarMassCalculatorProps) {
                 </div>
               </div>
             </div>
+
+            {/* 3D Molecular Viewer */}
+            <MolecularViewerSection formula={result.formula} />
 
             {/* Quick conversions */}
             <div className="mt-3 flex flex-wrap gap-3">
