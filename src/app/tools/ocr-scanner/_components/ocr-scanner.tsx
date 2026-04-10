@@ -941,6 +941,11 @@ export function OcrScanner() {
         }
         pages={searchablePdfPages}
         disabled={state.isProcessing || pdfRenderingCount > 0}
+        defaultFilename={
+          state.files.length === 1
+            ? state.files[0].name.replace(/\.[^.]+$/, "")
+            : "ocr-result"
+        }
       />
     </div>
     <ImagePreview

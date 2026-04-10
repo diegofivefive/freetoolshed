@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Download, Copy, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EXPORT_FORMAT_LABELS } from "@/lib/ocr/constants";
@@ -16,6 +16,7 @@ interface ExportPanelProps {
   onFormatChange: (format: ExportFormat) => void;
   pages: SearchablePdfPage[];
   disabled?: boolean;
+  defaultFilename?: string;
 }
 
 export function ExportPanel({
@@ -24,9 +25,16 @@ export function ExportPanel({
   onFormatChange,
   pages,
   disabled = false,
+  defaultFilename = "ocr-result",
 }: ExportPanelProps) {
   const [exportStatus, setExportStatus] = useState<ExportStatus>("idle");
   const [copyStatus, setCopyStatus] = useState<ExportStatus>("idle");
+  const [filename, setFilename] = useState(defaultFilename);
+
+  // Update filename when the default changes (e.g. new file uploaded)
+  useEffect(() => {
+    setFilename(defaultFilename);
+  }, [defaultFilename]);
 
   const hasText = text.trim().length > 0;
   const isDisabled = disabled || !hasText;
@@ -39,7 +47,7 @@ export function ExportPanel({
       await exportOcrResult({
         format,
         text,
-        filename: "ocr-result",
+        filename: filename || "ocr-result",
         pages: format === "pdf" ? pages : undefined,
       });
       setExportStatus("success");
@@ -62,6 +70,16 @@ export function ExportPanel({
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card px-4 py-3">
       <p className="mr-1 text-sm font-medium text-muted-foreground">Export:</p>
+
+      {/* Filename input */}
+      <input
+        type="text"
+        value={filename}
+        onChange={(e) => setFilename(e.target.value)}
+        placeholder="filename"
+        className="w-36 rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+        disabled={isDisabled}
+      />
 
       {/* Format selector */}
       <select
