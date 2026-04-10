@@ -476,13 +476,20 @@ export function OcrScanner() {
   const filterPanStart = useRef<{ x: number; y: number; panX: number; panY: number } | null>(null);
   const filterContainerRef = useRef<HTMLDivElement>(null);
 
-  const handleFilterWheel = useCallback((e: React.WheelEvent) => {
-    e.preventDefault();
-    setFilterZoom((z) => {
-      const next = z + (e.deltaY < 0 ? 0.15 : -0.15);
-      return Math.max(0.25, Math.min(5, next));
-    });
-  }, []);
+  // Attach wheel listener natively with { passive: false } so preventDefault works
+  useEffect(() => {
+    const el = filterContainerRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      setFilterZoom((z) => {
+        const next = z + (e.deltaY < 0 ? 0.15 : -0.15);
+        return Math.max(0.25, Math.min(5, next));
+      });
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [state.showFilters, selectedPage]);
 
   const handleFilterPointerDown = useCallback(
     (e: React.PointerEvent) => {
@@ -933,7 +940,6 @@ export function OcrScanner() {
                 ref={filterContainerRef}
                 className="relative flex-1 overflow-hidden bg-muted/30"
                 style={{ minHeight: "400px", cursor: filterZoom > 1 ? "grab" : "default" }}
-                onWheel={handleFilterWheel}
                 onPointerDown={handleFilterPointerDown}
                 onPointerMove={handleFilterPointerMove}
                 onPointerUp={handleFilterPointerUp}
