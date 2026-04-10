@@ -10,6 +10,8 @@ import {
   RotateCcw,
   FileText,
   ZoomIn,
+  ZoomOut,
+  Maximize2,
   SlidersHorizontal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -468,6 +470,52 @@ export function OcrScanner() {
     [handleFiles],
   );
 
+  // Filter preview zoom/pan
+  const [filterZoom, setFilterZoom] = useState(1);
+  const [filterPan, setFilterPan] = useState({ x: 0, y: 0 });
+  const filterPanStart = useRef<{ x: number; y: number; panX: number; panY: number } | null>(null);
+  const filterContainerRef = useRef<HTMLDivElement>(null);
+
+  const handleFilterWheel = useCallback((e: React.WheelEvent) => {
+    e.preventDefault();
+    setFilterZoom((z) => {
+      const next = z + (e.deltaY < 0 ? 0.15 : -0.15);
+      return Math.max(0.25, Math.min(5, next));
+    });
+  }, []);
+
+  const handleFilterPointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      if (filterZoom <= 1) return;
+      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+      filterPanStart.current = {
+        x: e.clientX,
+        y: e.clientY,
+        panX: filterPan.x,
+        panY: filterPan.y,
+      };
+    },
+    [filterZoom, filterPan],
+  );
+
+  const handleFilterPointerMove = useCallback((e: React.PointerEvent) => {
+    if (!filterPanStart.current) return;
+    setFilterPan({
+      x: filterPanStart.current.panX + (e.clientX - filterPanStart.current.x),
+      y: filterPanStart.current.panY + (e.clientY - filterPanStart.current.y),
+    });
+  }, []);
+
+  const handleFilterPointerUp = useCallback(() => {
+    filterPanStart.current = null;
+  }, []);
+
+  // Reset zoom/pan when selected page changes or filters panel closes
+  useEffect(() => {
+    setFilterZoom(1);
+    setFilterPan({ x: 0, y: 0 });
+  }, [state.selectedPageId, state.showFilters]);
+
   // Image preview navigation
   const previewPage = state.pages.find((p) => p.id === previewPageId) ?? null;
   const previewIndex = previewPageId
@@ -837,123 +885,209 @@ export function OcrScanner() {
           </p>
         </div>
 
-        {/* Right: Text output */}
-        <div className="flex flex-col rounded-lg border border-border">
-          <div className="border-b border-border px-4 py-2">
-            <div className="flex items-center justify-between">
-              <Tabs
-                value={state.viewMode}
-                onValueChange={(v: string) =>
-                  dispatch({ type: "SET_VIEW_MODE", payload: v as TextViewMode })
-                }
-              >
-                <TabsList variant="line">
-                  <TabsTrigger value="combined">All Pages</TabsTrigger>
-                  <TabsTrigger value="page">Selected Page</TabsTrigger>
-                </TabsList>
-              </Tabs>
-              {displayedText && (
-                <p className="text-xs text-muted-foreground">
-                  {displayedText.split(/\s+/).filter(Boolean).length} words
-                  {" / "}
-                  {displayedText.length} chars
-                </p>
-              )}
+        {/* Right panel: image preview (when filters open) or text output */}
+        {state.showFilters ? (
+          <div className="flex flex-col rounded-lg border border-border">
+            {/* Header with zoom controls */}
+            <div className="flex items-center justify-between border-b border-border px-4 py-2">
+              <p className="text-sm font-medium">Image Preview</p>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="size-7 p-0"
+                  onClick={() => setFilterZoom((z) => Math.max(0.25, z - 0.25))}
+                  disabled={filterZoom <= 0.25}
+                >
+                  <ZoomOut className="size-3.5" />
+                </Button>
+                <span className="w-12 text-center text-xs text-muted-foreground">
+                  {Math.round(filterZoom * 100)}%
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="size-7 p-0"
+                  onClick={() => setFilterZoom((z) => Math.min(5, z + 0.25))}
+                  disabled={filterZoom >= 5}
+                >
+                  <ZoomIn className="size-3.5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="size-7 p-0"
+                  onClick={() => {
+                    setFilterZoom(1);
+                    setFilterPan({ x: 0, y: 0 });
+                  }}
+                >
+                  <Maximize2 className="size-3.5" />
+                </Button>
+              </div>
             </div>
+
+            {/* Image viewport */}
+            {selectedPage ? (
+              <div
+                ref={filterContainerRef}
+                className="relative flex-1 overflow-hidden bg-muted/30"
+                style={{ minHeight: "400px", cursor: filterZoom > 1 ? "grab" : "default" }}
+                onWheel={handleFilterWheel}
+                onPointerDown={handleFilterPointerDown}
+                onPointerMove={handleFilterPointerMove}
+                onPointerUp={handleFilterPointerUp}
+              >
+                <div
+                  className="flex size-full items-center justify-center"
+                  style={{ minHeight: "400px" }}
+                >
+                  <img
+                    src={selectedPage.originalImageUrl}
+                    alt="Filter preview"
+                    draggable={false}
+                    className="max-h-full max-w-full select-none object-contain"
+                    style={{
+                      transform: `scale(${filterZoom}) translate(${filterPan.x / filterZoom}px, ${filterPan.y / filterZoom}px)`,
+                      transformOrigin: "center center",
+                      filter: filtersAreDefault(state.filters)
+                        ? undefined
+                        : getCssFilterString(state.filters),
+                    }}
+                  />
+                </div>
+                {state.filters.threshold > 0 && (
+                  <div className="absolute bottom-2 left-2 rounded bg-background/80 px-2 py-1 text-xs text-muted-foreground">
+                    Threshold preview applied after &quot;Apply &amp; Re-OCR&quot;
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex flex-1 items-center justify-center py-20">
+                <p className="text-sm text-muted-foreground">
+                  Select a page from the sidebar to preview.
+                </p>
+              </div>
+            )}
           </div>
-
-          {/* Amber info bar: combined text was manually edited */}
-          {state.viewMode === "page" && state.isTextEdited && (
-            <div className="flex items-center gap-2 border-b border-amber-500/30 bg-amber-500/10 px-4 py-1.5 text-xs text-amber-400">
-              <span>Combined text was manually edited.</span>
-              <button
-                className="underline"
-                onClick={() =>
-                  dispatch({ type: "REBUILD_COMBINED_FROM_PAGES" })
-                }
-              >
-                Rebuild from pages
-              </button>
-            </div>
-          )}
-
-          {/* Page mode: no page selected */}
-          {state.viewMode === "page" && !selectedPage && (
-            <div className="flex flex-1 items-center justify-center py-20">
-              <p className="text-sm text-muted-foreground">
-                Select a page from the sidebar to view its text.
-              </p>
-            </div>
-          )}
-
-          {/* Page mode: selected page is pending/processing */}
-          {state.viewMode === "page" &&
-            selectedPage &&
-            (selectedPage.status === "pending" ||
-              selectedPage.status === "processing") && (
-              <div className="flex flex-1 items-center justify-center py-20">
-                <div className="text-center">
-                  <Loader2 className="mx-auto mb-3 size-8 animate-spin text-brand" />
-                  <p className="text-sm text-muted-foreground">
-                    {selectedPage.status === "pending"
-                      ? "Waiting to process..."
-                      : "Extracting text..."}
+        ) : (
+          <div className="flex flex-col rounded-lg border border-border">
+            <div className="border-b border-border px-4 py-2">
+              <div className="flex items-center justify-between">
+                <Tabs
+                  value={state.viewMode}
+                  onValueChange={(v: string) =>
+                    dispatch({ type: "SET_VIEW_MODE", payload: v as TextViewMode })
+                  }
+                >
+                  <TabsList variant="line">
+                    <TabsTrigger value="combined">All Pages</TabsTrigger>
+                    <TabsTrigger value="page">Selected Page</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+                {displayedText && (
+                  <p className="text-xs text-muted-foreground">
+                    {displayedText.split(/\s+/).filter(Boolean).length} words
+                    {" / "}
+                    {displayedText.length} chars
                   </p>
-                </div>
+                )}
+              </div>
+            </div>
+
+            {/* Amber info bar: combined text was manually edited */}
+            {state.viewMode === "page" && state.isTextEdited && (
+              <div className="flex items-center gap-2 border-b border-amber-500/30 bg-amber-500/10 px-4 py-1.5 text-xs text-amber-400">
+                <span>Combined text was manually edited.</span>
+                <button
+                  className="underline"
+                  onClick={() =>
+                    dispatch({ type: "REBUILD_COMBINED_FROM_PAGES" })
+                  }
+                >
+                  Rebuild from pages
+                </button>
               </div>
             )}
 
-          {/* Page mode: selected page errored */}
-          {state.viewMode === "page" &&
-            selectedPage &&
-            selectedPage.status === "error" && (
+            {/* Page mode: no page selected */}
+            {state.viewMode === "page" && !selectedPage && (
               <div className="flex flex-1 items-center justify-center py-20">
-                <p className="text-sm text-pink-400">
-                  {selectedPage.errorMessage ?? "OCR failed for this page"}
+                <p className="text-sm text-muted-foreground">
+                  Select a page from the sidebar to view its text.
                 </p>
               </div>
             )}
 
-          {/* Page mode: selected page done — editable text */}
-          {state.viewMode === "page" &&
-            selectedPage &&
-            selectedPage.status === "done" && (
-              <textarea
-                value={selectedPage.text}
-                onChange={(e) => handleTextChange(e.target.value)}
-                placeholder="No text detected on this page."
-                className="min-h-[400px] flex-1 resize-none bg-transparent px-4 py-3 text-sm leading-relaxed focus:outline-none"
-              />
-            )}
+            {/* Page mode: selected page is pending/processing */}
+            {state.viewMode === "page" &&
+              selectedPage &&
+              (selectedPage.status === "pending" ||
+                selectedPage.status === "processing") && (
+                <div className="flex flex-1 items-center justify-center py-20">
+                  <div className="text-center">
+                    <Loader2 className="mx-auto mb-3 size-8 animate-spin text-brand" />
+                    <p className="text-sm text-muted-foreground">
+                      {selectedPage.status === "pending"
+                        ? "Waiting to process..."
+                        : "Extracting text..."}
+                    </p>
+                  </div>
+                </div>
+              )}
 
-          {/* Combined mode: loading spinner when no text yet */}
-          {state.viewMode === "combined" &&
-            (state.isProcessing || pdfRenderingCount > 0) &&
-            !state.editedText && (
-              <div className="flex flex-1 items-center justify-center py-20">
-                <div className="text-center">
-                  <Loader2 className="mx-auto mb-3 size-8 animate-spin text-brand" />
-                  <p className="text-sm text-muted-foreground">
-                    {pdfRenderingCount > 0
-                      ? "Rendering PDF pages..."
-                      : "Extracting text..."}
+            {/* Page mode: selected page errored */}
+            {state.viewMode === "page" &&
+              selectedPage &&
+              selectedPage.status === "error" && (
+                <div className="flex flex-1 items-center justify-center py-20">
+                  <p className="text-sm text-pink-400">
+                    {selectedPage.errorMessage ?? "OCR failed for this page"}
                   </p>
                 </div>
-              </div>
-            )}
+              )}
 
-          {/* Combined mode: editable text */}
-          {state.viewMode === "combined" &&
-            ((!state.isProcessing && pdfRenderingCount === 0) ||
-              state.editedText) && (
-              <textarea
-                value={state.editedText}
-                onChange={(e) => handleTextChange(e.target.value)}
-                placeholder="Extracted text will appear here..."
-                className="min-h-[400px] flex-1 resize-none bg-transparent px-4 py-3 text-sm leading-relaxed focus:outline-none"
-              />
-            )}
-        </div>
+            {/* Page mode: selected page done — editable text */}
+            {state.viewMode === "page" &&
+              selectedPage &&
+              selectedPage.status === "done" && (
+                <textarea
+                  value={selectedPage.text}
+                  onChange={(e) => handleTextChange(e.target.value)}
+                  placeholder="No text detected on this page."
+                  className="min-h-[400px] flex-1 resize-none bg-transparent px-4 py-3 text-sm leading-relaxed focus:outline-none"
+                />
+              )}
+
+            {/* Combined mode: loading spinner when no text yet */}
+            {state.viewMode === "combined" &&
+              (state.isProcessing || pdfRenderingCount > 0) &&
+              !state.editedText && (
+                <div className="flex flex-1 items-center justify-center py-20">
+                  <div className="text-center">
+                    <Loader2 className="mx-auto mb-3 size-8 animate-spin text-brand" />
+                    <p className="text-sm text-muted-foreground">
+                      {pdfRenderingCount > 0
+                        ? "Rendering PDF pages..."
+                        : "Extracting text..."}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+            {/* Combined mode: editable text */}
+            {state.viewMode === "combined" &&
+              ((!state.isProcessing && pdfRenderingCount === 0) ||
+                state.editedText) && (
+                <textarea
+                  value={state.editedText}
+                  onChange={(e) => handleTextChange(e.target.value)}
+                  placeholder="Extracted text will appear here..."
+                  className="min-h-[400px] flex-1 resize-none bg-transparent px-4 py-3 text-sm leading-relaxed focus:outline-none"
+                />
+              )}
+          </div>
+        )}
       </div>
 
       {/* Export bar */}
