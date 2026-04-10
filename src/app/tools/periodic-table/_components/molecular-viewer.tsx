@@ -30,7 +30,7 @@ export function MolecularViewer({ sdfData, compoundName }: MolecularViewerProps)
 
       // Detect dark/light mode from the document
       const isDark = document.documentElement.classList.contains("dark");
-      const bgColor = isDark ? 0x18181b : 0xffffff;
+      const bgColor = isDark ? "#18181b" : "#ffffff";
 
       const viewer = $3Dmol.createViewer(containerRef.current, {
         backgroundColor: bgColor,
