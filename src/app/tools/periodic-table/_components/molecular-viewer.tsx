@@ -6,9 +6,10 @@ import { Atom } from "lucide-react";
 interface MolecularViewerProps {
   sdfData: string;
   compoundName: string;
+  is2d: boolean;
 }
 
-export function MolecularViewer({ sdfData, compoundName }: MolecularViewerProps) {
+export function MolecularViewer({ sdfData, compoundName, is2d }: MolecularViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<ReturnType<typeof import("3dmol")["createViewer"]> | null>(null);
 
@@ -76,7 +77,7 @@ export function MolecularViewer({ sdfData, compoundName }: MolecularViewerProps)
   return (
     <div className="mt-3">
       <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-        3D Structure
+        {is2d ? "2D Structure" : "3D Structure"}
       </span>
       <div className="mt-1.5 overflow-hidden rounded-md border border-border">
         <div
@@ -90,7 +91,7 @@ export function MolecularViewer({ sdfData, compoundName }: MolecularViewerProps)
             {compoundName}
           </span>
           <span className="ml-auto text-[9px] text-muted-foreground/50">
-            Drag to rotate · Scroll to zoom
+            {is2d ? "2D — no 3D data available" : "Drag to rotate · Scroll to zoom"}
           </span>
         </div>
       </div>

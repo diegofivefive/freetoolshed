@@ -274,7 +274,7 @@ export function TableGrid({ state, dispatch }: TableGridProps) {
                     <div
                       key={`label-${rowIdx}`}
                       className="flex items-center justify-center"
-                      style={{ gridColumn: "1 / 4" }}
+                      style={{ gridColumn: "1 / 4", gridRow: 1 }}
                     >
                       <span className="text-[9px] font-semibold text-muted-foreground/60 lg:text-[10px]">
                         57–71
@@ -287,13 +287,17 @@ export function TableGrid({ state, dispatch }: TableGridProps) {
                     <div
                       key={`label-${rowIdx}`}
                       className="flex items-center justify-center"
-                      style={{ gridColumn: "1 / 4" }}
+                      style={{ gridColumn: "1 / 4", gridRow: 2 }}
                     >
                       <span className="text-[9px] font-semibold text-muted-foreground/60 lg:text-[10px]">
                         89–103
                       </span>
                     </div>
                   );
+                }
+                // Skip cols 1-2 — covered by the label span
+                if ((colIdx === 1 || colIdx === 2) && rowOffset <= 1) {
+                  return null;
                 }
                 return (
                   <div

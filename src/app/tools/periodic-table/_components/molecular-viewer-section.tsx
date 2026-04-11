@@ -82,7 +82,7 @@ export function MolecularViewerSection({ formula }: MolecularViewerSectionProps)
         </span>
         <div className="mt-1.5 flex h-[100px] items-center justify-center rounded-md border border-border/50 bg-muted/10">
           <span className="text-[10px] text-muted-foreground/60">
-            3D structure not available for {formula}
+            Structure not available for {formula}
           </span>
         </div>
       </div>
@@ -92,6 +92,6 @@ export function MolecularViewerSection({ formula }: MolecularViewerSectionProps)
   if (!data) return null;
 
   return (
-    <MolecularViewer sdfData={data.sdfData} compoundName={data.compoundName} />
+    <MolecularViewer sdfData={data.sdfData} compoundName={data.compoundName} is2d={data.is2d} />
   );
 }

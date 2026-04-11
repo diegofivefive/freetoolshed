@@ -4,6 +4,7 @@ export interface MolecularData {
   sdfData: string;
   compoundName: string;
   cid: number;
+  is2d: boolean;
 }
 
 /** Hardcoded CIDs for preset formulas — skips the formula lookup step */
@@ -48,13 +49,14 @@ async function fetchCidForFormula(
   }
 }
 
-async function fetch3dSdf(
+async function fetchSdf(
   cid: number,
+  recordType: "3d" | "2d",
   signal?: AbortSignal
 ): Promise<string | null> {
   try {
     const res = await fetch(
-      `${PUBCHEM_BASE}/cid/${cid}/SDF?record_type=3d`,
+      `${PUBCHEM_BASE}/cid/${cid}/SDF?record_type=${recordType}`,
       { signal }
     );
     if (!res.ok) return null;
@@ -94,15 +96,23 @@ export async function fetchMolecularData(
   const cid = await fetchCidForFormula(formula, signal);
   if (!cid) return null;
 
-  // Fetch SDF and name in parallel
-  const [sdfData, compoundName] = await Promise.all([
-    fetch3dSdf(cid, signal),
+  // Fetch 3D SDF and name in parallel
+  const [sdfData3d, compoundName] = await Promise.all([
+    fetchSdf(cid, "3d", signal),
     fetchCompoundName(cid, signal),
   ]);
 
-  if (!sdfData) return null;
+  if (sdfData3d) {
+    const result: MolecularData = { sdfData: sdfData3d, compoundName, cid, is2d: false };
+    cache.set(formula, result);
+    return result;
+  }
 
-  const result: MolecularData = { sdfData, compoundName, cid };
+  // Fallback to 2D structure
+  const sdfData2d = await fetchSdf(cid, "2d", signal);
+  if (!sdfData2d) return null;
+
+  const result: MolecularData = { sdfData: sdfData2d, compoundName, cid, is2d: true };
   cache.set(formula, result);
   return result;
 }
