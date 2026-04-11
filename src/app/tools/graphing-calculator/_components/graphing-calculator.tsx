@@ -7,9 +7,17 @@ import {
   BarChart3,
   Grid3X3,
   Activity,
+  Search,
 } from "lucide-react";
 import { calcReducer, INITIAL_STATE } from "@/lib/graphing-calculator/reducer";
 import { loadCalcState, saveCalcState } from "@/lib/graphing-calculator/storage";
+import {
+  STANDARD_LABELS,
+  FUNCTION_COLORS,
+  DEFAULT_LINE_WIDTH,
+  DEFAULT_VIEWPORT,
+  ZOOM_FACTOR,
+} from "@/lib/graphing-calculator/constants";
 import type {
   CalcMode,
   GraphFunction,
@@ -20,8 +28,11 @@ import type {
   DistributionParams,
   DistributionResult,
 } from "@/lib/graphing-calculator/types";
-import { ToolGuide } from "@/components/shared/tool-guide";
+import { ToolGuideWithOverlay } from "@/components/shared/tool-guide";
 import type { ToolGuideSection } from "@/components/shared/tool-guide";
+import { useActiveInput } from "@/hooks/use-active-input";
+import { CommandPalette } from "./command-palette";
+import { TI84ButtonOverlay } from "./ti84-button-overlay";
 import { GraphCanvas } from "./graph-canvas";
 import { FunctionInputPanel } from "./function-input-panel";
 import { TableView } from "./table-view";
@@ -98,7 +109,7 @@ const TOOL_GUIDE_SECTIONS: ToolGuideSection[] = [
     title: "Keyboard Shortcuts",
     content: "Quick access to common operations.",
     steps: [
-      "Ctrl/⌘ + K — Command palette (coming soon)",
+      "Ctrl/⌘ + K — Open command palette",
       "Escape — Close panels and dialogs",
       "R / D — Toggle Radian / Degree mode",
     ],
@@ -120,6 +131,8 @@ const MODE_TABS: { mode: CalcMode; label: string; icon: typeof LineChart }[] = [
 export function GraphingCalculator() {
   const [state, dispatch] = useReducer(calcReducer, INITIAL_STATE);
   const initialized = useRef(false);
+  const workspaceRef = useRef<HTMLDivElement>(null);
+  const { insert, backspace, clearInput, navigateInputs } = useActiveInput(workspaceRef);
 
   // Load persisted state on mount
   useEffect(() => {
@@ -193,6 +206,109 @@ export function GraphingCalculator() {
     setCanvasAspectRatio(ratio);
   }, []);
 
+  // ── Command Palette ─────────────────────────────────────────────────
+  const [paletteOpen, setPaletteOpen] = useState(false);
+
+  useEffect(() => {
+    function handleGlobalKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setPaletteOpen((prev) => !prev);
+      }
+    }
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, []);
+
+  const handlePaletteAddFunction = useCallback(() => {
+    if (state.functions.length >= 10) return;
+    const index = state.functions.length;
+    const label = STANDARD_LABELS[index] ?? `Y${index}`;
+    const color = FUNCTION_COLORS[index % FUNCTION_COLORS.length];
+    dispatch({
+      type: "ADD_FUNCTION",
+      fn: {
+        id: `fn-${Date.now()}`,
+        label,
+        expression: "",
+        type: "standard" as const,
+        color,
+        visible: true,
+        lineWidth: DEFAULT_LINE_WIDTH,
+      },
+    });
+  }, [state.functions.length]);
+
+  const handleZoomIn = useCallback(() => {
+    const v = state.viewport;
+    const cx = (v.xMin + v.xMax) / 2;
+    const cy = (v.yMin + v.yMax) / 2;
+    const f = 1 / ZOOM_FACTOR;
+    dispatch({
+      type: "SET_VIEWPORT",
+      viewport: {
+        xMin: cx - (cx - v.xMin) * f,
+        xMax: cx + (v.xMax - cx) * f,
+        yMin: cy - (cy - v.yMin) * f,
+        yMax: cy + (v.yMax - cy) * f,
+      },
+    });
+  }, [state.viewport]);
+
+  const handleZoomOut = useCallback(() => {
+    const v = state.viewport;
+    const cx = (v.xMin + v.xMax) / 2;
+    const cy = (v.yMin + v.yMax) / 2;
+    const f = ZOOM_FACTOR;
+    dispatch({
+      type: "SET_VIEWPORT",
+      viewport: {
+        xMin: cx - (cx - v.xMin) * f,
+        xMax: cx + (v.xMax - cx) * f,
+        yMin: cy - (cy - v.yMin) * f,
+        yMax: cy + (v.yMax - cy) * f,
+      },
+    });
+  }, [state.viewport]);
+
+  const handleZoomStandard = useCallback(() => {
+    dispatch({ type: "SET_VIEWPORT", viewport: { ...DEFAULT_VIEWPORT } });
+  }, []);
+
+  const handleZoomTrig = useCallback(() => {
+    dispatch({
+      type: "SET_VIEWPORT",
+      viewport: {
+        xMin: -2 * Math.PI,
+        xMax: 2 * Math.PI,
+        yMin: -4,
+        yMax: 4,
+      },
+    });
+  }, []);
+
+  const handleZoomSquare = useCallback(() => {
+    const aspect = canvasAspectRatio ?? 2;
+    const v = state.viewport;
+    const cx = (v.xMin + v.xMax) / 2;
+    const cy = (v.yMin + v.yMax) / 2;
+    const yRange = v.yMax - v.yMin;
+    const xRange = yRange * aspect;
+    dispatch({
+      type: "SET_VIEWPORT",
+      viewport: {
+        xMin: cx - xRange / 2,
+        xMax: cx + xRange / 2,
+        yMin: cy - yRange / 2,
+        yMax: cy + yRange / 2,
+      },
+    });
+  }, [state.viewport, canvasAspectRatio]);
+
+  const handleResetState = useCallback(() => {
+    dispatch({ type: "LOAD_STATE", state: INITIAL_STATE });
+  }, []);
+
   // ── Stat callbacks ────────────────────────────────────────────────
   const handleUpdateStatList = useCallback(
     (name: string, data: number[]) =>
@@ -239,7 +355,7 @@ export function GraphingCalculator() {
 
   return (
     <>
-      <div className="rounded-lg border border-border bg-card">
+      <div ref={workspaceRef} className="rounded-lg border border-border bg-card">
         {/* ── Toolbar ─────────────────────────────────────────────────── */}
         <div className="flex items-center gap-1 border-b border-border px-4 py-2">
           {MODE_TABS.map(({ mode, label, icon: Icon }) => (
@@ -256,6 +372,18 @@ export function GraphingCalculator() {
               {label}
             </button>
           ))}
+
+          <button
+            onClick={() => setPaletteOpen(true)}
+            className="ml-auto flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            title="Command palette"
+          >
+            <Search className="h-3 w-3" />
+            <span className="hidden sm:inline">Search</span>
+            <kbd className="hidden rounded border border-border bg-muted px-1 py-0.5 font-mono text-[10px] sm:inline-block">
+              ⌘K
+            </kbd>
+          </button>
         </div>
 
         {/* ── Workspace ───────────────────────────────────────────────── */}
@@ -326,7 +454,45 @@ export function GraphingCalculator() {
         </div>
       </div>
 
-      <ToolGuide sections={TOOL_GUIDE_SECTIONS} />
+      <CommandPalette
+        open={paletteOpen}
+        onClose={() => setPaletteOpen(false)}
+        onSetMode={setMode}
+        onToggleAngleMode={toggleAngleMode}
+        onAddFunction={handlePaletteAddFunction}
+        onZoomIn={handleZoomIn}
+        onZoomOut={handleZoomOut}
+        onZoomStandard={handleZoomStandard}
+        onZoomTrig={handleZoomTrig}
+        onZoomSquare={handleZoomSquare}
+        onToggleTrace={handleTraceToggle}
+        onResetState={handleResetState}
+        angleMode={state.angleMode}
+        currentMode={state.mode}
+        functionCount={state.functions.length}
+      />
+
+      <ToolGuideWithOverlay
+        sections={TOOL_GUIDE_SECTIONS}
+        overlay={
+          <TI84ButtonOverlay
+            onSetMode={setMode}
+            onToggleAngleMode={toggleAngleMode}
+            onZoomIn={handleZoomIn}
+            onZoomOut={handleZoomOut}
+            onZoomStandard={handleZoomStandard}
+            onZoomTrig={handleZoomTrig}
+            onZoomSquare={handleZoomSquare}
+            onToggleTrace={handleTraceToggle}
+            onResetState={handleResetState}
+            onOpenPalette={() => setPaletteOpen(true)}
+            insert={insert}
+            backspace={backspace}
+            clearInput={clearInput}
+            navigateInputs={navigateInputs}
+          />
+        }
+      />
     </>
   );
 }
