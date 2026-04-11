@@ -88,6 +88,15 @@ const TOOLS: Tool[] = [
     icon: "LineChart",
     paidAlternative: "TI-84 Online",
   },
+  {
+    name: "Screen Recorder",
+    slug: "screen-recorder",
+    description:
+      "Record your screen, window, or tab with a webcam picture-in-picture overlay. Trim and export as WebM, MP4, or GIF.",
+    category: "Media",
+    icon: "Video",
+    paidAlternative: "Loom",
+  },
 ];
 
 export default function HomePage() {
