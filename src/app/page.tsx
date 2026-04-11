@@ -79,6 +79,15 @@ const TOOLS: Tool[] = [
     icon: "Atom",
     paidAlternative: "Merck PTE",
   },
+  {
+    name: "Graphing Calculator",
+    slug: "graphing-calculator",
+    description:
+      "Plot functions, run statistics, solve matrices, and compute distributions — TI-84 workflow with a modern HD interface.",
+    category: "Education",
+    icon: "LineChart",
+    paidAlternative: "TI-84 Online",
+  },
 ];
 
 export default function HomePage() {

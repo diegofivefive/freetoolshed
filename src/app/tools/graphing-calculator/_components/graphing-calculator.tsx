@@ -10,13 +10,24 @@ import {
 } from "lucide-react";
 import { calcReducer, INITIAL_STATE } from "@/lib/graphing-calculator/reducer";
 import { loadCalcState, saveCalcState } from "@/lib/graphing-calculator/storage";
-import type { CalcMode, GraphFunction, Viewport } from "@/lib/graphing-calculator/types";
+import type {
+  CalcMode,
+  GraphFunction,
+  Viewport,
+  TableSettings,
+  NamedMatrix,
+  RegressionType,
+  DistributionParams,
+  DistributionResult,
+} from "@/lib/graphing-calculator/types";
 import { ToolGuide } from "@/components/shared/tool-guide";
 import type { ToolGuideSection } from "@/components/shared/tool-guide";
 import { GraphCanvas } from "./graph-canvas";
 import { FunctionInputPanel } from "./function-input-panel";
 import { TableView } from "./table-view";
-import type { TableSettings } from "@/lib/graphing-calculator/types";
+import { StatPanel } from "./stat-panel";
+import { MatrixPanel } from "./matrix-panel";
+import { DistributionPanel } from "./distribution-panel";
 
 // ─── Tool Guide Sections ─────────────────────────────────────────────────────
 
@@ -182,6 +193,50 @@ export function GraphingCalculator() {
     setCanvasAspectRatio(ratio);
   }, []);
 
+  // ── Stat callbacks ────────────────────────────────────────────────
+  const handleUpdateStatList = useCallback(
+    (name: string, data: number[]) =>
+      dispatch({ type: "UPDATE_STAT_LIST", name, data }),
+    []
+  );
+
+  const handleSetRegressionType = useCallback(
+    (regression: RegressionType) =>
+      dispatch({ type: "SET_REGRESSION_TYPE", regression }),
+    []
+  );
+
+  const handleSetStatPlot = useCallback(
+    (enabled: boolean, xList?: string, yList?: string) =>
+      dispatch({ type: "SET_STAT_PLOT", enabled, xList, yList }),
+    []
+  );
+
+  // ── Matrix callbacks ──────────────────────────────────────────────
+  const handleSetMatrix = useCallback(
+    (name: string, matrix: NamedMatrix) =>
+      dispatch({ type: "SET_MATRIX", name, matrix }),
+    []
+  );
+
+  const handleSetActiveMatrix = useCallback(
+    (name: string) => dispatch({ type: "SET_ACTIVE_MATRIX", name }),
+    []
+  );
+
+  // ── Distribution callbacks ────────────────────────────────────────
+  const handleSetDistributionParams = useCallback(
+    (params: DistributionParams) =>
+      dispatch({ type: "SET_DISTRIBUTION_PARAMS", params }),
+    []
+  );
+
+  const handleSetDistributionResult = useCallback(
+    (result: DistributionResult | null) =>
+      dispatch({ type: "SET_DISTRIBUTION_RESULT", result }),
+    []
+  );
+
   return (
     <>
       <div className="rounded-lg border border-border bg-card">
@@ -240,9 +295,34 @@ export function GraphingCalculator() {
               onTableSettingsChange={handleTableSettingsChange}
             />
           )}
-          {state.mode === "stat" && <StatPlaceholder />}
-          {state.mode === "matrix" && <MatrixPlaceholder />}
-          {state.mode === "distribution" && <DistributionPlaceholder />}
+          {state.mode === "stat" && (
+            <StatPanel
+              statLists={state.statLists}
+              activeRegression={state.activeRegression}
+              statPlotEnabled={state.statPlotEnabled}
+              statPlotXList={state.statPlotXList}
+              statPlotYList={state.statPlotYList}
+              onUpdateStatList={handleUpdateStatList}
+              onSetRegressionType={handleSetRegressionType}
+              onSetStatPlot={handleSetStatPlot}
+            />
+          )}
+          {state.mode === "matrix" && (
+            <MatrixPanel
+              matrices={state.matrices}
+              activeMatrix={state.activeMatrix}
+              onSetMatrix={handleSetMatrix}
+              onSetActiveMatrix={handleSetActiveMatrix}
+            />
+          )}
+          {state.mode === "distribution" && (
+            <DistributionPanel
+              distributionParams={state.distributionParams}
+              distributionResult={state.distributionResult}
+              onSetDistributionParams={handleSetDistributionParams}
+              onSetDistributionResult={handleSetDistributionResult}
+            />
+          )}
         </div>
       </div>
 
@@ -251,56 +331,3 @@ export function GraphingCalculator() {
   );
 }
 
-// ─── Placeholder Panels (to be replaced in later stages) ─────────────────────
-
-function PlaceholderPanel({
-  title,
-  description,
-  icon: Icon,
-}: {
-  title: string;
-  description: string;
-  icon: typeof LineChart;
-}) {
-  return (
-    <div className="flex min-h-[460px] flex-col items-center justify-center text-center">
-      <div className="rounded-full bg-brand/10 p-4">
-        <Icon className="h-8 w-8 text-brand" />
-      </div>
-      <h3 className="mt-4 text-lg font-semibold">{title}</h3>
-      <p className="mt-2 max-w-md text-sm text-muted-foreground">
-        {description}
-      </p>
-    </div>
-  );
-}
-
-function StatPlaceholder() {
-  return (
-    <PlaceholderPanel
-      title="Statistics Mode"
-      description="Enter data into lists L1–L6, compute 1-Var Stats, and run regression analysis — LinReg, QuadReg, ExpReg, and PwrReg."
-      icon={BarChart3}
-    />
-  );
-}
-
-function MatrixPlaceholder() {
-  return (
-    <PlaceholderPanel
-      title="Matrix Mode"
-      description="Edit matrices [A] through [J]. Compute addition, multiplication, determinant, inverse, RREF, and transpose."
-      icon={Grid3X3}
-    />
-  );
-}
-
-function DistributionPlaceholder() {
-  return (
-    <PlaceholderPanel
-      title="Distribution Mode"
-      description="Compute probabilities with normalcdf, invNorm, tcdf, binompdf, chi-square, and Poisson — matching TI-84 output."
-      icon={Activity}
-    />
-  );
-}
