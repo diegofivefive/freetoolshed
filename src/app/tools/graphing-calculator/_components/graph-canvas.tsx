@@ -29,6 +29,7 @@ interface GraphCanvasProps {
   scatterPoints?: Point[];
   scatterColor?: string;
   onViewportChange: (viewport: Viewport) => void;
+  onAspectRatioChange?: (ratio: number) => void;
 }
 
 export function GraphCanvas({
@@ -41,6 +42,7 @@ export function GraphCanvas({
   scatterPoints,
   scatterColor,
   onViewportChange,
+  onAspectRatioChange,
 }: GraphCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -52,9 +54,12 @@ export function GraphCanvas({
   const viewportRef = useRef(viewport);
   const mouseWorldPos = useRef<{ x: number; y: number } | null>(null);
   const animFrameRef = useRef<number | null>(null);
+  const prevCanvasSize = useRef<{ width: number; height: number } | null>(null);
 
-  // Keep ref in sync
+  // Keep refs in sync
   viewportRef.current = viewport;
+  const onViewportChangeRef = useRef(onViewportChange);
+  onViewportChangeRef.current = onViewportChange;
 
   const theme: GraphTheme = resolvedTheme === "light" ? LIGHT_THEME : DARK_THEME;
   const themeRef = useRef(theme);
@@ -76,6 +81,27 @@ export function GraphCanvas({
 
       const ctx = canvas.getContext("2d");
       if (ctx) ctx.scale(dpr, dpr);
+
+      if (rect.height > 0) {
+        onAspectRatioChange?.(rect.width / rect.height);
+      }
+
+      // Keep scale (units per pixel) locked on resize:
+      // Y-range stays fixed, X-range adjusts to match new aspect ratio
+      const prev = prevCanvasSize.current;
+      if (prev && prev.width > 0 && prev.height > 0 && rect.width > 0 && rect.height > 0) {
+        const vp = viewportRef.current;
+        const unitsPerPixelY = (vp.yMax - vp.yMin) / prev.height;
+        const newXRange = unitsPerPixelY * rect.width;
+        const cx = (vp.xMin + vp.xMax) / 2;
+        onViewportChangeRef.current({
+          xMin: cx - newXRange / 2,
+          xMax: cx + newXRange / 2,
+          yMin: vp.yMin,
+          yMax: vp.yMax,
+        });
+      }
+      prevCanvasSize.current = { width: rect.width, height: rect.height };
 
       requestPaint();
     });
@@ -234,9 +260,6 @@ export function GraphCanvas({
 
   // Use native wheel listener with { passive: false } so preventDefault() works
   // React's onWheel is passive by default and cannot prevent page scroll
-  const onViewportChangeRef = useRef(onViewportChange);
-  onViewportChangeRef.current = onViewportChange;
-
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;

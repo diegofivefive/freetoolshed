@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useEffect, useRef, useCallback } from "react";
+import { useReducer, useEffect, useRef, useCallback, useState } from "react";
 import {
   LineChart,
   Table,
@@ -177,6 +177,11 @@ export function GraphingCalculator() {
     []
   );
 
+  const [canvasAspectRatio, setCanvasAspectRatio] = useState<number | undefined>(undefined);
+  const handleAspectRatioChange = useCallback((ratio: number) => {
+    setCanvasAspectRatio(ratio);
+  }, []);
+
   return (
     <>
       <div className="rounded-lg border border-border bg-card">
@@ -207,6 +212,7 @@ export function GraphingCalculator() {
                 angleMode={state.angleMode}
                 viewport={state.viewport}
                 traceEnabled={state.traceEnabled}
+                canvasAspectRatio={canvasAspectRatio}
                 onAddFunction={handleAddFunction}
                 onUpdateFunction={handleUpdateFunction}
                 onRemoveFunction={handleRemoveFunction}
@@ -222,6 +228,7 @@ export function GraphingCalculator() {
                 parametricSettings={state.parametricSettings}
                 polarSettings={state.polarSettings}
                 onViewportChange={handleViewportChange}
+                onAspectRatioChange={handleAspectRatioChange}
               />
             </div>
           )}

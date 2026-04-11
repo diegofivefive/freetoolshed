@@ -10,6 +10,7 @@ import {
   ZoomOut,
   Maximize,
   Crosshair,
+  Square,
 } from "lucide-react";
 import type { GraphFunction, AngleMode, Viewport } from "@/lib/graphing-calculator/types";
 import { validateExpression } from "@/lib/graphing-calculator/engine";
@@ -29,6 +30,7 @@ interface FunctionInputPanelProps {
   angleMode: AngleMode;
   viewport: Viewport;
   traceEnabled: boolean;
+  canvasAspectRatio?: number; // width / height of the canvas
   onAddFunction: (fn: GraphFunction) => void;
   onUpdateFunction: (id: string, updates: Partial<GraphFunction>) => void;
   onRemoveFunction: (id: string) => void;
@@ -42,6 +44,7 @@ export function FunctionInputPanel({
   angleMode,
   viewport,
   traceEnabled,
+  canvasAspectRatio,
   onAddFunction,
   onUpdateFunction,
   onRemoveFunction,
@@ -103,6 +106,21 @@ export function FunctionInputPanel({
     });
   }, [onViewportChange]);
 
+  // ZoomSquare: adjust viewport so 1 unit in X = 1 unit in Y visually
+  const zoomSquare = useCallback(() => {
+    const aspect = canvasAspectRatio ?? 2; // fallback if unknown
+    const cx = (viewport.xMin + viewport.xMax) / 2;
+    const cy = (viewport.yMin + viewport.yMax) / 2;
+    const yRange = viewport.yMax - viewport.yMin;
+    const xRange = yRange * aspect;
+    onViewportChange({
+      xMin: cx - xRange / 2,
+      xMax: cx + xRange / 2,
+      yMin: cy - yRange / 2,
+      yMax: cy + yRange / 2,
+    });
+  }, [viewport, canvasAspectRatio, onViewportChange]);
+
   return (
     <div className="space-y-3">
       {/* ── Function Inputs ─────────────────────────────────────────── */}
@@ -135,6 +153,7 @@ export function FunctionInputPanel({
         <ToolbarButton icon={ZoomIn} label="Zoom in" onClick={zoomIn} />
         <ToolbarButton icon={ZoomOut} label="Zoom out" onClick={zoomOut} />
         <ToolbarButton icon={Maximize} label="Standard (±10)" onClick={zoomStandard} />
+        <ToolbarButton icon={Square} label="Zoom Square (equal axes)" onClick={zoomSquare} />
 
         <button
           onClick={zoomTrig}

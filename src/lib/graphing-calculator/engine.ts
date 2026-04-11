@@ -83,7 +83,7 @@ export function parseExpression(expr: string): ParsedExpression {
     const variables = new Set<string>();
     node.traverse((n) => {
       if (n.type === "SymbolNode") {
-        const name = (n as { name: string }).name;
+        const name = (n as unknown as { name: string }).name;
         // Exclude known constants and function names
         if (!isKnownSymbol(name)) {
           variables.add(name);
