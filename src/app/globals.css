@@ -202,3 +202,14 @@
     transform: translateY(0);
   }
 }
+
+/* Indeterminate progress bar — used when we cannot report accurate
+   percentages (e.g. ffmpeg.wasm single-threaded transcode events). */
+@keyframes indeterminateProgress {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+.progress-indeterminate {
+  width: 40% !important;
+  animation: indeterminateProgress 1.6s ease-in-out infinite;
+}

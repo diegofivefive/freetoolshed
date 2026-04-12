@@ -98,6 +98,9 @@ export function ExportPanel({
   const [status, setStatus] = useState<ExportStatus>("idle");
   const [progress, setProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  // When ffmpeg.wasm's progress event stays silent (common for single-threaded
+  // MP4 transcodes), we flip to an indeterminate bar so the user sees motion.
+  const [indeterminate, setIndeterminate] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Populate a default filename the first time we land in this panel.
@@ -115,6 +118,22 @@ export function ExportPanel({
       abortControllerRef.current?.abort();
     };
   }, []);
+
+  // If we're transcoding and ffmpeg hasn't reported progress after ~1.2s,
+  // switch the bar to an indeterminate slide so the user sees activity.
+  // Any real progress event cancels the timer and restores determinate mode.
+  useEffect(() => {
+    if (status !== "transcoding") {
+      setIndeterminate(false);
+      return;
+    }
+    if (progress > 0) {
+      setIndeterminate(false);
+      return;
+    }
+    const t = window.setTimeout(() => setIndeterminate(true), 1200);
+    return () => window.clearTimeout(t);
+  }, [progress, status]);
 
   const meta = useMemo(
     () => FORMATS.find((f) => f.id === exportFormat) ?? FORMATS[0],
@@ -168,6 +187,7 @@ export function ExportPanel({
     abortControllerRef.current = null;
     setStatus("idle");
     setProgress(0);
+    setIndeterminate(false);
   }, []);
 
   const onDownload = useCallback(async () => {
@@ -199,9 +219,11 @@ export function ExportPanel({
       if ((err as DOMException)?.name === "AbortError") {
         setStatus("idle");
         setProgress(0);
+        setIndeterminate(false);
         return;
       }
       setStatus("error");
+      setIndeterminate(false);
       setErrorMessage(
         err instanceof Error
           ? err.message
@@ -343,23 +365,33 @@ export function ExportPanel({
               {statusLabel}
             </span>
             <span className="font-mono tabular-nums text-xs text-muted-foreground">
-              {status === "transcoding" ? `${progressPct}%` : ""}
+              {status === "transcoding" && !indeterminate
+                ? `${progressPct}%`
+                : status === "transcoding" && indeterminate
+                  ? "Working…"
+                  : ""}
             </span>
           </div>
           <div
             role="progressbar"
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-valuenow={progressPct}
+            aria-valuenow={indeterminate ? undefined : progressPct}
+            aria-valuetext={
+              indeterminate ? "Working, progress indeterminate" : undefined
+            }
             className="h-2 w-full overflow-hidden rounded-full bg-border"
           >
             <div
               className={`h-full bg-brand transition-[width] duration-150 ${
                 status === "loading-ffmpeg" ? "animate-pulse" : ""
-              }`}
+              } ${indeterminate ? "progress-indeterminate" : ""}`}
               style={{
-                width:
-                  status === "loading-ffmpeg" ? "30%" : `${progressPct}%`,
+                width: indeterminate
+                  ? undefined
+                  : status === "loading-ffmpeg"
+                    ? "30%"
+                    : `${progressPct}%`,
               }}
             />
           </div>
