@@ -97,6 +97,15 @@ const TOOLS: Tool[] = [
     icon: "Video",
     paidAlternative: "Loom",
   },
+  {
+    name: "Media Toolkit",
+    slug: "media-toolkit",
+    description:
+      "Merge, convert, compress, and trim audio and video files. Combine audiobook MP3s into a single M4A, convert formats, extract audio — all in your browser.",
+    category: "Media",
+    icon: "Clapperboard",
+    paidAlternative: "Adobe Media Encoder",
+  },
 ];
 
 export default function HomePage() {
