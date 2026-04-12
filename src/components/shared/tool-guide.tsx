@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
 export interface ToolGuideSection {
@@ -11,12 +11,6 @@ export interface ToolGuideSection {
 
 interface ToolGuideProps {
   sections: ToolGuideSection[];
-}
-
-interface ToolGuideWithOverlayProps {
-  sections: ToolGuideSection[];
-  overlay: ReactNode;
-  overlayLabel?: string;
 }
 
 function GuideSections({ sections }: { sections: ToolGuideSection[] }) {
@@ -65,63 +59,3 @@ export function ToolGuide({ sections }: ToolGuideProps) {
   );
 }
 
-/**
- * ToolGuide with a tabbed overlay (e.g., TI-84 buttons).
- * Renders a segmented toggle above the content panel.
- */
-export function ToolGuideWithOverlay({
-  sections,
-  overlay,
-  overlayLabel = "TI-84",
-}: ToolGuideWithOverlayProps) {
-  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
-  const [activeTab, setActiveTab] = useState<"guide" | "overlay">("guide");
-
-  useEffect(() => {
-    setPortalTarget(document.getElementById("tool-guide-portal"));
-  }, []);
-
-  if (!portalTarget) return null;
-
-  return createPortal(
-    <div className="mt-4">
-      {/* Segmented tab toggle */}
-      <div className="mb-2 flex rounded-lg border border-border bg-muted p-0.5">
-        <button
-          onClick={() => setActiveTab("guide")}
-          className={`flex-1 rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
-            activeTab === "guide"
-              ? "bg-card text-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Guide
-        </button>
-        <button
-          onClick={() => setActiveTab("overlay")}
-          className={`flex-1 rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
-            activeTab === "overlay"
-              ? "bg-card text-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          {overlayLabel}
-        </button>
-      </div>
-
-      {/* Content */}
-      {activeTab === "guide" ? (
-        <div
-          className="overflow-y-auto rounded-lg border border-border bg-card p-4"
-          style={{ maxHeight: "calc(100vh - 5rem - 250px - 3rem)" }}
-        >
-          <h3 className="mb-4 border-b border-brand/30 pb-2 text-sm font-semibold">Guide</h3>
-          <GuideSections sections={sections} />
-        </div>
-      ) : (
-        overlay
-      )}
-    </div>,
-    portalTarget
-  );
-}

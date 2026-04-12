@@ -8,6 +8,7 @@ import {
   Grid3X3,
   Activity,
   Search,
+  Calculator,
 } from "lucide-react";
 import { calcReducer, INITIAL_STATE } from "@/lib/graphing-calculator/reducer";
 import { loadCalcState, saveCalcState } from "@/lib/graphing-calculator/storage";
@@ -28,11 +29,11 @@ import type {
   DistributionParams,
   DistributionResult,
 } from "@/lib/graphing-calculator/types";
-import { ToolGuideWithOverlay } from "@/components/shared/tool-guide";
+import { ToolGuide } from "@/components/shared/tool-guide";
 import type { ToolGuideSection } from "@/components/shared/tool-guide";
 import { useActiveInput } from "@/hooks/use-active-input";
 import { CommandPalette } from "./command-palette";
-import { TI84ButtonOverlay } from "./ti84-button-overlay";
+import { TI84Sheet } from "./ti84-sheet";
 import { GraphCanvas } from "./graph-canvas";
 import { FunctionInputPanel } from "./function-input-panel";
 import { TableView } from "./table-view";
@@ -206,6 +207,9 @@ export function GraphingCalculator() {
     setCanvasAspectRatio(ratio);
   }, []);
 
+  // ── TI-84 Sheet ────────────────────────────────────────────────────
+  const [ti84Open, setTi84Open] = useState(false);
+
   // ── Command Palette ─────────────────────────────────────────────────
   const [paletteOpen, setPaletteOpen] = useState(false);
 
@@ -357,12 +361,12 @@ export function GraphingCalculator() {
     <>
       <div ref={workspaceRef} className="rounded-lg border border-border bg-card">
         {/* ── Toolbar ─────────────────────────────────────────────────── */}
-        <div className="flex items-center gap-1 border-b border-border px-4 py-2">
+        <div className="flex items-center gap-1 overflow-x-auto border-b border-border px-4 py-2">
           {MODE_TABS.map(({ mode, label, icon: Icon }) => (
             <button
               key={mode}
               onClick={() => setMode(mode)}
-              className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+              className={`flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                 state.mode === mode
                   ? "bg-brand/10 text-brand"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -374,8 +378,17 @@ export function GraphingCalculator() {
           ))}
 
           <button
+            onClick={() => setTi84Open(true)}
+            className="ml-auto flex shrink-0 items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            title="Open TI-84 calculator"
+          >
+            <Calculator className="h-3 w-3" />
+            <span className="hidden sm:inline">TI-84</span>
+          </button>
+
+          <button
             onClick={() => setPaletteOpen(true)}
-            className="ml-auto flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="flex shrink-0 items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             title="Command palette"
           >
             <Search className="h-3 w-3" />
@@ -472,26 +485,25 @@ export function GraphingCalculator() {
         functionCount={state.functions.length}
       />
 
-      <ToolGuideWithOverlay
-        sections={TOOL_GUIDE_SECTIONS}
-        overlay={
-          <TI84ButtonOverlay
-            onSetMode={setMode}
-            onToggleAngleMode={toggleAngleMode}
-            onZoomIn={handleZoomIn}
-            onZoomOut={handleZoomOut}
-            onZoomStandard={handleZoomStandard}
-            onZoomTrig={handleZoomTrig}
-            onZoomSquare={handleZoomSquare}
-            onToggleTrace={handleTraceToggle}
-            onResetState={handleResetState}
-            onOpenPalette={() => setPaletteOpen(true)}
-            insert={insert}
-            backspace={backspace}
-            clearInput={clearInput}
-            navigateInputs={navigateInputs}
-          />
-        }
+      <ToolGuide sections={TOOL_GUIDE_SECTIONS} />
+
+      <TI84Sheet
+        open={ti84Open}
+        onOpenChange={setTi84Open}
+        onSetMode={setMode}
+        onToggleAngleMode={toggleAngleMode}
+        onZoomIn={handleZoomIn}
+        onZoomOut={handleZoomOut}
+        onZoomStandard={handleZoomStandard}
+        onZoomTrig={handleZoomTrig}
+        onZoomSquare={handleZoomSquare}
+        onToggleTrace={handleTraceToggle}
+        onResetState={handleResetState}
+        onOpenPalette={() => setPaletteOpen(true)}
+        insert={insert}
+        backspace={backspace}
+        clearInput={clearInput}
+        navigateInputs={navigateInputs}
       />
     </>
   );

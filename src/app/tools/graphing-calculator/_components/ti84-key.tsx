@@ -49,29 +49,32 @@ export function TI84Key({ button, modifier, onPress }: TI84KeyProps) {
       ? "text-emerald-300"
       : "";
 
-  // 2nd label annotation shown above the key in normal state
-  const secondAnnotation =
-    modifier === "none" && button.secondLabel ? button.secondLabel : null;
+  // Annotations shown above the key in normal state
+  const hasAnnotations =
+    modifier === "none" && (button.secondLabel || button.alphaLabel);
 
   return (
-    <div
-      className="flex flex-col items-center"
-      style={{ gridColumn: button.colSpan ? `span ${button.colSpan}` : undefined }}
-    >
-      {/* 2nd function label (shown above key like on real TI-84) */}
-      {secondAnnotation && (
-        <span className="mb-0.5 truncate text-center text-[8px] leading-none text-amber-500">
-          {secondAnnotation}
-        </span>
+    <div className="flex flex-col items-center">
+      {/* Annotations: 2nd label (amber, left) + alpha label (green, right) */}
+      {hasAnnotations ? (
+        <div className="mb-0.5 flex w-full items-center justify-between gap-0.5 px-0.5">
+          <span className="truncate text-[7px] leading-none text-blue-400">
+            {button.secondLabel ?? ""}
+          </span>
+          <span className="text-[7px] leading-none text-emerald-400">
+            {button.alphaLabel ?? ""}
+          </span>
+        </div>
+      ) : (
+        <div className="mb-0.5 h-[9px]" />
       )}
 
       <button
         onMouseDown={(e) => {
-          // Prevent focus steal from the active expression input
           e.preventDefault();
           onPress(button);
         }}
-        className={`flex w-full cursor-pointer items-center justify-center rounded-md border px-0.5 py-1.5 text-[10px] leading-tight transition-colors select-none ${COLOR_STYLES[button.color]} ${labelColorClass}`}
+        className={`flex w-full cursor-pointer items-center justify-center rounded-md border px-1 py-2 text-[11px] leading-tight transition-colors select-none ${COLOR_STYLES[button.color]} ${labelColorClass}`}
         title={
           showSecond
             ? `2nd: ${button.secondLabel}`
