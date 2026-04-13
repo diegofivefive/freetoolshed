@@ -70,16 +70,34 @@ function AdsterraSlot({ slot, className }: AdSlotProps) {
     if (!key) return;
 
     injected.current = true;
+    const container = containerRef.current;
 
-    const optionsScript = document.createElement("script");
-    optionsScript.text = `atOptions = { 'key': '${key}', 'format': 'iframe', 'height': ${height}, 'width': ${width}, 'params': {} };`;
+    // Use an iframe to isolate each ad's atOptions global — prevents
+    // race conditions when multiple slots share the same key on one page.
+    const iframe = document.createElement("iframe");
+    iframe.style.width = `${width}px`;
+    iframe.style.height = `${height}px`;
+    iframe.style.border = "none";
+    iframe.style.overflow = "hidden";
+    iframe.scrolling = "no";
+    iframe.setAttribute("loading", "lazy");
+    container.appendChild(iframe);
 
-    const invokeScript = document.createElement("script");
-    invokeScript.src = `https://www.highperformanceformat.com/${key}/invoke.js`;
-    invokeScript.async = true;
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+    if (!iframeDoc) return;
 
-    containerRef.current.appendChild(optionsScript);
-    containerRef.current.appendChild(invokeScript);
+    iframeDoc.open();
+    iframeDoc.write(`
+      <!doctype html>
+      <html><head><style>body{margin:0;overflow:hidden}</style></head>
+      <body>
+        <script>
+          atOptions = { 'key': '${key}', 'format': 'iframe', 'height': ${height}, 'width': ${width}, 'params': {} };
+        <\/script>
+        <script src="https://www.highperformanceformat.com/${key}/invoke.js"><\/script>
+      </body></html>
+    `);
+    iframeDoc.close();
   }, [slot, width, height]);
 
   return (
