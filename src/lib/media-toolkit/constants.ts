@@ -91,7 +91,7 @@ export const TOOLKIT_TOOLS = [
     description:
       "Trim audio files or split them by time markers. Quick and precise cuts.",
     icon: "Scissors",
-    status: "coming-soon" as const,
+    status: "live" as const,
   },
   {
     name: "Image Converter",
