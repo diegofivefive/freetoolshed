@@ -65,9 +65,6 @@ export default function RootLayout({
         <ThemeProvider>
           <TooltipProvider>
             <SiteNav />
-            <div className="mx-auto hidden w-full max-w-7xl justify-center px-4 py-2 sm:px-6 lg:flex lg:px-8">
-              <AdSlot slot="leaderboard" />
-            </div>
             <div className="flex flex-1 flex-col">{children}</div>
             <SiteFooter />
           </TooltipProvider>

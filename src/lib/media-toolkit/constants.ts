@@ -110,11 +110,27 @@ export const TOOLKIT_TOOLS = [
     status: "live" as const,
   },
   {
+    name: "Audio Extractor",
+    slug: "audio-extractor",
+    description:
+      "Extract audio tracks from video files. Convert to MP3, M4A, WAV, OGG, or FLAC.",
+    icon: "Music",
+    status: "live" as const,
+  },
+  {
+    name: "Subtitle Extractor",
+    slug: "subtitle-extractor",
+    description:
+      "Pull embedded subtitle tracks from MKV, MP4, and other video containers.",
+    icon: "Subtitles",
+    status: "live" as const,
+  },
+  {
     name: "Metadata Editor",
     slug: "metadata-editor",
     description:
-      "Edit MP3 tags, strip EXIF data from images, and view file metadata.",
+      "View, edit, and strip metadata tags from audio and video files.",
     icon: "Tags",
-    status: "coming-soon" as const,
+    status: "live" as const,
   },
 ] as const;

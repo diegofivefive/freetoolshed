@@ -18,6 +18,8 @@ import {
   Image,
   ScissorsLineDashed,
   Tags,
+  Music,
+  Subtitles,
 } from "lucide-react";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { SeoContent } from "./_components/seo-content";
@@ -38,6 +40,8 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Image,
   ScissorsLineDashed,
   Tags,
+  Music,
+  Subtitles,
 };
 
 export default function MediaToolkitPage() {
