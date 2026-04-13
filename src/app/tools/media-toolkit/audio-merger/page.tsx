@@ -1,4 +1,5 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
+import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { SeoContent } from "./_components/seo-content";
 import { AudioMergerLoader } from "./_components/audio-merger-loader";
 import { AdSlot } from "@/components/layout/ad-slot";
@@ -95,6 +96,14 @@ export default function AudioMergerPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Media Toolkit", href: "/tools/media-toolkit" },
+          { label: "Audio Merger" },
+        ]}
       />
 
       <h1 className="text-3xl font-bold tracking-tight">

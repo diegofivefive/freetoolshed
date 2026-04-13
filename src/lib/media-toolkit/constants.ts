@@ -67,7 +67,7 @@ export const TOOLKIT_TOOLS = [
     description:
       "Convert between MP3, M4A, WAV, OGG, FLAC, and more. Single file or batch mode.",
     icon: "ArrowLeftRight",
-    status: "coming-soon" as const,
+    status: "live" as const,
   },
   {
     name: "Video Compressor",
@@ -75,7 +75,7 @@ export const TOOLKIT_TOOLS = [
     description:
       "Reduce video file size with quality presets. H.264 encoding right in your browser.",
     icon: "Minimize2",
-    status: "coming-soon" as const,
+    status: "live" as const,
   },
   {
     name: "Video Converter",
@@ -83,7 +83,7 @@ export const TOOLKIT_TOOLS = [
     description:
       "Convert between MP4, WebM, MOV, AVI, and GIF. No uploads, no file size limits.",
     icon: "Film",
-    status: "coming-soon" as const,
+    status: "live" as const,
   },
   {
     name: "Audio Trimmer",

@@ -19,6 +19,7 @@ import {
   ScissorsLineDashed,
   Tags,
 } from "lucide-react";
+import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { SeoContent } from "./_components/seo-content";
 
 export const metadata = generatePageMetadata({
@@ -54,6 +55,13 @@ export default function MediaToolkitPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Media Toolkit" },
+        ]}
       />
 
       <h1 className="text-3xl font-bold tracking-tight">
