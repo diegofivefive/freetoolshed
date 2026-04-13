@@ -99,7 +99,7 @@ export const TOOLKIT_TOOLS = [
     description:
       "Bulk convert images between PNG, JPG, WebP, and AVIF with quality controls.",
     icon: "Image",
-    status: "coming-soon" as const,
+    status: "live" as const,
   },
   {
     name: "Video Trimmer",
