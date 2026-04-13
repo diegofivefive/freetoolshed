@@ -29,9 +29,34 @@ const ADSTERRA_KEYS: Record<string, string> = {
   "300x250": "1a7c37f9a68e7017209378c2620c901d",
 };
 
+const ADSTERRA_NATIVE_KEY = "a85b10fcd5453be6dfd1e5dab8569251";
+
 function getAdsterraKey(slot: AdSlotProps["slot"]): string {
   const { width, height } = SLOT_DIMENSIONS[slot];
   return ADSTERRA_KEYS[`${width}x${height}`] ?? "";
+}
+
+function AdsterraNativeBanner() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const injected = useRef(false);
+
+  useEffect(() => {
+    if (injected.current || !containerRef.current) return;
+    injected.current = true;
+
+    const invokeScript = document.createElement("script");
+    invokeScript.src = `https://pl29142630.profitablecpmratenetwork.com/${ADSTERRA_NATIVE_KEY}/invoke.js`;
+    invokeScript.async = true;
+    invokeScript.setAttribute("data-cfasync", "false");
+
+    containerRef.current.appendChild(invokeScript);
+  }, []);
+
+  return (
+    <div ref={containerRef} className="mt-4 w-full max-w-[728px] overflow-hidden rounded">
+      <div id={`container-${ADSTERRA_NATIVE_KEY}`} />
+    </div>
+  );
 }
 
 function AdsterraSlot({ slot, className }: AdSlotProps) {
@@ -58,12 +83,15 @@ function AdsterraSlot({ slot, className }: AdSlotProps) {
   }, [slot, width, height]);
 
   return (
-    <div
-      ref={containerRef}
-      className={`flex items-center justify-center overflow-hidden rounded ${className ?? ""}`}
-      style={{ width, height, maxWidth: "100%" }}
-      data-ad-slot={slot}
-    />
+    <>
+      <div
+        ref={containerRef}
+        className={`flex items-center justify-center overflow-hidden rounded ${className ?? ""}`}
+        style={{ width, height, maxWidth: "100%" }}
+        data-ad-slot={slot}
+      />
+      {slot === "mid-content" && <AdsterraNativeBanner />}
+    </>
   );
 }
 
