@@ -59,56 +59,107 @@ function AdsterraNativeBanner() {
   );
 }
 
+/** Delay (ms) before loading the mid-content 728x90 — lets top + sidebar ads
+ *  claim inventory first so they don't compete for the same fill. */
+const MID_CONTENT_DELAY = 1500;
+
+/** How long (ms) to wait for the 728x90 iframe to render content before
+ *  falling back to the native banner. */
+const BANNER_FILL_TIMEOUT = 3000;
+
 function AdsterraSlot({ slot, className }: AdSlotProps) {
   const { width, height } = SLOT_DIMENSIONS[slot];
   const containerRef = useRef<HTMLDivElement>(null);
   const injected = useRef(false);
+  const isMidContent = slot === "mid-content";
+
+  // For mid-content: track whether the 728x90 filled or we need native fallback
+  const [bannerStatus, setBannerStatus] = useState<"pending" | "filled" | "unfilled">(
+    isMidContent ? "pending" : "filled"
+  );
 
   useEffect(() => {
     if (injected.current || !containerRef.current) return;
     const key = getAdsterraKey(slot);
     if (!key) return;
 
-    injected.current = true;
-    const container = containerRef.current;
+    const inject = () => {
+      if (injected.current || !containerRef.current) return;
+      injected.current = true;
+      const container = containerRef.current;
 
-    // Use an iframe to isolate each ad's atOptions global — prevents
-    // race conditions when multiple slots share the same key on one page.
-    const iframe = document.createElement("iframe");
-    iframe.style.width = `${width}px`;
-    iframe.style.height = `${height}px`;
-    iframe.style.border = "none";
-    iframe.style.overflow = "hidden";
-    iframe.scrolling = "no";
-    iframe.setAttribute("loading", "lazy");
-    container.appendChild(iframe);
+      // Use an iframe to isolate each ad's atOptions global — prevents
+      // race conditions when multiple slots share the same key on one page.
+      const iframe = document.createElement("iframe");
+      iframe.style.width = `${width}px`;
+      iframe.style.height = `${height}px`;
+      iframe.style.border = "none";
+      iframe.style.overflow = "hidden";
+      iframe.scrolling = "no";
+      iframe.setAttribute("loading", "lazy");
+      container.appendChild(iframe);
 
-    const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
-    if (!iframeDoc) return;
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+      if (!iframeDoc) return;
 
-    iframeDoc.open();
-    iframeDoc.write(`
-      <!doctype html>
-      <html><head><style>body{margin:0;overflow:hidden}</style></head>
-      <body>
-        <script>
-          atOptions = { 'key': '${key}', 'format': 'iframe', 'height': ${height}, 'width': ${width}, 'params': {} };
-        <\/script>
-        <script src="https://www.highperformanceformat.com/${key}/invoke.js"><\/script>
-      </body></html>
-    `);
-    iframeDoc.close();
-  }, [slot, width, height]);
+      iframeDoc.open();
+      iframeDoc.write(`
+        <!doctype html>
+        <html><head><style>body{margin:0;overflow:hidden}</style></head>
+        <body>
+          <script>
+            atOptions = { 'key': '${key}', 'format': 'iframe', 'height': ${height}, 'width': ${width}, 'params': {} };
+          <\/script>
+          <script src="https://www.highperformanceformat.com/${key}/invoke.js"><\/script>
+        </body></html>
+      `);
+      iframeDoc.close();
+
+      // For mid-content, check if the iframe actually rendered ad content
+      if (isMidContent) {
+        setTimeout(() => {
+          try {
+            const innerDoc = iframe.contentDocument || iframe.contentWindow?.document;
+            const body = innerDoc?.body;
+            // If the iframe body has meaningful content (ads inject elements),
+            // treat it as filled; otherwise fall back to native
+            if (body && body.children.length > 0 && body.innerHTML.length > 200) {
+              setBannerStatus("filled");
+            } else {
+              setBannerStatus("unfilled");
+            }
+          } catch {
+            // Cross-origin — assume filled (ad network took over the iframe)
+            setBannerStatus("filled");
+          }
+        }, BANNER_FILL_TIMEOUT);
+      }
+    };
+
+    // Mid-content slots wait so top + sidebar load first
+    if (isMidContent) {
+      const timer = setTimeout(inject, MID_CONTENT_DELAY);
+      return () => clearTimeout(timer);
+    } else {
+      inject();
+    }
+  }, [slot, width, height, isMidContent]);
 
   return (
     <>
+      {/* Hide the 728x90 container if it didn't fill and we're showing native instead */}
       <div
         ref={containerRef}
         className={`flex items-center justify-center overflow-hidden rounded ${className ?? ""}`}
-        style={{ width, height, maxWidth: "100%" }}
+        style={{
+          width,
+          height,
+          maxWidth: "100%",
+          display: isMidContent && bannerStatus === "unfilled" ? "none" : undefined,
+        }}
         data-ad-slot={slot}
       />
-      {slot === "mid-content" && <AdsterraNativeBanner />}
+      {isMidContent && bannerStatus === "unfilled" && <AdsterraNativeBanner />}
     </>
   );
 }
