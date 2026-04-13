@@ -107,7 +107,7 @@ export const TOOLKIT_TOOLS = [
     description:
       "Quick-cut video clips without re-encoding the entire file. Fast stream copy mode.",
     icon: "ScissorsLineDashed",
-    status: "coming-soon" as const,
+    status: "live" as const,
   },
   {
     name: "Metadata Editor",
