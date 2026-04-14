@@ -357,22 +357,31 @@ export function Waveform({
     setIsDragging(false);
   }, []);
 
-  // Scroll wheel for horizontal scroll + zoom
+  // Scroll wheel: plain scroll = zoom at cursor, Shift+scroll = horizontal pan
   const handleWheel = useCallback(
     (e: WheelEvent) => {
       e.preventDefault();
-      if (e.ctrlKey || e.metaKey) {
-        // Zoom
-        const factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
-        const newZoom = Math.max(10, Math.min(1000, zoom * factor));
-        onZoomChange(newZoom);
-      } else {
-        // Horizontal scroll
+      if (e.shiftKey) {
+        // Horizontal scroll (pan)
         const delta = e.deltaY / zoom;
         const maxOffset = Math.max(0, buffer.duration - containerWidth / zoom);
         onScrollOffsetChange(
           Math.max(0, Math.min(scrollOffset + delta, maxOffset))
         );
+      } else {
+        // Zoom toward cursor position
+        const rect = canvasRef.current?.getBoundingClientRect();
+        const cursorX = rect ? e.clientX - rect.left : containerWidth / 2;
+        const cursorTime = scrollOffset + cursorX / zoom;
+
+        const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+        const newZoom = Math.max(10, Math.min(1000, zoom * factor));
+
+        // Adjust scroll so the time under the cursor stays at the same pixel
+        const newOffset = cursorTime - cursorX / newZoom;
+        const maxOffset = Math.max(0, buffer.duration - containerWidth / newZoom);
+        onScrollOffsetChange(Math.max(0, Math.min(newOffset, maxOffset)));
+        onZoomChange(newZoom);
       }
     },
     [zoom, buffer.duration, containerWidth, scrollOffset, onZoomChange, onScrollOffsetChange]

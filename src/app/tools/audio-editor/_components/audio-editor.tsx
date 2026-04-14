@@ -886,22 +886,16 @@ export function AudioEditor() {
           <ZoomIn className="size-4" />
         </Button>
 
-        {/* Spacer + time display */}
-        <div className="ml-auto flex items-center gap-3 text-xs font-mono text-muted-foreground">
-          <span>{formatTime(state.playheadPosition)}</span>
-          <span>/</span>
-          <span>{formatTime(state.track.duration)}</span>
-          {state.selection && (
-            <>
-              <Separator orientation="vertical" className="h-4" />
-              <span>
-                Sel: {formatTime(state.selection.start)} –{" "}
-                {formatTime(state.selection.end)}
-              </span>
-            </>
-          )}
-        </div>
+      </div>
 
+      {/* Time display — fixed second row so it never causes layout shift */}
+      <div className="flex items-center gap-4 border-b border-border px-3 pb-2 text-xs font-mono text-muted-foreground">
+        <span>{formatTime(state.playheadPosition)} / {formatTime(state.track.duration)}</span>
+        <span className="text-muted-foreground/50">
+          {state.selection
+            ? `Sel: ${formatTime(state.selection.start)} – ${formatTime(state.selection.end)}`
+            : "No selection"}
+        </span>
       </div>
 
       {/* Waveform area */}
