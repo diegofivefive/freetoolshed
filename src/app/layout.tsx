@@ -60,6 +60,12 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full`}
     >
+      <head>
+        <link rel="preconnect" href="https://www.highperformanceformat.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://www.highperformanceformat.com" />
+        <link rel="preconnect" href="https://pl29142630.profitablecpmratenetwork.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://pl29142630.profitablecpmratenetwork.com" />
+      </head>
       <body className="flex min-h-full flex-col antialiased">
         <AdSenseScript />
         <ThemeProvider>
