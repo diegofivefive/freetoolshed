@@ -10,6 +10,14 @@ import {
 import { WAVEFORM_HEIGHT, WAVEFORM_COLORS } from "@/lib/audio/constants";
 import type { Selection } from "@/lib/audio/types";
 
+/** Resolve CSS variable references (e.g. "var(--color-brand)") to actual
+ *  color values that the Canvas 2D API can use. Raw color values pass through. */
+function resolveColor(el: HTMLElement, color: string): string {
+  const match = color.match(/^var\((.+)\)$/);
+  if (!match) return color;
+  return getComputedStyle(el).getPropertyValue(match[1]).trim() || color;
+}
+
 interface WaveformProps {
   buffer: AudioBuffer;
   zoom: number;
@@ -114,8 +122,11 @@ export function Waveform({
     const width = containerWidth;
     const height = WAVEFORM_HEIGHT;
 
+    // Resolve CSS variables once per frame
+    const rc = (c: string) => resolveColor(canvas, c);
+
     // Background
-    ctx.fillStyle = WAVEFORM_COLORS.background;
+    ctx.fillStyle = rc(WAVEFORM_COLORS.background);
     ctx.fillRect(0, 0, width, height);
 
     // Grid lines (no labels — ruler handles those)
@@ -123,7 +134,7 @@ export function Waveform({
     const endTime = scrollOffset + width / zoom;
     const gridStep = zoom > 200 ? 0.5 : zoom > 50 ? 1 : zoom > 20 ? 5 : 10;
 
-    ctx.strokeStyle = WAVEFORM_COLORS.gridLine;
+    ctx.strokeStyle = rc(WAVEFORM_COLORS.gridLine);
     ctx.lineWidth = 0.5;
 
     const firstGrid = Math.ceil(startTime / gridStep) * gridStep;
@@ -139,10 +150,10 @@ export function Waveform({
     if (selection) {
       const selX1 = timeToPx(selection.start);
       const selX2 = timeToPx(selection.end);
-      ctx.fillStyle = WAVEFORM_COLORS.selection;
+      ctx.fillStyle = rc(WAVEFORM_COLORS.selection);
       ctx.fillRect(selX1, 0, selX2 - selX1, height);
 
-      ctx.strokeStyle = WAVEFORM_COLORS.selectionBorder;
+      ctx.strokeStyle = rc(WAVEFORM_COLORS.selectionBorder);
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(selX1, 0);
@@ -163,7 +174,7 @@ export function Waveform({
       const peaks = getPeaks(channelData, width, startSample, samplesPerPixel);
       const centerY = channelHeight * ch + channelHeight / 2;
 
-      ctx.fillStyle = WAVEFORM_COLORS.waveform;
+      ctx.fillStyle = rc(WAVEFORM_COLORS.waveform);
 
       for (let i = 0; i < peaks.length; i++) {
         const { min, max } = peaks[i];
@@ -174,7 +185,7 @@ export function Waveform({
 
       // Center line
       if (channelCount > 1) {
-        ctx.strokeStyle = WAVEFORM_COLORS.gridLine;
+        ctx.strokeStyle = rc(WAVEFORM_COLORS.gridLine);
         ctx.lineWidth = 0.5;
         ctx.beginPath();
         ctx.moveTo(0, channelHeight * (ch + 1));
@@ -186,14 +197,12 @@ export function Waveform({
     // Playhead
     const phX = timeToPx(playheadPosition);
     if (phX >= 0 && phX <= width) {
-      ctx.strokeStyle = WAVEFORM_COLORS.playhead;
+      ctx.strokeStyle = rc(WAVEFORM_COLORS.playhead);
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(phX, 0);
       ctx.lineTo(phX, height);
       ctx.stroke();
-
-      // Playhead triangle (rendered on the ruler instead)
     }
   }, [
     buffer,
@@ -219,13 +228,14 @@ export function Waveform({
 
     const width = containerWidth;
     const height = RULER_HEIGHT;
+    const rc = (c: string) => resolveColor(canvas, c);
 
     // Background
-    ctx.fillStyle = WAVEFORM_COLORS.background;
+    ctx.fillStyle = rc(WAVEFORM_COLORS.background);
     ctx.fillRect(0, 0, width, height);
 
     // Bottom border line
-    ctx.strokeStyle = WAVEFORM_COLORS.gridLine;
+    ctx.strokeStyle = rc(WAVEFORM_COLORS.gridLine);
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(0, height - 0.5);
@@ -259,7 +269,7 @@ export function Waveform({
     }
 
     // Draw minor ticks
-    ctx.strokeStyle = WAVEFORM_COLORS.gridLine;
+    ctx.strokeStyle = rc(WAVEFORM_COLORS.gridLine);
     ctx.lineWidth = 0.5;
     const firstMinor = Math.ceil(startTime / minorStep) * minorStep;
     for (let t = firstMinor; t <= endTime; t += minorStep) {
@@ -271,10 +281,12 @@ export function Waveform({
     }
 
     // Draw major ticks + labels
-    ctx.strokeStyle = WAVEFORM_COLORS.timeLabel;
+    const timeLabelColor = rc(WAVEFORM_COLORS.timeLabel);
+    ctx.strokeStyle = timeLabelColor;
     ctx.lineWidth = 1;
-    ctx.fillStyle = WAVEFORM_COLORS.timeLabel;
-    ctx.font = "10px var(--font-geist-mono)";
+    ctx.fillStyle = timeLabelColor;
+    const monoFont = getComputedStyle(canvas).getPropertyValue("--font-geist-mono").trim() || "monospace";
+    ctx.font = `10px ${monoFont}`;
     ctx.textBaseline = "top";
 
     const firstMajor = Math.ceil(startTime / majorStep) * majorStep;
@@ -300,7 +312,7 @@ export function Waveform({
     // Playhead marker on ruler
     const phX = timeToPx(playheadPosition);
     if (phX >= 0 && phX <= width) {
-      ctx.fillStyle = WAVEFORM_COLORS.playhead;
+      ctx.fillStyle = rc(WAVEFORM_COLORS.playhead);
       ctx.beginPath();
       ctx.moveTo(phX - 4, height);
       ctx.lineTo(phX + 4, height);
@@ -392,14 +404,16 @@ export function Waveform({
 
     const width = containerWidth;
     const height = MINIMAP_HEIGHT;
+    const rc = (c: string) => resolveColor(canvas, c);
 
     // Background
-    ctx.fillStyle = WAVEFORM_COLORS.background;
+    ctx.fillStyle = rc(WAVEFORM_COLORS.background);
     ctx.fillRect(0, 0, width, height);
 
     // Draw full waveform (all channels mixed)
     const samplesPerPixel = buffer.length / width;
     const channelCount = buffer.numberOfChannels;
+    const waveformMuted = rc(WAVEFORM_COLORS.waveformMuted);
 
     for (let i = 0; i < width; i++) {
       let min = 1;
@@ -418,7 +432,7 @@ export function Waveform({
       }
       const y1 = height / 2 - max * (height / 2) * 0.85;
       const y2 = height / 2 - min * (height / 2) * 0.85;
-      ctx.fillStyle = WAVEFORM_COLORS.waveformMuted;
+      ctx.fillStyle = waveformMuted;
       ctx.fillRect(i, y1, 1, Math.max(1, y2 - y1));
     }
 
@@ -426,7 +440,7 @@ export function Waveform({
     if (selection) {
       const selX1 = (selection.start / buffer.duration) * width;
       const selX2 = (selection.end / buffer.duration) * width;
-      ctx.fillStyle = WAVEFORM_COLORS.selection;
+      ctx.fillStyle = rc(WAVEFORM_COLORS.selection);
       ctx.fillRect(selX1, 0, selX2 - selX1, height);
     }
 
@@ -440,13 +454,13 @@ export function Waveform({
     ctx.fillRect(vpStart + vpWidth, 0, width - vpStart - vpWidth, height);
 
     // Viewport border
-    ctx.strokeStyle = WAVEFORM_COLORS.selectionBorder;
+    ctx.strokeStyle = rc(WAVEFORM_COLORS.selectionBorder);
     ctx.lineWidth = 1.5;
     ctx.strokeRect(vpStart, 0.5, vpWidth, height - 1);
 
     // Playhead on minimap
     const phX = (playheadPosition / buffer.duration) * width;
-    ctx.strokeStyle = WAVEFORM_COLORS.playhead;
+    ctx.strokeStyle = rc(WAVEFORM_COLORS.playhead);
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(phX, 0);
