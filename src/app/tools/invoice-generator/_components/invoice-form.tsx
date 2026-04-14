@@ -85,12 +85,19 @@ export function InvoiceForm({
   return (
     <div className="space-y-4">
       <Tabs defaultValue="details">
-        <TabsList>
-          <TabsTrigger value="details">Details</TabsTrigger>
-          <TabsTrigger value="items">Items</TabsTrigger>
-          <TabsTrigger value="notes">Notes</TabsTrigger>
-          <TabsTrigger value="style">Style</TabsTrigger>
-        </TabsList>
+        <div className="flex items-center gap-3">
+          <TabsList>
+            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="items">Items</TabsTrigger>
+            <TabsTrigger value="notes">Notes</TabsTrigger>
+            <TabsTrigger value="style">Style</TabsTrigger>
+          </TabsList>
+          <div className="flex-1" />
+          <Button variant="outline" size="sm" onClick={onNewInvoice}>
+            <FilePlus className="size-4" data-icon="inline-start" />
+            New Invoice
+          </Button>
+        </div>
         <div className="mt-2">
           <Button
             variant={showPreview ? "default" : "outline"}
@@ -242,10 +249,6 @@ export function InvoiceForm({
             ))}
           </SelectContent>
         </Select>
-        <Button variant="outline" onClick={onNewInvoice}>
-          <FilePlus className="size-4" data-icon="inline-start" />
-          New Invoice
-        </Button>
       </div>
     </div>
   );

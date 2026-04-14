@@ -10,7 +10,7 @@ import type {
 } from "@/lib/invoice/types";
 import { createDefaultInvoiceData } from "@/lib/invoice/constants";
 import { calculateInvoice } from "@/lib/invoice/calculations";
-import { saveDraft, loadDraft, getNextInvoiceNumber, loadDefaults } from "@/lib/invoice/storage";
+import { saveDraft, loadDraft, getNextInvoiceNumber, loadDefaults, saveInvoiceNumber } from "@/lib/invoice/storage";
 import { ToolGuide } from "@/components/shared/tool-guide";
 import type { ToolGuideSection } from "@/components/shared/tool-guide";
 
@@ -207,8 +207,10 @@ export function InvoiceGenerator() {
   }, [state]);
 
   const handleNewInvoice = useCallback(() => {
+    // Persist the current invoice number so the next reset increments properly
+    saveInvoiceNumber(state.settings.invoiceNumber);
     dispatch({ type: "RESET" });
-  }, []);
+  }, [state.settings.invoiceNumber]);
 
   return (
     <>

@@ -8,6 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuGroup,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { Users, UserPlus, Trash2 } from "lucide-react";
@@ -71,7 +72,9 @@ export function EmployeeRoster({
         }
       />
       <DropdownMenuContent align="end" className="w-64">
-        <DropdownMenuLabel>Employee Roster</DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Employee Roster</DropdownMenuLabel>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
 
         {roster.length === 0 ? (
@@ -85,7 +88,7 @@ export function EmployeeRoster({
             <DropdownMenuItem
               key={entry.id}
               className="group/roster-item flex items-center justify-between gap-2"
-              onSelect={() => onApply(entry)}
+              onClick={() => onApply(entry)}
             >
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">
@@ -123,7 +126,7 @@ export function EmployeeRoster({
           <div className="px-2 py-1 text-xs text-pink-400">{saveError}</div>
         )}
 
-        <DropdownMenuItem onSelect={handleSave}>
+        <DropdownMenuItem onClick={handleSave}>
           <UserPlus className="size-3.5" />
           Save Current Employee
         </DropdownMenuItem>
