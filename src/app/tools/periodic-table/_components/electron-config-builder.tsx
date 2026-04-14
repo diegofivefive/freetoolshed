@@ -55,7 +55,35 @@ const BLOCK_COLORS: Record<string, { bg: string; border: string; text: string }>
   f: { bg: "bg-purple-500/15", border: "border-purple-500/40", text: "text-purple-400" },
 };
 
-/** Build aufbau config for a given atomic number */
+/**
+ * Anomalous electron configurations — elements that deviate from Aufbau filling.
+ * Each entry maps atomic number → [orbitalIndex, correctElectronCount] overrides.
+ * Orbital indices: 5=4s, 6=3d, 8=5s, 9=4d, 11=6s, 12=4f, 13=5d, 15=7s, 16=5f, 17=6d, 18=7p
+ */
+const ANOMALOUS_CONFIGS: Record<number, [number, number][]> = {
+  24: [[5, 1], [6, 5]],    // Cr: [Ar] 3d⁵ 4s¹
+  29: [[5, 1], [6, 10]],   // Cu: [Ar] 3d¹⁰ 4s¹
+  41: [[8, 1], [9, 4]],    // Nb: [Kr] 4d⁴ 5s¹
+  42: [[8, 1], [9, 5]],    // Mo: [Kr] 4d⁵ 5s¹
+  44: [[8, 1], [9, 7]],    // Ru: [Kr] 4d⁷ 5s¹
+  45: [[8, 1], [9, 8]],    // Rh: [Kr] 4d⁸ 5s¹
+  46: [[8, 0], [9, 10]],   // Pd: [Kr] 4d¹⁰ 5s⁰
+  47: [[8, 1], [9, 10]],   // Ag: [Kr] 4d¹⁰ 5s¹
+  57: [[12, 0], [13, 1]],  // La: [Xe] 5d¹ 6s²
+  58: [[12, 1], [13, 1]],  // Ce: [Xe] 4f¹ 5d¹ 6s²
+  64: [[12, 7], [13, 1]],  // Gd: [Xe] 4f⁷ 5d¹ 6s²
+  78: [[11, 1], [13, 9]],  // Pt: [Xe] 4f¹⁴ 5d⁹ 6s¹
+  79: [[11, 1], [13, 10]], // Au: [Xe] 4f¹⁴ 5d¹⁰ 6s¹
+  89: [[16, 0], [17, 1]],  // Ac: [Rn] 6d¹ 7s²
+  90: [[16, 0], [17, 2]],  // Th: [Rn] 6d² 7s²
+  91: [[16, 2], [17, 1]],  // Pa: [Rn] 5f² 6d¹ 7s²
+  92: [[16, 3], [17, 1]],  // U:  [Rn] 5f³ 6d¹ 7s²
+  93: [[16, 4], [17, 1]],  // Np: [Rn] 5f⁴ 6d¹ 7s²
+  96: [[16, 7], [17, 1]],  // Cm: [Rn] 5f⁷ 6d¹ 7s²
+  103: [[17, 0], [18, 1]], // Lr: [Rn] 5f¹⁴ 7s² 7p¹
+};
+
+/** Build electron config for a given atomic number, using real anomalous configs when known */
 function buildAufbauConfig(atomicNumber: number): number[] {
   const config = new Array(AUFBAU_ORBITALS.length).fill(0);
   let remaining = atomicNumber;
@@ -63,6 +91,13 @@ function buildAufbauConfig(atomicNumber: number): number[] {
     const fill = Math.min(remaining, AUFBAU_ORBITALS[i].maxElectrons);
     config[i] = fill;
     remaining -= fill;
+  }
+  // Apply anomalous overrides
+  const overrides = ANOMALOUS_CONFIGS[atomicNumber];
+  if (overrides) {
+    for (const [idx, count] of overrides) {
+      config[idx] = count;
+    }
   }
   return config;
 }
@@ -98,12 +133,12 @@ function findMatchingElement(config: number[]): { symbol: string; name: string; 
   const total = totalElectrons(config);
   if (total === 0 || total > 118) return null;
 
-  // Check if config matches the aufbau filling for this total
-  const aufbauConfig = buildAufbauConfig(total);
-  const isStandard = config.every((v, i) => v === aufbauConfig[i]);
+  // buildAufbauConfig already includes anomalous overrides, so this matches
+  // both standard Aufbau elements and known anomalous configurations (Cr, Cu, etc.)
+  const expectedConfig = buildAufbauConfig(total);
+  const isMatch = config.every((v, i) => v === expectedConfig[i]);
 
-  // For standard aufbau, just match by electron count
-  if (isStandard) {
+  if (isMatch) {
     const el = ELEMENTS.find((e) => e.atomicNumber === total);
     if (el) return { symbol: el.symbol, name: el.name, atomicNumber: el.atomicNumber };
   }
@@ -183,6 +218,15 @@ export function ElectronConfigBuilder({
   const total = useMemo(() => totalElectrons(config), [config]);
   const notation = useMemo(() => configToNotation(config), [config]);
   const matchedElement = useMemo(() => findMatchingElement(config), [config]);
+
+  /** Check if current config exactly matches a given atomic number's config */
+  const configMatchesElement = useCallback(
+    (atomicNumber: number) => {
+      const expected = buildAufbauConfig(atomicNumber);
+      return config.every((v, i) => v === expected[i]);
+    },
+    [config]
+  );
 
   const handleOrbitalClick = useCallback(
     (index: number) => {
@@ -375,7 +419,7 @@ export function ElectronConfigBuilder({
                 key={el.z}
                 onClick={() => handleLoadElement(el.z)}
                 className={`rounded-md border px-2 py-1 text-[10px] font-medium transition-all ${
-                  total === el.z
+                  configMatchesElement(el.z)
                     ? "border-brand bg-brand/10 text-brand"
                     : "border-border text-muted-foreground hover:border-brand/40 hover:text-foreground"
                 }`}
