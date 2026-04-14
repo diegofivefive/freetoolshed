@@ -22,7 +22,7 @@ interface SkillsEditorProps {
 export function SkillsEditor({ section, dispatch }: SkillsEditorProps) {
   return (
     <div className="space-y-3">
-      <div className="grid gap-2 sm:grid-cols-2">
+      <div className="space-y-2">
         {section.items.map((item) => (
           <div key={item.id} className="flex items-center gap-2">
             <Input
@@ -34,7 +34,7 @@ export function SkillsEditor({ section, dispatch }: SkillsEditorProps) {
                   payload: { sectionId: section.id, itemId: item.id, data: { name: e.target.value } },
                 })
               }
-              className="flex-1"
+              className="min-w-0 flex-1"
             />
             <Select
               value={item.proficiency}
@@ -45,7 +45,7 @@ export function SkillsEditor({ section, dispatch }: SkillsEditorProps) {
                 })
               }
             >
-              <SelectTrigger className="w-36">
+              <SelectTrigger className="w-36 shrink-0">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

@@ -85,14 +85,13 @@ export function PayStubForm({
   return (
     <div className="space-y-4">
       <Tabs defaultValue="details">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <TabsList>
             <TabsTrigger value="details">Details</TabsTrigger>
             <TabsTrigger value="earnings">Earnings</TabsTrigger>
             <TabsTrigger value="deductions">Deductions</TabsTrigger>
             <TabsTrigger value="style">Style</TabsTrigger>
           </TabsList>
-          <div className="flex-1" />
           <Button variant="outline" size="sm" onClick={onNewStub}>
             <FilePlus className="size-4" data-icon="inline-start" />
             New Stub

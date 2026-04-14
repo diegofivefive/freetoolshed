@@ -124,12 +124,18 @@ export function ResumeForm({
   return (
     <div className="space-y-4">
       <Tabs defaultValue="content">
-        <TabsList>
-          <TabsTrigger value="content">Content</TabsTrigger>
-          <TabsTrigger value="sections">Sections</TabsTrigger>
-          <TabsTrigger value="style">Style</TabsTrigger>
-          <TabsTrigger value="ats">ATS</TabsTrigger>
-        </TabsList>
+        <div className="flex items-center gap-2">
+          <TabsList>
+            <TabsTrigger value="content">Content</TabsTrigger>
+            <TabsTrigger value="sections">Sections</TabsTrigger>
+            <TabsTrigger value="style">Style</TabsTrigger>
+            <TabsTrigger value="ats">ATS</TabsTrigger>
+          </TabsList>
+          <Button variant="outline" size="sm" onClick={onNewResume}>
+            <FilePlus className="size-4" data-icon="inline-start" />
+            New Resume
+          </Button>
+        </div>
         <div className="mt-2">
           <Button
             variant={showPreview ? "default" : "outline"}
@@ -255,11 +261,6 @@ export function ResumeForm({
           currentState={state}
           onLoad={(data) => dispatch({ type: "LOAD_DRAFT", payload: data })}
         />
-        <div className="flex-1" />
-        <Button variant="outline" onClick={onNewResume}>
-          <FilePlus className="size-4" data-icon="inline-start" />
-          New Resume
-        </Button>
       </div>
     </div>
   );
