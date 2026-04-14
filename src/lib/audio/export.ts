@@ -1,12 +1,14 @@
 /**
  * Audio export utilities.
  * WAV is encoded natively (lossless).
- * MP3 and OGG use the OfflineAudioContext + MediaRecorder approach.
+ * MP3 is encoded via lamejs (pure-JS LAME encoder).
+ * OGG uses MediaRecorder (audio/ogg on Firefox, audio/webm on Chrome).
  */
 
 import type { ExportFormat } from "./types";
 
-/** Encode an AudioBuffer as a WAV Blob */
+// ── WAV encoder ──────────────────────────────────────────────
+
 export function encodeWav(buffer: AudioBuffer): Blob {
   const numChannels = buffer.numberOfChannels;
   const sampleRate = buffer.sampleRate;
@@ -29,7 +31,7 @@ export function encodeWav(buffer: AudioBuffer): Blob {
 
   // fmt chunk
   writeString(view, 12, "fmt ");
-  view.setUint32(16, 16, true); // chunk size
+  view.setUint32(16, 16, true);
   view.setUint16(20, format, true);
   view.setUint16(22, numChannels, true);
   view.setUint32(24, sampleRate, true);
@@ -41,7 +43,6 @@ export function encodeWav(buffer: AudioBuffer): Blob {
   writeString(view, 36, "data");
   view.setUint32(40, dataLength, true);
 
-  // Interleave channels and write samples
   const channels: Float32Array[] = [];
   for (let ch = 0; ch < numChannels; ch++) {
     channels.push(buffer.getChannelData(ch));
@@ -51,8 +52,7 @@ export function encodeWav(buffer: AudioBuffer): Blob {
   for (let i = 0; i < buffer.length; i++) {
     for (let ch = 0; ch < numChannels; ch++) {
       const sample = Math.max(-1, Math.min(1, channels[ch][i]));
-      const intSample =
-        sample < 0 ? sample * 0x8000 : sample * 0x7fff;
+      const intSample = sample < 0 ? sample * 0x8000 : sample * 0x7fff;
       view.setInt16(offset, intSample, true);
       offset += 2;
     }
@@ -67,32 +67,72 @@ function writeString(view: DataView, offset: number, str: string) {
   }
 }
 
-/**
- * Encode an AudioBuffer as MP3 or OGG using OfflineAudioContext + MediaRecorder.
- * Falls back to WAV if the browser doesn't support the requested MIME type.
- */
-export async function encodeCompressed(
-  buffer: AudioBuffer,
-  format: "mp3" | "ogg",
-  bitrate?: number
-): Promise<Blob> {
-  const mimeType =
-    format === "mp3" ? "audio/webm;codecs=opus" : "audio/ogg;codecs=opus";
+// ── MP3 encoder (via lamejs) ────────────────────────────────
 
-  // Check if MediaRecorder supports the format
-  if (
-    typeof MediaRecorder === "undefined" ||
-    !MediaRecorder.isTypeSupported(mimeType)
-  ) {
-    // Fallback: try webm, then fall back to wav
-    const fallbackMime = "audio/webm;codecs=opus";
-    if (
-      typeof MediaRecorder !== "undefined" &&
-      MediaRecorder.isTypeSupported(fallbackMime)
-    ) {
-      return encodeViaMediaRecorder(buffer, fallbackMime);
-    }
-    // Last resort: WAV
+/** Convert Float32Array [-1, 1] to Int16Array */
+function floatTo16Bit(float32: Float32Array): Int16Array {
+  const int16 = new Int16Array(float32.length);
+  for (let i = 0; i < float32.length; i++) {
+    const s = Math.max(-1, Math.min(1, float32[i]));
+    int16[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+  }
+  return int16;
+}
+
+async function encodeMp3(
+  buffer: AudioBuffer,
+  bitrate: number
+): Promise<Blob> {
+  // Dynamic import — lamejs is a large CJS bundle, only load when needed
+  const { Mp3Encoder } = await import("lamejs");
+
+  const numChannels = buffer.numberOfChannels;
+  const sampleRate = buffer.sampleRate;
+  const kbps = bitrate || 192;
+
+  const encoder = new Mp3Encoder(numChannels, sampleRate, kbps);
+
+  const left = floatTo16Bit(buffer.getChannelData(0));
+  const right = numChannels > 1
+    ? floatTo16Bit(buffer.getChannelData(1))
+    : left;
+
+  const mp3Data: Uint8Array[] = [];
+
+  // Encode in chunks of 1152 samples (LAME frame size)
+  const CHUNK = 1152;
+  for (let i = 0; i < left.length; i += CHUNK) {
+    const leftChunk = left.subarray(i, i + CHUNK);
+    const rightChunk = right.subarray(i, i + CHUNK);
+    const encoded = numChannels > 1
+      ? encoder.encodeBuffer(leftChunk, rightChunk)
+      : encoder.encodeBuffer(leftChunk);
+    if (encoded.length > 0) mp3Data.push(new Uint8Array(encoded.buffer, encoded.byteOffset, encoded.byteLength));
+  }
+
+  const tail = encoder.flush();
+  if (tail.length > 0) mp3Data.push(new Uint8Array(tail.buffer, tail.byteOffset, tail.byteLength));
+
+  return new Blob(mp3Data as BlobPart[], { type: "audio/mpeg" });
+}
+
+// ── OGG encoder (MediaRecorder) ─────────────────────────────
+
+async function encodeOgg(
+  buffer: AudioBuffer,
+  bitrate: number
+): Promise<Blob> {
+  // Try audio/ogg first (Firefox), then fall back to audio/webm (Chrome)
+  const oggMime = "audio/ogg;codecs=opus";
+  const webmMime = "audio/webm;codecs=opus";
+
+  let mimeType: string;
+  if (typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(oggMime)) {
+    mimeType = oggMime;
+  } else if (typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(webmMime)) {
+    mimeType = webmMime;
+  } else {
+    // No MediaRecorder support at all — fall back to WAV
     return encodeWav(buffer);
   }
 
@@ -102,9 +142,8 @@ export async function encodeCompressed(
 async function encodeViaMediaRecorder(
   buffer: AudioBuffer,
   mimeType: string,
-  _bitrate?: number
+  bitrate?: number
 ): Promise<Blob> {
-  // Create an OfflineAudioContext to render the buffer
   const offlineCtx = new OfflineAudioContext(
     buffer.numberOfChannels,
     buffer.length,
@@ -118,17 +157,15 @@ async function encodeViaMediaRecorder(
 
   const renderedBuffer = await offlineCtx.startRendering();
 
-  // Now play through a real AudioContext + MediaRecorder
   const ctx = new AudioContext({ sampleRate: renderedBuffer.sampleRate });
   const dest = ctx.createMediaStreamDestination();
-
   const playSource = ctx.createBufferSource();
   playSource.buffer = renderedBuffer;
   playSource.connect(dest);
 
   const recorder = new MediaRecorder(dest.stream, {
     mimeType,
-    audioBitsPerSecond: _bitrate ? _bitrate * 1000 : undefined,
+    audioBitsPerSecond: bitrate ? bitrate * 1000 : undefined,
   });
 
   const chunks: Blob[] = [];
@@ -140,8 +177,7 @@ async function encodeViaMediaRecorder(
 
     recorder.onstop = () => {
       ctx.close();
-      const blob = new Blob(chunks, { type: mimeType });
-      resolve(blob);
+      resolve(new Blob(chunks, { type: mimeType }));
     };
 
     recorder.onerror = () => {
@@ -152,26 +188,26 @@ async function encodeViaMediaRecorder(
     recorder.start();
     playSource.start(0);
 
-    // Stop recording after the buffer duration + small padding
-    const durationMs = (renderedBuffer.duration + 0.1) * 1000;
-    setTimeout(() => {
-      if (recorder.state === "recording") {
-        recorder.stop();
-      }
-    }, durationMs);
-
     playSource.onended = () => {
-      // Give a small delay for final data
       setTimeout(() => {
         if (recorder.state === "recording") {
           recorder.stop();
         }
       }, 100);
     };
+
+    // Safety timeout
+    const durationMs = (renderedBuffer.duration + 0.5) * 1000;
+    setTimeout(() => {
+      if (recorder.state === "recording") {
+        recorder.stop();
+      }
+    }, durationMs);
   });
 }
 
-/** Main export function */
+// ── Main export function ────────────────────────────────────
+
 export async function exportAudio(
   buffer: AudioBuffer,
   format: ExportFormat,
@@ -183,18 +219,16 @@ export async function exportAudio(
       return { blob, extension: "wav", mimeType: "audio/wav" };
     }
     case "mp3": {
-      const blob = await encodeCompressed(buffer, "mp3", bitrate);
-      return {
-        blob,
-        extension: blob.type.includes("webm") ? "webm" : "mp3",
-        mimeType: blob.type,
-      };
+      const blob = await encodeMp3(buffer, bitrate ?? 192);
+      return { blob, extension: "mp3", mimeType: "audio/mpeg" };
     }
     case "ogg": {
-      const blob = await encodeCompressed(buffer, "ogg", bitrate);
+      const blob = await encodeOgg(buffer, bitrate ?? 192);
+      // Actual extension depends on what the browser produced
+      const isOgg = blob.type.includes("ogg");
       return {
         blob,
-        extension: blob.type.includes("webm") ? "webm" : "ogg",
+        extension: isOgg ? "ogg" : "webm",
         mimeType: blob.type,
       };
     }

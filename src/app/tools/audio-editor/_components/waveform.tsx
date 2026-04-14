@@ -357,18 +357,11 @@ export function Waveform({
     setIsDragging(false);
   }, []);
 
-  // Scroll wheel: plain scroll = zoom at cursor, Shift+scroll = horizontal pan
+  // Scroll wheel: Ctrl/Cmd+scroll = zoom at cursor, plain scroll = horizontal pan
   const handleWheel = useCallback(
     (e: WheelEvent) => {
       e.preventDefault();
-      if (e.shiftKey) {
-        // Horizontal scroll (pan)
-        const delta = e.deltaY / zoom;
-        const maxOffset = Math.max(0, buffer.duration - containerWidth / zoom);
-        onScrollOffsetChange(
-          Math.max(0, Math.min(scrollOffset + delta, maxOffset))
-        );
-      } else {
+      if (e.ctrlKey || e.metaKey) {
         // Zoom toward cursor position
         const rect = canvasRef.current?.getBoundingClientRect();
         const cursorX = rect ? e.clientX - rect.left : containerWidth / 2;
@@ -382,6 +375,13 @@ export function Waveform({
         const maxOffset = Math.max(0, buffer.duration - containerWidth / newZoom);
         onScrollOffsetChange(Math.max(0, Math.min(newOffset, maxOffset)));
         onZoomChange(newZoom);
+      } else {
+        // Horizontal scroll (pan)
+        const delta = e.deltaY / zoom;
+        const maxOffset = Math.max(0, buffer.duration - containerWidth / zoom);
+        onScrollOffsetChange(
+          Math.max(0, Math.min(scrollOffset + delta, maxOffset))
+        );
       }
     },
     [zoom, buffer.duration, containerWidth, scrollOffset, onZoomChange, onScrollOffsetChange]

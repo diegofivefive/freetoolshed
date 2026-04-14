@@ -66,7 +66,7 @@ const AUDIO_GUIDE_SECTIONS: ToolGuideSection[] = [
     steps: [
       "Click + drag on the waveform to select a region",
       "Use the minimap below the waveform to navigate long files",
-      "Scroll to pan, or use +/- to zoom in and out",
+      "Ctrl+scroll to zoom at cursor, scroll to pan",
     ],
   },
   {

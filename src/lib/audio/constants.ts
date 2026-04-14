@@ -44,7 +44,7 @@ export const IMPORT_MIME_TYPES = [
 export const FORMAT_LABELS: Record<ExportFormat, string> = {
   wav: "WAV (lossless)",
   mp3: "MP3",
-  ogg: "OGG Vorbis",
+  ogg: "OGG / WebM Opus",
 };
 
 /** Available MP3 bitrate options */

@@ -46,7 +46,7 @@ export function SeoContent() {
           <li>50-step undo/redo history</li>
           <li>Export as WAV (lossless), MP3, or OGG</li>
           <li>Configurable bitrate for compressed formats</li>
-          <li>Zoom and scroll with mouse wheel</li>
+          <li>Ctrl+scroll to zoom toward cursor, scroll to pan</li>
           <li>Keyboard shortcuts (Space, Delete, T, Ctrl+Z/Y)</li>
           <li>Time grid overlay with automatic scaling</li>
           <li>Real-time playhead animation during playback</li>
@@ -70,7 +70,7 @@ export function SeoContent() {
             },
             {
               title: "2. Navigate the waveform",
-              desc: "Use the visual waveform to see your audio. Scroll to pan left and right, or hold Ctrl and scroll to zoom in and out. Click anywhere to position the playhead, then press Space to play.",
+              desc: "Use the visual waveform to see your audio. Hold Ctrl (or Cmd on Mac) and scroll to zoom in and out — the view zooms toward your cursor for fast navigation. Scroll without a modifier to pan left and right. Click anywhere to position the playhead, then press Space to play.",
             },
             {
               title: "3. Select a region",
