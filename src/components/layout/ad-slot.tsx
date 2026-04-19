@@ -29,54 +29,20 @@ const ADSTERRA_KEYS: Record<string, string> = {
   "300x250": "1a7c37f9a68e7017209378c2620c901d",
 };
 
-const ADSTERRA_NATIVE_KEY = "a85b10fcd5453be6dfd1e5dab8569251";
-
 function getAdsterraKey(slot: AdSlotProps["slot"]): string {
   const { width, height } = SLOT_DIMENSIONS[slot];
   return ADSTERRA_KEYS[`${width}x${height}`] ?? "";
-}
-
-function AdsterraNativeBanner() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const injected = useRef(false);
-
-  useEffect(() => {
-    if (injected.current || !containerRef.current) return;
-    injected.current = true;
-
-    const invokeScript = document.createElement("script");
-    invokeScript.src = `https://pl29142630.profitablecpmratenetwork.com/${ADSTERRA_NATIVE_KEY}/invoke.js`;
-    invokeScript.async = true;
-    invokeScript.setAttribute("data-cfasync", "false");
-
-    containerRef.current.appendChild(invokeScript);
-  }, []);
-
-  return (
-    <div ref={containerRef} className="mt-4 w-full max-w-[728px] overflow-hidden rounded">
-      <div id={`container-${ADSTERRA_NATIVE_KEY}`} />
-    </div>
-  );
 }
 
 /** Delay (ms) before loading the mid-content 728x90 — lets top + sidebar ads
  *  claim inventory first so they don't compete for the same fill. */
 const MID_CONTENT_DELAY = 1500;
 
-/** How long (ms) to wait for the 728x90 iframe to render content before
- *  falling back to the native banner. */
-const BANNER_FILL_TIMEOUT = 3000;
-
 function AdsterraSlot({ slot, className }: AdSlotProps) {
   const { width, height } = SLOT_DIMENSIONS[slot];
   const containerRef = useRef<HTMLDivElement>(null);
   const injected = useRef(false);
   const isMidContent = slot === "mid-content";
-
-  // For mid-content: track whether the 728x90 filled or we need native fallback
-  const [bannerStatus, setBannerStatus] = useState<"pending" | "filled" | "unfilled">(
-    isMidContent ? "pending" : "filled"
-  );
 
   useEffect(() => {
     if (injected.current || !containerRef.current) return;
@@ -114,26 +80,6 @@ function AdsterraSlot({ slot, className }: AdSlotProps) {
         </body></html>
       `);
       iframeDoc.close();
-
-      // For mid-content, check if the iframe actually rendered ad content
-      if (isMidContent) {
-        setTimeout(() => {
-          try {
-            const innerDoc = iframe.contentDocument || iframe.contentWindow?.document;
-            const body = innerDoc?.body;
-            // If the iframe body has meaningful content (ads inject elements),
-            // treat it as filled; otherwise fall back to native
-            if (body && body.children.length > 0 && body.innerHTML.length > 200) {
-              setBannerStatus("filled");
-            } else {
-              setBannerStatus("unfilled");
-            }
-          } catch {
-            // Cross-origin — assume filled (ad network took over the iframe)
-            setBannerStatus("filled");
-          }
-        }, BANNER_FILL_TIMEOUT);
-      }
     };
 
     // Mid-content slots wait so top + sidebar load first
@@ -146,21 +92,12 @@ function AdsterraSlot({ slot, className }: AdSlotProps) {
   }, [slot, width, height, isMidContent]);
 
   return (
-    <>
-      {/* Hide the 728x90 container if it didn't fill and we're showing native instead */}
-      <div
-        ref={containerRef}
-        className={`flex items-center justify-center overflow-hidden rounded ${className ?? ""}`}
-        style={{
-          width,
-          height,
-          maxWidth: "100%",
-          display: isMidContent && bannerStatus === "unfilled" ? "none" : undefined,
-        }}
-        data-ad-slot={slot}
-      />
-      {isMidContent && bannerStatus === "unfilled" && <AdsterraNativeBanner />}
-    </>
+    <div
+      ref={containerRef}
+      className={`flex items-center justify-center overflow-hidden rounded ${className ?? ""}`}
+      style={{ width, height, maxWidth: "100%" }}
+      data-ad-slot={slot}
+    />
   );
 }
 
