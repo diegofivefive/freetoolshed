@@ -10,16 +10,6 @@ export type PlaybackStatus = "idle" | "playing" | "paused";
 /** Available editing tools */
 export type EditorTool = "select" | "trim" | "cut" | "silence";
 
-/** Available audio effects */
-export type AudioEffect =
-  | "fade-in"
-  | "fade-out"
-  | "normalize"
-  | "reverse"
-  | "silence"
-  | "amplify"
-  | "noise-reduction";
-
 /** A selected region on the waveform (in seconds) */
 export interface Selection {
   start: number;

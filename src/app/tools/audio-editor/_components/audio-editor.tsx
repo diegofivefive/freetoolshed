@@ -145,7 +145,6 @@ export function AudioEditor() {
   const recordTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
-  const [recordMode, setRecordMode] = useState<"new" | "append">("new");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Keep looping ref in sync with state
@@ -291,7 +290,6 @@ export function AudioEditor() {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         recordStreamRef.current = stream;
         recordedChunksRef.current = [];
-        setRecordMode(mode);
 
         const recorder = new MediaRecorder(stream);
         mediaRecorderRef.current = recorder;
@@ -523,7 +521,7 @@ export function AudioEditor() {
         ? 0
         : state.track.gain;
     }
-  }, [state.track?.muted, state.track?.gain, state.track]);
+  }, [state.track?.muted, state.track?.gain]);
 
   // Keyboard shortcuts
   useEffect(() => {

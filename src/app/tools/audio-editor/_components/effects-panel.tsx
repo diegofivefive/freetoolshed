@@ -78,6 +78,19 @@ export function EffectsPanel({
     [audioContext, buffer, onApply]
   );
 
+  const applyAsyncEffect = useCallback(
+    async (work: () => Promise<AudioBuffer>, label: string) => {
+      onProcessingChange(true);
+      try {
+        const result = await work();
+        onApply(result, label);
+      } finally {
+        onProcessingChange(false);
+      }
+    },
+    [onApply, onProcessingChange]
+  );
+
   return (
     <div className="flex flex-wrap items-center gap-2 rounded border border-border bg-muted/30 px-3 py-2">
       <span className="text-xs font-medium text-muted-foreground">
@@ -225,16 +238,10 @@ export function EffectsPanel({
           variant="outline"
           size="sm"
           disabled={disabled}
-          onClick={async () => {
+          onClick={() => {
             const rate = parseFloat(speedRate);
             if (isNaN(rate) || rate <= 0 || rate > 4) return;
-            onProcessingChange(true);
-            try {
-              const result = await changeSpeed(buffer, rate);
-              onApply(result, `Speed ×${rate}`);
-            } finally {
-              onProcessingChange(false);
-            }
+            applyAsyncEffect(() => changeSpeed(buffer, rate), `Speed ×${rate}`);
           }}
           title="Change speed and pitch (applies to entire track)"
         >
@@ -263,16 +270,13 @@ export function EffectsPanel({
           variant="outline"
           size="sm"
           disabled={disabled}
-          onClick={async () => {
+          onClick={() => {
             const preset = EQ_PRESETS[eqPreset];
             if (!preset) return;
-            onProcessingChange(true);
-            try {
-              const result = await applyEq(buffer, preset.bands);
-              onApply(result, `EQ: ${preset.label}`);
-            } finally {
-              onProcessingChange(false);
-            }
+            applyAsyncEffect(
+              () => applyEq(buffer, preset.bands),
+              `EQ: ${preset.label}`
+            );
           }}
           title="Apply EQ preset"
         >
@@ -304,20 +308,18 @@ export function EffectsPanel({
             variant="outline"
             size="sm"
             disabled={disabled}
-            onClick={async () => {
+            onClick={() => {
               const freq = parseFloat(eqFreq);
               const gain = parseFloat(eqGain);
               const q = parseFloat(eqQ);
               if (isNaN(freq) || isNaN(gain) || isNaN(q)) return;
-              onProcessingChange(true);
-              try {
-                const result = await applyEq(buffer, [
-                  { type: "peaking", frequency: freq, gain, Q: q },
-                ]);
-                onApply(result, `EQ: ${freq}Hz ${gain > 0 ? "+" : ""}${gain}dB`);
-              } finally {
-                onProcessingChange(false);
-              }
+              applyAsyncEffect(
+                () =>
+                  applyEq(buffer, [
+                    { type: "peaking", frequency: freq, gain, Q: q },
+                  ]),
+                `EQ: ${freq}Hz ${gain > 0 ? "+" : ""}${gain}dB`
+              );
             }}
             title="Apply custom EQ band"
           >
@@ -368,16 +370,13 @@ export function EffectsPanel({
           variant="outline"
           size="sm"
           disabled={disabled}
-          onClick={async () => {
+          onClick={() => {
             const preset = COMPRESSOR_PRESETS[compPreset];
             if (!preset) return;
-            onProcessingChange(true);
-            try {
-              const result = await applyCompressor(buffer, preset.settings);
-              onApply(result, `Compressor: ${preset.label}`);
-            } finally {
-              onProcessingChange(false);
-            }
+            applyAsyncEffect(
+              () => applyCompressor(buffer, preset.settings),
+              `Compressor: ${preset.label}`
+            );
           }}
           title="Apply dynamics compression"
         >

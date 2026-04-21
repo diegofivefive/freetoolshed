@@ -69,15 +69,3 @@ export const INITIAL_EDITOR_STATE: EditorState = {
   exportBitrate: 192,
   isLooping: false,
 };
-
-/** Keyboard shortcuts */
-export const SHORTCUTS = {
-  play: " ", // Space
-  undo: "z",
-  redo: "y",
-  delete: "Delete",
-  selectAll: "a",
-  zoomIn: "=",
-  zoomOut: "-",
-  trimToSelection: "t",
-} as const;
