@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, type Dispatch } from "react";
+import { useCallback, useState, type Dispatch } from "react";
 import { FileUpload } from "@/components/shared/file-upload";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -50,21 +50,27 @@ function resizeImage(file: File, maxSize: number): Promise<string> {
 }
 
 export function LogoUpload({ logoUrl, dispatch }: LogoUploadProps) {
+  const [error, setError] = useState<string | null>(null);
+
   const handleFiles = useCallback(
     async (files: File[]) => {
       const file = files[0];
       if (!file) return;
+      setError(null);
       try {
         const dataUrl = await resizeImage(file, 200);
         dispatch({ type: "SET_LOGO", payload: dataUrl });
-      } catch {
-        // Silently fail — user can retry
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Could not load logo. Try a different image."
+        );
       }
     },
     [dispatch]
   );
 
   const handleRemove = () => {
+    setError(null);
     dispatch({ type: "SET_LOGO", payload: null });
   };
 
@@ -105,6 +111,12 @@ export function LogoUpload({ logoUrl, dispatch }: LogoUploadProps) {
             PNG, JPEG, or SVG — max 2MB
           </p>
         </FileUpload>
+      )}
+
+      {error && (
+        <p className="text-xs text-pink-500" role="alert">
+          {error}
+        </p>
       )}
     </div>
   );

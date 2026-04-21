@@ -56,7 +56,7 @@ export const STATUS_OPTIONS: {
   { label: "Draft", value: "draft", color: "#a1a1aa" },
   { label: "Sent", value: "sent", color: "#3b82f6" },
   { label: "Paid", value: "paid", color: "#10b981" },
-  { label: "Overdue", value: "overdue", color: "#ef4444" },
+  { label: "Overdue", value: "overdue", color: "#ec4899" },
 ];
 
 export const DATE_FORMAT_OPTIONS: {
@@ -74,7 +74,7 @@ export const ACCENT_PRESETS = [
   { name: "Blue", hex: "#3b82f6" },
   { name: "Indigo", hex: "#6366f1" },
   { name: "Violet", hex: "#8b5cf6" },
-  { name: "Rose", hex: "#f43f5e" },
+  { name: "Pink", hex: "#ec4899" },
   { name: "Amber", hex: "#f59e0b" },
   { name: "Teal", hex: "#14b8a6" },
   { name: "Slate", hex: "#64748b" },

@@ -9,6 +9,7 @@ interface InvoicePreviewProps {
   calculations: InvoiceCalculations;
 }
 
+// A4 is 595×842 pt — we render at native size, then scale to a 520px viewport.
 const SCALE = 520 / 595;
 
 export function InvoicePreview({ state, calculations }: InvoicePreviewProps) {

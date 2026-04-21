@@ -39,24 +39,15 @@ function humanizeErrors(errors: InvoiceValidationError[]): string[] {
   });
 }
 
-export async function generateInvoicePdf(
+type JsPDFDoc = Awaited<ReturnType<typeof buildInvoiceDoc>>;
+
+async function buildInvoiceDoc(
   data: InvoiceData,
   calculations: InvoiceCalculations
-): Promise<PdfExportResult | PdfExportError> {
-  // ── Validate ──
-  const validation = validateInvoice(data);
-  if (!validation.success) {
-    return {
-      success: false,
-      errors: humanizeErrors(validation.errors),
-    };
-  }
-
-  // ── Create jsPDF instance ──
+) {
   const { jsPDF } = await import("jspdf");
   const doc = new jsPDF({ unit: "mm", format: "a4" });
 
-  // ── Select and render template ──
   switch (data.settings.template) {
     case "modern": {
       const { renderModernTemplate } = await import(
@@ -81,17 +72,28 @@ export async function generateInvoicePdf(
     }
   }
 
-  // ── Build filename ──
+  return doc;
+}
+
+function buildFilename(data: InvoiceData): string {
   const invoiceNum = data.settings.invoiceNumber || "invoice";
   const clientName = data.client.name
     ? `-${data.client.name.replace(/[^a-zA-Z0-9]/g, "_")}`
     : "";
-  const filename = `${invoiceNum}${clientName}.pdf`;
+  return `${invoiceNum}${clientName}.pdf`;
+}
 
-  // ── Download ──
-  doc.save(filename);
+export async function generateInvoicePdf(
+  data: InvoiceData,
+  calculations: InvoiceCalculations
+): Promise<PdfExportResult | PdfExportError> {
+  const validation = validateInvoice(data);
+  if (!validation.success) {
+    return { success: false, errors: humanizeErrors(validation.errors) };
+  }
 
-  // ── Persist invoice number for auto-increment ──
+  const doc: JsPDFDoc = await buildInvoiceDoc(data, calculations);
+  doc.save(buildFilename(data));
   saveInvoiceNumber(data.settings.invoiceNumber);
 
   return { success: true };
@@ -101,53 +103,31 @@ export async function printInvoicePdf(
   data: InvoiceData,
   calculations: InvoiceCalculations
 ): Promise<PdfExportResult | PdfExportError> {
-  // ── Validate ──
   const validation = validateInvoice(data);
   if (!validation.success) {
-    return {
-      success: false,
-      errors: humanizeErrors(validation.errors),
-    };
+    return { success: false, errors: humanizeErrors(validation.errors) };
   }
 
-  // ── Create jsPDF instance ──
-  const { jsPDF } = await import("jspdf");
-  const doc = new jsPDF({ unit: "mm", format: "a4" });
-
-  // ── Select and render template ──
-  switch (data.settings.template) {
-    case "modern": {
-      const { renderModernTemplate } = await import(
-        "@/lib/invoice/templates/modern"
-      );
-      await renderModernTemplate(doc, data, calculations);
-      break;
-    }
-    case "classic": {
-      const { renderClassicTemplate } = await import(
-        "@/lib/invoice/templates/classic"
-      );
-      await renderClassicTemplate(doc, data, calculations);
-      break;
-    }
-    case "compact": {
-      const { renderCompactTemplate } = await import(
-        "@/lib/invoice/templates/compact"
-      );
-      await renderCompactTemplate(doc, data, calculations);
-      break;
-    }
-  }
-
-  // ── Open print dialog via blob URL ──
+  const doc: JsPDFDoc = await buildInvoiceDoc(data, calculations);
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
   const printWindow = window.open(url);
-  if (printWindow) {
-    printWindow.onload = () => {
-      printWindow.print();
+
+  if (!printWindow) {
+    URL.revokeObjectURL(url);
+    return {
+      success: false,
+      errors: ["Print window was blocked. Please allow popups and try again."],
     };
   }
+
+  // Revoke the URL after the print dialog closes (or after a safety timeout).
+  printWindow.onload = () => {
+    printWindow.print();
+  };
+  printWindow.onafterprint = () => {
+    URL.revokeObjectURL(url);
+  };
 
   return { success: true };
 }

@@ -34,16 +34,6 @@ const TOOLS: Tool[] = [
     paidAlternative: "Resume.io",
   },
   {
-    name: "Floor Plan Maker",
-    slug: "floor-plan-maker",
-    description:
-      "Design room layouts with drag-and-drop furniture, walls, and rooms. Export as SVG, PNG, or PDF.",
-    category: "Design",
-    icon: "LayoutGrid",
-    paidAlternative: "SmartDraw",
-    badge: "Under Construction",
-  },
-  {
     name: "Audio Editor",
     slug: "audio-editor",
     description:
@@ -51,15 +41,6 @@ const TOOLS: Tool[] = [
     category: "Media",
     icon: "AudioLines",
     paidAlternative: "Adobe Audition",
-  },
-  {
-    name: "Flowchart Maker",
-    slug: "flowchart-maker",
-    description:
-      "Create flowcharts, process diagrams, and decision trees with smart connection routing. Export as SVG, PNG, or PDF.",
-    category: "Design",
-    icon: "GitBranch",
-    paidAlternative: "Lucidchart",
   },
   {
     name: "OCR Scanner",
@@ -105,6 +86,26 @@ const TOOLS: Tool[] = [
     category: "Media",
     icon: "Clapperboard",
     paidAlternative: "Adobe Media Encoder",
+  },
+  {
+    name: "Floor Plan Maker",
+    slug: "floor-plan-maker",
+    description:
+      "Design room layouts with drag-and-drop furniture, walls, and rooms. Export as SVG, PNG, or PDF.",
+    category: "Design",
+    icon: "LayoutGrid",
+    paidAlternative: "SmartDraw",
+    badge: "Under Construction",
+  },
+  {
+    name: "Flowchart Maker",
+    slug: "flowchart-maker",
+    description:
+      "Create flowcharts, process diagrams, and decision trees with smart connection routing. Export as SVG, PNG, or PDF.",
+    category: "Design",
+    icon: "GitBranch",
+    paidAlternative: "Lucidchart",
+    badge: "Under Construction",
   },
 ];
 
