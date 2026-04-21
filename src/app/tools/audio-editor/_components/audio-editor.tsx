@@ -14,13 +14,13 @@ import {
   ZoomOut,
   Volume2,
   VolumeX,
-  SplitSquareHorizontal,
   VolumeOff,
   Crop,
   Repeat,
   FilePlus,
   Mic,
   CircleDot,
+  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -36,7 +36,6 @@ import {
   trimToSelection,
   deleteSelection,
   silenceSelection,
-  splitAtPosition,
   concatenateBuffers,
   resampleBuffer,
 } from "@/lib/audio/operations";
@@ -147,6 +146,7 @@ export function AudioEditor() {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [recordMode, setRecordMode] = useState<"new" | "append">("new");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Keep looping ref in sync with state
   useEffect(() => {
@@ -164,8 +164,11 @@ export function AudioEditor() {
 
   const handleFileSelect = useCallback(
     async (file: File) => {
+      setErrorMessage(null);
       if (file.size > MAX_FILE_SIZE) {
-        alert(`File too large (${Math.round(file.size / 1024 / 1024)} MB). Maximum is 500 MB.`);
+        setErrorMessage(
+          `File too large (${Math.round(file.size / 1024 / 1024)} MB). Maximum is 500 MB.`
+        );
         return;
       }
       try {
@@ -179,6 +182,9 @@ export function AudioEditor() {
         });
       } catch {
         dispatch({ type: "SET_PROCESSING", payload: false });
+        setErrorMessage(
+          `Could not decode "${file.name}". The file may be corrupt or in an unsupported format.`
+        );
       }
     },
     [getAudioContext]
@@ -241,6 +247,7 @@ export function AudioEditor() {
   const handleAppendFile = useCallback(
     async (file: File) => {
       if (!state.track) return;
+      setErrorMessage(null);
       try {
         dispatch({ type: "SET_PROCESSING", payload: true });
         const arrayBuffer = await file.arrayBuffer();
@@ -260,6 +267,9 @@ export function AudioEditor() {
         });
       } catch {
         dispatch({ type: "SET_PROCESSING", payload: false });
+        setErrorMessage(
+          `Could not append "${file.name}". The file may be corrupt or in an unsupported format.`
+        );
       }
     },
     [state.track, getAudioContext, stopPlayback]
@@ -332,6 +342,7 @@ export function AudioEditor() {
             }
           } catch {
             dispatch({ type: "SET_PROCESSING", payload: false });
+            setErrorMessage("Could not decode the recording. Please try again.");
           }
         };
 
@@ -344,7 +355,9 @@ export function AudioEditor() {
           setRecordingTime((Date.now() - startMs) / 1000);
         }, 100);
       } catch {
-        // Permission denied or no mic
+        setErrorMessage(
+          "Could not access microphone. Check that you've granted permission and that a mic is connected."
+        );
       }
     },
     [getAudioContext, state.track, stopPlayback]
@@ -503,20 +516,6 @@ export function AudioEditor() {
     });
   }, [state.track, state.selection, getAudioContext, stopPlayback]);
 
-  const handleSplit = useCallback(() => {
-    if (!state.track) return;
-    stopPlayback();
-    const pos = state.playheadPosition;
-    if (pos <= 0 || pos >= state.track.duration) return;
-    const ctx = getAudioContext();
-    const [before, after] = splitAtPosition(ctx, state.track.buffer, pos);
-    const newBuffer = concatenateBuffers(ctx, before, after);
-    dispatch({
-      type: "APPLY_BUFFER",
-      payload: { buffer: newBuffer, label: `Split at ${pos.toFixed(2)}s` },
-    });
-  }, [state.track, state.playheadPosition, getAudioContext, stopPlayback]);
-
   // Update gain in real time
   useEffect(() => {
     if (gainNodeRef.current && state.track) {
@@ -609,6 +608,21 @@ export function AudioEditor() {
     return `${m}:${s.toString().padStart(2, "0")}.${ms.toString().padStart(2, "0")}`;
   };
 
+  const errorBanner = errorMessage ? (
+    <div className="mb-3 flex items-start gap-2 rounded-lg border border-pink-500/50 bg-pink-500/10 px-3 py-2 text-sm text-pink-400">
+      <AlertCircle className="mt-0.5 size-4 shrink-0" />
+      <span className="flex-1">{errorMessage}</span>
+      <button
+        type="button"
+        onClick={() => setErrorMessage(null)}
+        className="text-pink-400 hover:text-pink-300"
+        aria-label="Dismiss error"
+      >
+        ×
+      </button>
+    </div>
+  ) : null;
+
   // No track loaded — show drop zone or recording UI
   if (!state.track) {
     if (isRecording) {
@@ -634,6 +648,7 @@ export function AudioEditor() {
 
     return (
       <>
+      {errorBanner}
       <div
         onDrop={handleDrop}
         onDragOver={handleDragOver}
@@ -683,6 +698,7 @@ export function AudioEditor() {
   // Track loaded — show editor
   return (
     <>
+    {errorBanner}
     <div className="flex flex-col gap-3 rounded-lg border border-border bg-card">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-1 border-b border-border px-3 py-2">
@@ -792,15 +808,6 @@ export function AudioEditor() {
           title="Silence selection"
         >
           <VolumeOff className="size-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleSplit}
-          disabled={state.playheadPosition <= 0 || state.playheadPosition >= (state.track?.duration ?? 0)}
-          title="Split at playhead"
-        >
-          <SplitSquareHorizontal className="size-4" />
         </Button>
 
         <Separator orientation="vertical" className="mx-1 h-6" />
@@ -932,6 +939,9 @@ export function AudioEditor() {
                 payload: { buffer, label },
               });
             }}
+            onProcessingChange={(value) =>
+              dispatch({ type: "SET_PROCESSING", payload: value })
+            }
             disabled={state.isProcessing}
           />
         </div>

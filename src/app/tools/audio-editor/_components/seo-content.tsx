@@ -37,7 +37,6 @@ export function SeoContent() {
           <li>Trim (crop) audio to selection</li>
           <li>Delete selected region and join remaining parts</li>
           <li>Silence selected region</li>
-          <li>Split audio at the playhead position</li>
           <li>Fade in and fade out effects</li>
           <li>Normalize volume to peak amplitude</li>
           <li>Reverse audio (entire track or selection)</li>
