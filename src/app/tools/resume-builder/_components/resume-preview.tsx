@@ -3,7 +3,7 @@
 import DOMPurify from "dompurify";
 import type { ResumeData, ResumeSection } from "@/lib/resume/types";
 import { getSectionLabel, MARGIN_OPTIONS, SECTION_SPACING_OPTIONS, LINE_SPACING_OPTIONS } from "@/lib/resume/constants";
-import { formatDateRange, proficiencyToPercentage, languageProficiencyLabel } from "@/lib/resume/format";
+import { formatDateRange, languageProficiencyLabel } from "@/lib/resume/format";
 import type { ResumeSettings } from "@/lib/resume/types";
 
 function sanitize(html: string): string {
@@ -42,19 +42,6 @@ function getSpacing(settings: ResumeSettings) {
 }
 
 // ── Shared renderers ────────────────────────────────────────
-
-function ContactLine({ state, fontSize }: { state: ResumeData; fontSize: number }) {
-  const { email, phone, location, website, linkedin } = state.personalInfo;
-  const parts = [email, phone, location, website, linkedin].filter(Boolean);
-  if (parts.length === 0) return null;
-  return (
-    <div style={{ fontSize: fontSize - 1, color: "#666", display: "flex", flexWrap: "wrap", gap: "4px 12px" }}>
-      {parts.map((p, i) => (
-        <span key={i}>{p}</span>
-      ))}
-    </div>
-  );
-}
 
 function SectionContent({ section, accent, fontSize, dateFormat, lineScale = 1 }: {
   section: ResumeSection;

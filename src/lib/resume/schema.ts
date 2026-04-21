@@ -101,6 +101,14 @@ const referenceSchema = z.object({
   phone: z.string(),
 });
 
+const customItemSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  subtitle: z.string(),
+  date: z.string(),
+  description: z.string(),
+});
+
 const resumeSectionSchema = z.discriminatedUnion("type", [
   sectionBaseSchema.extend({ type: z.literal("summary"), content: z.string() }),
   sectionBaseSchema.extend({ type: z.literal("experience"), items: z.array(workExperienceSchema) }),
@@ -113,6 +121,7 @@ const resumeSectionSchema = z.discriminatedUnion("type", [
   sectionBaseSchema.extend({ type: z.literal("awards"), items: z.array(awardSchema) }),
   sectionBaseSchema.extend({ type: z.literal("publications"), items: z.array(publicationSchema) }),
   sectionBaseSchema.extend({ type: z.literal("references"), items: z.array(referenceSchema) }),
+  sectionBaseSchema.extend({ type: z.literal("custom"), title: z.string(), items: z.array(customItemSchema) }),
 ]);
 
 const settingsSchema = z.object({
@@ -121,6 +130,9 @@ const settingsSchema = z.object({
   fontFamily: z.enum(["helvetica", "times", "courier"]),
   dateFormat: z.enum(["MM/YYYY", "Month YYYY", "YYYY"]).default("Month YYYY"),
   fontSize: z.enum(["compact", "standard", "spacious"]).default("standard"),
+  marginSize: z.enum(["narrow", "normal", "wide"]).default("normal"),
+  sectionSpacing: z.enum(["compact", "normal", "relaxed"]).default("normal"),
+  lineSpacing: z.enum(["tight", "normal", "relaxed"]).default("normal"),
 });
 
 export const resumeDataSchema = z.object({

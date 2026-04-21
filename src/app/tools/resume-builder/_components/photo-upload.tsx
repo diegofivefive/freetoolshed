@@ -1,7 +1,7 @@
 "use client";
 
 import type { Dispatch } from "react";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Camera, X } from "lucide-react";
 import type { ResumeAction } from "@/lib/resume/types";
@@ -15,14 +15,19 @@ const MAX_SIZE_BYTES = 512 * 1024; // 512 KB
 
 export function PhotoUpload({ photoUrl, dispatch }: PhotoUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleFile = useCallback(
     (file: File) => {
-      if (!file.type.startsWith("image/")) return;
-      if (file.size > MAX_SIZE_BYTES) {
-        alert("Photo must be under 512 KB.");
+      if (!file.type.startsWith("image/")) {
+        setError("File must be an image.");
         return;
       }
+      if (file.size > MAX_SIZE_BYTES) {
+        setError("Photo must be under 512 KB.");
+        return;
+      }
+      setError(null);
       const reader = new FileReader();
       reader.onload = () => {
         dispatch({ type: "SET_PHOTO", payload: reader.result as string });
@@ -52,7 +57,10 @@ export function PhotoUpload({ photoUrl, dispatch }: PhotoUploadProps) {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => dispatch({ type: "SET_PHOTO", payload: null })}
+          onClick={() => {
+            setError(null);
+            dispatch({ type: "SET_PHOTO", payload: null });
+          }}
         >
           <X className="size-3.5" data-icon="inline-start" />
           Remove
@@ -62,7 +70,7 @@ export function PhotoUpload({ photoUrl, dispatch }: PhotoUploadProps) {
   }
 
   return (
-    <>
+    <div className="flex flex-col gap-2">
       <input
         ref={inputRef}
         type="file"
@@ -74,10 +82,16 @@ export function PhotoUpload({ photoUrl, dispatch }: PhotoUploadProps) {
         variant="outline"
         size="sm"
         onClick={() => inputRef.current?.click()}
+        className="self-start"
       >
         <Camera className="size-3.5" data-icon="inline-start" />
         Upload Photo
       </Button>
-    </>
+      {error && (
+        <p className="text-xs text-pink-400" role="alert">
+          {error}
+        </p>
+      )}
+    </div>
   );
 }

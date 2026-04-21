@@ -114,6 +114,11 @@ export async function printResumePdf(
     printWindow.onload = () => {
       printWindow.print();
     };
+    const revoke = () => URL.revokeObjectURL(url);
+    printWindow.addEventListener("afterprint", revoke);
+    printWindow.addEventListener("pagehide", revoke);
+  } else {
+    URL.revokeObjectURL(url);
   }
 
   return { success: true };

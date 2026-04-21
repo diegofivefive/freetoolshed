@@ -132,6 +132,20 @@ export function renameInHistory(id: string, name: string): void {
   }
 }
 
+export function mergeIntoHistory(resumes: SavedResume[]): {
+  added: number;
+  skipped: number;
+} {
+  const existing = loadHistory();
+  const existingIds = new Set(existing.map((r) => r.id));
+  const newResumes = resumes.filter((r) => !existingIds.has(r.id));
+  if (newResumes.length === 0) {
+    return { added: 0, skipped: resumes.length };
+  }
+  persistHistory([...newResumes, ...existing]);
+  return { added: newResumes.length, skipped: resumes.length - newResumes.length };
+}
+
 // ── Settings defaults ─────────────────────────────────────────
 
 export function saveDefaults(data: ResumeData): void {

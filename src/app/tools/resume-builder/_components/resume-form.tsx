@@ -1,6 +1,6 @@
 "use client";
 
-import { type Dispatch, useState, useCallback } from "react";
+import { type Dispatch, useState, useCallback, useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ExportButton } from "@/components/shared/export-button";
 import { Button } from "@/components/ui/button";
@@ -86,6 +86,27 @@ export function ResumeForm({
 }: ResumeFormProps) {
   const [pdfLoading, setPdfLoading] = useState(false);
   const [pdfErrors, setPdfErrors] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState<string>("content");
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("freetoolshed-resume-active-tab");
+      if (saved === "content" || saved === "sections" || saved === "style" || saved === "ats") {
+        setActiveTab(saved);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const handleTabChange = useCallback((value: string) => {
+    setActiveTab(value);
+    try {
+      localStorage.setItem("freetoolshed-resume-active-tab", value);
+    } catch {
+      // ignore
+    }
+  }, []);
 
   const handleDownloadPdf = useCallback(async () => {
     setPdfLoading(true);
@@ -123,7 +144,7 @@ export function ResumeForm({
 
   return (
     <div className="space-y-4">
-      <Tabs defaultValue="content">
+      <Tabs value={activeTab} onValueChange={handleTabChange}>
         <div className="flex items-center gap-2">
           <TabsList>
             <TabsTrigger value="content">Content</TabsTrigger>

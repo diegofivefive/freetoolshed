@@ -33,6 +33,7 @@ import {
   exportAllJson,
   parseImportedJson,
   saveDefaults,
+  mergeIntoHistory,
 } from "@/lib/resume/storage";
 
 interface ResumeHistoryProps {
@@ -118,16 +119,11 @@ export function ResumeHistory({ currentState, onLoad }: ResumeHistoryProps) {
           setImportError(result.error);
           return;
         }
-        // Merge into history
-        const existing = loadHistory();
-        const existingIds = new Set(existing.map((r) => r.id));
-        const newResumes = result.resumes.filter((r) => !existingIds.has(r.id));
-        if (newResumes.length === 0) {
+        const { added } = mergeIntoHistory(result.resumes);
+        if (added === 0) {
           setImportError("All resumes in this file already exist in your history.");
           return;
         }
-        const merged = [...newResumes, ...existing];
-        localStorage.setItem("freetoolshed-resume-history", JSON.stringify(merged));
         refreshHistory();
       };
       reader.readAsText(file);
