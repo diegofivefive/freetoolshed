@@ -5,7 +5,11 @@ type ProgressCallback = (progress: number) => void;
 interface TesseractWorker {
   recognize: (
     image: string,
-  ) => Promise<{ data: { text: string; confidence: number } }>;
+    options?: Record<string, unknown>,
+    output?: { text?: boolean; pdf?: boolean },
+  ) => Promise<{
+    data: { text: string; confidence: number; pdf: number[] | null };
+  }>;
   terminate: () => Promise<void>;
 }
 
@@ -69,7 +73,6 @@ function reflowParagraphs(raw: string): string {
     const trimmed = line.trim();
 
     if (trimmed.length === 0) {
-      // Blank line → flush current paragraph
       if (current.length > 0) {
         paragraphs.push(current);
         current = "";
@@ -80,7 +83,6 @@ function reflowParagraphs(raw: string): string {
     if (current.length === 0) {
       current = trimmed;
     } else if (current.endsWith("-")) {
-      // Hyphenated word break: join without space and remove hyphen
       current = current.slice(0, -1) + trimmed;
     } else {
       current += " " + trimmed;
@@ -94,14 +96,21 @@ function reflowParagraphs(raw: string): string {
   return paragraphs.join("\n\n");
 }
 
-export async function recognizeImage(
-  imageUrl: string,
-): Promise<{ text: string; confidence: number }> {
+export interface RecognizeResult {
+  text: string;
+  confidence: number;
+  /** Single-page searchable PDF bytes (image + invisible text layer) */
+  pdfBytes: Uint8Array | null;
+}
+
+export async function recognizeImage(imageUrl: string): Promise<RecognizeResult> {
   if (!worker) throw new Error("OCR worker not initialized");
-  const result = await worker.recognize(imageUrl);
+  const result = await worker.recognize(imageUrl, {}, { text: true, pdf: true });
+  const pdfArray = result.data.pdf;
   return {
     text: reflowParagraphs(result.data.text.trim()),
     confidence: result.data.confidence,
+    pdfBytes: pdfArray ? new Uint8Array(pdfArray) : null,
   };
 }
 
@@ -112,12 +121,4 @@ export async function terminateWorker(): Promise<void> {
     currentLanguage = null;
     initPromise = null;
   }
-}
-
-export function isWorkerReady(): boolean {
-  return worker !== null;
-}
-
-export function getWorkerLanguage(): string | null {
-  return currentLanguage;
 }

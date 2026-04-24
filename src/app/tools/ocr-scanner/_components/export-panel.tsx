@@ -15,6 +15,8 @@ interface ExportPanelProps {
   onFormatChange: (format: ExportFormat) => void;
   disabled?: boolean;
   defaultFilename?: string;
+  /** Returns per-page searchable PDF bytes in page order. Called at export time. */
+  getPagePdfs?: () => Uint8Array[];
 }
 
 export function ExportPanel({
@@ -23,6 +25,7 @@ export function ExportPanel({
   onFormatChange,
   disabled = false,
   defaultFilename = "ocr-result",
+  getPagePdfs,
 }: ExportPanelProps) {
   const [exportStatus, setExportStatus] = useState<ExportStatus>("idle");
   const [copyStatus, setCopyStatus] = useState<ExportStatus>("idle");
@@ -45,6 +48,7 @@ export function ExportPanel({
         format,
         text,
         filename: filename || "ocr-result",
+        pagePdfs: format === "pdf" ? getPagePdfs?.() ?? [] : undefined,
       });
       setExportStatus("success");
       setTimeout(() => setExportStatus("idle"), 2500);

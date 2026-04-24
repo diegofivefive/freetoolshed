@@ -43,7 +43,6 @@ export function ocrReducer(state: OcrState, action: OcrAction): OcrState {
     case "CLEAR_ALL":
       return {
         ...INITIAL_OCR_STATE,
-        isWorkerReady: state.isWorkerReady,
         language: state.language,
         exportFormat: state.exportFormat,
         viewMode: state.viewMode,
@@ -100,6 +99,7 @@ export function ocrReducer(state: OcrState, action: OcrAction): OcrState {
             ? {
                 ...p,
                 status: "error" as const,
+                progress: 0,
                 errorMessage: action.payload.errorMessage,
               }
             : p,
@@ -115,30 +115,11 @@ export function ocrReducer(state: OcrState, action: OcrAction): OcrState {
     case "SET_PROCESSING":
       return { ...state, isProcessing: action.payload };
 
-    case "UPDATE_COMBINED_TEXT": {
-      const newCombined = buildCombinedText(state.pages);
-      return {
-        ...state,
-        combinedText: newCombined,
-        editedText: state.isTextEdited ? state.editedText : newCombined,
-      };
-    }
-
     case "SET_EDITED_TEXT":
       return { ...state, editedText: action.payload, isTextEdited: true };
 
-    case "RESET_EDITED_TEXT":
-      return {
-        ...state,
-        editedText: state.combinedText,
-        isTextEdited: false,
-      };
-
     case "SET_EXPORT_FORMAT":
       return { ...state, exportFormat: action.payload };
-
-    case "SET_WORKER_READY":
-      return { ...state, isWorkerReady: action.payload };
 
     case "SET_ERROR":
       return { ...state, errorMessage: action.payload };

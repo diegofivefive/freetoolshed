@@ -25,7 +25,6 @@ import {
   MAX_PDF_PAGES,
   IMAGE_MIME_TYPES,
   LANGUAGE_LABELS,
-  DEFAULT_FILTERS,
 } from "@/lib/ocr/constants";
 import { loadPrefs, savePrefs } from "@/lib/ocr/storage";
 import {
@@ -43,7 +42,7 @@ import { ExportPanel } from "./export-panel";
 import { ImagePreview } from "./image-preview";
 import { ToolGuide } from "@/components/shared/tool-guide";
 import type { ToolGuideSection } from "@/components/shared/tool-guide";
-import type { OcrFile, OcrPage, OcrLanguage, ExportFormat, TextViewMode, ImageFilters } from "@/lib/ocr/types";
+import type { OcrFile, OcrPage, OcrLanguage, ExportFormat, TextViewMode } from "@/lib/ocr/types";
 
 const OCR_GUIDE_SECTIONS: ToolGuideSection[] = [
   {
@@ -130,6 +129,7 @@ function getInitialState() {
 export function OcrScanner() {
   const [state, dispatch] = useReducer(ocrReducer, undefined, getInitialState);
   const objectUrlsRef = useRef<Map<string, string>>(new Map());
+  const pagePdfBytesRef = useRef<Map<string, Uint8Array>>(new Map());
   const addFilesInputRef = useRef<HTMLInputElement>(null);
   const processingRef = useRef(false);
   const abortRef = useRef(false);
@@ -191,6 +191,11 @@ export function OcrScanner() {
           });
 
           const result = await recognizeImage(nextPending.imageUrl);
+          if (result.pdfBytes) {
+            pagePdfBytesRef.current.set(nextPending.id, result.pdfBytes);
+          } else {
+            pagePdfBytesRef.current.delete(nextPending.id);
+          }
           dispatch({
             type: "SET_PAGE_RESULT",
             payload: {
@@ -260,6 +265,10 @@ export function OcrScanner() {
     img.onerror = () => {
       URL.revokeObjectURL(imageUrl);
       objectUrlsRef.current.delete(pageId);
+      dispatch({
+        type: "SET_ERROR",
+        payload: `Could not load image "${file.name}". The file may be corrupt or in an unsupported format.`,
+      });
     };
     img.src = imageUrl;
   }, []);
@@ -348,6 +357,7 @@ export function OcrScanner() {
           URL.revokeObjectURL(url);
           objectUrlsRef.current.delete(page.id);
         }
+        pagePdfBytesRef.current.delete(page.id);
       }
       dispatch({ type: "REMOVE_FILE", payload: fileId });
     },
@@ -358,47 +368,69 @@ export function OcrScanner() {
     abortRef.current = true;
     objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
     objectUrlsRef.current.clear();
+    pagePdfBytesRef.current.clear();
     dispatch({ type: "CLEAR_ALL" });
   }, []);
 
   const handleReOcr = useCallback(async () => {
     abortRef.current = true;
     await terminateWorker();
+    pagePdfBytesRef.current.clear();
+    dispatch({ type: "SET_ERROR", payload: null });
     dispatch({ type: "RESET_ALL_PAGES_PENDING" });
   }, []);
 
   const handleApplyFiltersAndReOcr = useCallback(async () => {
     abortRef.current = true;
     await terminateWorker();
+    pagePdfBytesRef.current.clear();
+    dispatch({ type: "SET_ERROR", payload: null });
 
     const pages = pagesRef.current;
     const filters = state.filters;
+    let failures = 0;
 
     for (const page of pages) {
-      // Revoke old filtered URL (only if it differs from original)
-      if (page.imageUrl !== page.originalImageUrl) {
-        URL.revokeObjectURL(page.imageUrl);
-        objectUrlsRef.current.delete(page.id);
-      }
+      try {
+        // Revoke old filtered URL (only if it differs from original)
+        if (page.imageUrl !== page.originalImageUrl) {
+          URL.revokeObjectURL(page.imageUrl);
+          objectUrlsRef.current.delete(page.id);
+        }
 
-      if (filtersAreDefault(filters)) {
-        // Reset to original
+        if (filtersAreDefault(filters)) {
+          dispatch({
+            type: "SET_PAGE_IMAGE_URL",
+            payload: { pageId: page.id, imageUrl: page.originalImageUrl },
+          });
+          objectUrlsRef.current.set(page.id, page.originalImageUrl);
+        } else {
+          const filteredUrl = await applyFiltersToImage(
+            page.originalImageUrl,
+            filters,
+          );
+          dispatch({
+            type: "SET_PAGE_IMAGE_URL",
+            payload: { pageId: page.id, imageUrl: filteredUrl },
+          });
+          objectUrlsRef.current.set(page.id, filteredUrl);
+        }
+      } catch {
+        failures++;
+        // Fall back to original image for this page so re-OCR can still run
         dispatch({
           type: "SET_PAGE_IMAGE_URL",
           payload: { pageId: page.id, imageUrl: page.originalImageUrl },
         });
         objectUrlsRef.current.set(page.id, page.originalImageUrl);
-      } else {
-        const filteredUrl = await applyFiltersToImage(
-          page.originalImageUrl,
-          filters,
-        );
-        dispatch({
-          type: "SET_PAGE_IMAGE_URL",
-          payload: { pageId: page.id, imageUrl: filteredUrl },
-        });
-        objectUrlsRef.current.set(page.id, filteredUrl);
       }
+    }
+
+    if (failures > 0) {
+      dispatch({
+        type: "SET_ERROR",
+        payload: `Could not apply filters to ${failures} page${failures === 1 ? "" : "s"}. Those pages will be re-OCR'd using the original image.`,
+      });
     }
 
     dispatch({ type: "RESET_ALL_PAGES_PENDING" });
@@ -817,13 +849,22 @@ export function OcrScanner() {
                     {filePages.map((page) => (
                       <div
                         key={page.id}
+                        role="button"
+                        tabIndex={0}
+                        aria-pressed={state.selectedPageId === page.id}
                         onClick={() =>
                           dispatch({
                             type: "SELECT_PAGE",
                             payload: page.id,
                           })
                         }
-                        className={`flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-xs transition-colors ${
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            dispatch({ type: "SELECT_PAGE", payload: page.id });
+                          }
+                        }}
+                        className={`flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-xs outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand ${
                           state.selectedPageId === page.id
                             ? "bg-brand/10 text-brand"
                             : "text-muted-foreground hover:bg-muted"
@@ -1104,6 +1145,15 @@ export function OcrScanner() {
           dispatch({ type: "SET_EXPORT_FORMAT", payload: f })
         }
         disabled={state.isProcessing || pdfRenderingCount > 0}
+        getPagePdfs={() => {
+          // Preserve page order; skip pages that didn't produce PDF bytes
+          const out: Uint8Array[] = [];
+          for (const p of pagesRef.current) {
+            const bytes = pagePdfBytesRef.current.get(p.id);
+            if (bytes) out.push(bytes);
+          }
+          return out;
+        }}
         defaultFilename={
           state.files.length === 1
             ? state.files[0].name.replace(/\.[^.]+$/, "")

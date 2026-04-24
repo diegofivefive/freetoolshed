@@ -1,9 +1,5 @@
 import type { ExportFormat } from "./types";
 
-/* ------------------------------------------------------------------ */
-/*  Helpers                                                           */
-/* ------------------------------------------------------------------ */
-
 function downloadBlob(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -17,16 +13,12 @@ function downloadBlob(blob: Blob, filename: string): void {
 
 function sanitizeFilename(name: string): string {
   return name
-    .replace(/\.[^.]+$/, "") // strip extension
+    .replace(/\.[^.]+$/, "")
     .replace(/\s+/g, "-")
     .toLowerCase()
     .replace(/[^a-z0-9-]/g, "")
     .slice(0, 80);
 }
-
-/* ------------------------------------------------------------------ */
-/*  Copy to clipboard                                                 */
-/* ------------------------------------------------------------------ */
 
 export async function copyTextToClipboard(text: string): Promise<boolean> {
   try {
@@ -37,18 +29,10 @@ export async function copyTextToClipboard(text: string): Promise<boolean> {
   }
 }
 
-/* ------------------------------------------------------------------ */
-/*  Export as .txt                                                     */
-/* ------------------------------------------------------------------ */
-
 export function exportAsTxt(text: string, filename: string): void {
   const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
   downloadBlob(blob, `${sanitizeFilename(filename)}.txt`);
 }
-
-/* ------------------------------------------------------------------ */
-/*  Export as .docx                                                    */
-/* ------------------------------------------------------------------ */
 
 export async function exportAsDocx(
   text: string,
@@ -57,7 +41,6 @@ export async function exportAsDocx(
   const { Document, Packer, Paragraph, TextRun } = await import("docx");
 
   const paragraphs = text.split("\n").map((line) => {
-    // Page separator
     if (line.trim() === "---") {
       return new Paragraph({
         children: [
@@ -74,8 +57,8 @@ export async function exportAsDocx(
     return new Paragraph({
       children: [
         new TextRun({
-          text: line || " ", // empty lines need at least a space
-          size: 24, // 12pt
+          text: line || " ",
+          size: 24,
           font: "Calibri",
         }),
       ],
@@ -88,12 +71,7 @@ export async function exportAsDocx(
       {
         properties: {
           page: {
-            margin: {
-              top: 1440, // 1 inch in twips
-              right: 1440,
-              bottom: 1440,
-              left: 1440,
-            },
+            margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 },
           },
         },
         children: paragraphs,
@@ -105,55 +83,46 @@ export async function exportAsDocx(
   downloadBlob(buffer, `${sanitizeFilename(filename)}.docx`);
 }
 
-/* ------------------------------------------------------------------ */
-/*  Export as text PDF                                                  */
-/* ------------------------------------------------------------------ */
-
-export async function exportAsTextPdf(
-  text: string,
+/**
+ * Merge per-page searchable PDFs (produced by tesseract with image + invisible
+ * text layer) into a single multi-page PDF. Each input PDF has accurate word
+ * bounding boxes so text selection/search lines up with the scan.
+ */
+export async function exportAsSearchablePdf(
+  pagePdfs: Uint8Array[],
   filename: string,
 ): Promise<void> {
-  const { default: jsPDF } = await import("jspdf");
-
-  const doc = new jsPDF({ unit: "pt", format: "a4" });
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  const margin = 40;
-  const usableWidth = pageWidth - margin * 2;
-  const lineHeight = 18;
-  const fontSize = 12;
-
-  doc.setFontSize(fontSize);
-  doc.setTextColor(0, 0, 0);
-  doc.setFont("helvetica", "normal");
-
-  const wrapped = doc.splitTextToSize(text, usableWidth) as string[];
-  let y = margin + fontSize;
-
-  for (const line of wrapped) {
-    if (y + lineHeight > pageHeight - margin) {
-      doc.addPage("a4", "portrait");
-      y = margin + fontSize;
-    }
-    doc.text(line, margin, y);
-    y += lineHeight;
+  if (pagePdfs.length === 0) {
+    throw new Error("No PDF data available. Run OCR first.");
   }
 
-  doc.save(`${sanitizeFilename(filename)}.pdf`);
-}
+  const { PDFDocument } = await import("pdf-lib");
+  const merged = await PDFDocument.create();
 
-/* ------------------------------------------------------------------ */
-/*  Unified export dispatcher                                         */
-/* ------------------------------------------------------------------ */
+  for (const bytes of pagePdfs) {
+    const src = await PDFDocument.load(bytes);
+    const copied = await merged.copyPages(src, src.getPageIndices());
+    for (const page of copied) merged.addPage(page);
+  }
+
+  const out = await merged.save();
+  // Copy to a fresh ArrayBuffer so Blob typing is happy regardless of
+  // whether `out` is backed by a SharedArrayBuffer or a plain Uint8Array.
+  const ab = new ArrayBuffer(out.byteLength);
+  new Uint8Array(ab).set(out);
+  downloadBlob(new Blob([ab], { type: "application/pdf" }), `${sanitizeFilename(filename)}.pdf`);
+}
 
 export interface ExportOptions {
   format: ExportFormat;
   text: string;
   filename: string;
+  /** Per-page searchable PDF bytes — required when format === "pdf" */
+  pagePdfs?: Uint8Array[];
 }
 
 export async function exportOcrResult(options: ExportOptions): Promise<void> {
-  const { format, text, filename } = options;
+  const { format, text, filename, pagePdfs } = options;
 
   switch (format) {
     case "txt":
@@ -163,7 +132,7 @@ export async function exportOcrResult(options: ExportOptions): Promise<void> {
       await exportAsDocx(text, filename);
       break;
     case "pdf":
-      await exportAsTextPdf(text, filename);
+      await exportAsSearchablePdf(pagePdfs ?? [], filename);
       break;
   }
 }

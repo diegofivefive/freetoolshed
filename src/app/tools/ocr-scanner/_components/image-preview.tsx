@@ -110,10 +110,22 @@ export function ImagePreview({
     setIsPanning(false);
   }, []);
 
-  // Keyboard shortcuts
+  // Keyboard shortcuts — ignore when typing in an input/textarea/contentEditable
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target) {
+        const tag = target.tagName;
+        if (
+          tag === "INPUT" ||
+          tag === "TEXTAREA" ||
+          tag === "SELECT" ||
+          target.isContentEditable
+        ) {
+          return;
+        }
+      }
       if (e.key === "ArrowLeft" && hasPrev) {
         e.preventDefault();
         onNavigate("prev");

@@ -110,15 +110,3 @@ export async function renderPdfPages(
 
   return results;
 }
-
-/**
- * Get page count without rendering (quick check).
- */
-export async function getPdfPageCount(file: File): Promise<number> {
-  await configurePdfjsMainThread();
-  const pdfjsLib = await import("pdfjs-dist");
-
-  const arrayBuffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-  return pdf.numPages;
-}

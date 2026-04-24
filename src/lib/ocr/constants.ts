@@ -23,7 +23,7 @@ export const LANGUAGE_LABELS: Record<OcrLanguage, string> = {
 export const EXPORT_FORMAT_LABELS: Record<ExportFormat, string> = {
   txt: "Plain Text (.txt)",
   docx: "Word Document (.docx)",
-  pdf: "PDF Document (.pdf)",
+  pdf: "Searchable PDF (.pdf)",
 };
 
 /** File input accept string */
@@ -67,7 +67,6 @@ export const INITIAL_OCR_STATE: OcrState = {
   editedText: "",
   isTextEdited: false,
   exportFormat: "txt",
-  isWorkerReady: false,
   errorMessage: null,
   filters: DEFAULT_FILTERS,
   showFilters: false,

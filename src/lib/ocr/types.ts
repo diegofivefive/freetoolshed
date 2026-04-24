@@ -73,7 +73,6 @@ export interface OcrState {
   editedText: string;
   isTextEdited: boolean;
   exportFormat: ExportFormat;
-  isWorkerReady: boolean;
   errorMessage: string | null;
   filters: ImageFilters;
   showFilters: boolean;
@@ -98,11 +97,8 @@ export type OcrAction =
   | { type: "SELECT_PAGE"; payload: string | null }
   | { type: "SET_LANGUAGE"; payload: OcrLanguage }
   | { type: "SET_PROCESSING"; payload: boolean }
-  | { type: "UPDATE_COMBINED_TEXT" }
   | { type: "SET_EDITED_TEXT"; payload: string }
-  | { type: "RESET_EDITED_TEXT" }
   | { type: "SET_EXPORT_FORMAT"; payload: ExportFormat }
-  | { type: "SET_WORKER_READY"; payload: boolean }
   | { type: "SET_ERROR"; payload: string | null }
   | { type: "RESET_ALL_PAGES_PENDING" }
   | { type: "UPDATE_FILE_PAGE_COUNT"; payload: { fileId: string; pageCount: number } }
