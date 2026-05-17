@@ -1,0 +1,260 @@
+{
+  "version": 3,
+  "pages404": true,
+  "appType": "app",
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "priority": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(self), geolocation=()"
+        }
+      ],
+      "regex": "^(?:/(.*))(?:/)?$"
+    }
+  ],
+  "onMatchHeaders": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_global-error",
+      "regex": "^/_global\\-error(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_global\\-error(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/about",
+      "regex": "^/about(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/about(?:/)?$"
+    },
+    {
+      "page": "/contact",
+      "regex": "^/contact(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/contact(?:/)?$"
+    },
+    {
+      "page": "/favicon.ico",
+      "regex": "^/favicon\\.ico(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/favicon\\.ico(?:/)?$"
+    },
+    {
+      "page": "/privacy",
+      "regex": "^/privacy(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/privacy(?:/)?$"
+    },
+    {
+      "page": "/robots.txt",
+      "regex": "^/robots\\.txt(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/robots\\.txt(?:/)?$"
+    },
+    {
+      "page": "/sitemap.xml",
+      "regex": "^/sitemap\\.xml(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/sitemap\\.xml(?:/)?$"
+    },
+    {
+      "page": "/terms",
+      "regex": "^/terms(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/terms(?:/)?$"
+    },
+    {
+      "page": "/tools/audio-editor",
+      "regex": "^/tools/audio\\-editor(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tools/audio\\-editor(?:/)?$"
+    },
+    {
+      "page": "/tools/floor-plan-maker",
+      "regex": "^/tools/floor\\-plan\\-maker(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tools/floor\\-plan\\-maker(?:/)?$"
+    },
+    {
+      "page": "/tools/flowchart-maker",
+      "regex": "^/tools/flowchart\\-maker(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tools/flowchart\\-maker(?:/)?$"
+    },
+    {
+      "page": "/tools/graphing-calculator",
+      "regex": "^/tools/graphing\\-calculator(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tools/graphing\\-calculator(?:/)?$"
+    },
+    {
+      "page": "/tools/invoice-generator",
+      "regex": "^/tools/invoice\\-generator(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tools/invoice\\-generator(?:/)?$"
+    },
+    {
+      "page": "/tools/media-toolkit",
+      "regex": "^/tools/media\\-toolkit(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tools/media\\-toolkit(?:/)?$"
+    },
+    {
+      "page": "/tools/media-toolkit/audio-converter",
+      "regex": "^/tools/media\\-toolkit/audio\\-converter(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tools/media\\-toolkit/audio\\-converter(?:/)?$"
+    },
+    {
+      "page": "/tools/media-toolkit/audio-extractor",
+      "regex": "^/tools/media\\-toolkit/audio\\-extractor(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tools/media\\-toolkit/audio\\-extractor(?:/)?$"
+    },
+    {
+      "page": "/tools/media-toolkit/audio-merger",
+      "regex": "^/tools/media\\-toolkit/audio\\-merger(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tools/media\\-toolkit/audio\\-merger(?:/)?$"
+    },
+    {
+      "page": "/tools/media-toolkit/audio-trimmer",
+      "regex": "^/tools/media\\-toolkit/audio\\-trimmer(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tools/media\\-toolkit/audio\\-trimmer(?:/)?$"
+    },
+    {
+      "page": "/tools/media-toolkit/image-converter",
+      "regex": "^/tools/media\\-toolkit/image\\-converter(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tools/media\\-toolkit/image\\-converter(?:/)?$"
+    },
+    {
+      "page": "/tools/media-toolkit/metadata-editor",
+      "regex": "^/tools/media\\-toolkit/metadata\\-editor(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tools/media\\-toolkit/metadata\\-editor(?:/)?$"
+    },
+    {
+      "page": "/tools/media-toolkit/subtitle-extractor",
+      "regex": "^/tools/media\\-toolkit/subtitle\\-extractor(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tools/media\\-toolkit/subtitle\\-extractor(?:/)?$"
+    },
+    {
+      "page": "/tools/media-toolkit/video-compressor",
+      "regex": "^/tools/media\\-toolkit/video\\-compressor(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tools/media\\-toolkit/video\\-compressor(?:/)?$"
+    },
+    {
+      "page": "/tools/media-toolkit/video-converter",
+      "regex": "^/tools/media\\-toolkit/video\\-converter(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tools/media\\-toolkit/video\\-converter(?:/)?$"
+    },
+    {
+      "page": "/tools/media-toolkit/video-trimmer",
+      "regex": "^/tools/media\\-toolkit/video\\-trimmer(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tools/media\\-toolkit/video\\-trimmer(?:/)?$"
+    },
+    {
+      "page": "/tools/ocr-scanner",
+      "regex": "^/tools/ocr\\-scanner(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tools/ocr\\-scanner(?:/)?$"
+    },
+    {
+      "page": "/tools/pay-stub-generator",
+      "regex": "^/tools/pay\\-stub\\-generator(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tools/pay\\-stub\\-generator(?:/)?$"
+    },
+    {
+      "page": "/tools/periodic-table",
+      "regex": "^/tools/periodic\\-table(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tools/periodic\\-table(?:/)?$"
+    },
+    {
+      "page": "/tools/resume-builder",
+      "regex": "^/tools/resume\\-builder(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tools/resume\\-builder(?:/)?$"
+    },
+    {
+      "page": "/tools/screen-recorder",
+      "regex": "^/tools/screen\\-recorder(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tools/screen\\-recorder(?:/)?$"
+    },
+    {
+      "page": "/tools/unit-converter",
+      "regex": "^/tools/unit\\-converter(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tools/unit\\-converter(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments",
+    "clientParamParsing": false,
+    "dynamicRSCPrerender": false
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}
