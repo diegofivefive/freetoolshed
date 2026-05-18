@@ -1,5 +1,6 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
 import { ToolByline } from "@/components/shared/tool-byline";
+import { ToolTldr } from "@/components/shared/tool-tldr";
 import { SeoContent } from "./_components/seo-content";
 import { ResumeBuilderLoader } from "./_components/resume-builder-loader";
 import { AdSlot } from "@/components/layout/ad-slot";
@@ -122,6 +123,15 @@ export default function ResumeBuilderPage() {
         instant PDF download — a free alternative to Resume.io, Zety, and
         Novoresume. No sign-up required.
       </p>
+
+      <ToolTldr>
+        Build a professional, ATS-friendly resume with twelve PDF templates and a
+        live preview that updates as you type. Drag-reorder sections, add custom
+        blocks, store multiple tailored versions in a private local history, and
+        export a print-ready PDF. Everything stays in your browser — no upload,
+        no sign-up. A free alternative to Resume.io, Zety, and Novoresume that
+        doesn&apos;t paywall the download button.
+      </ToolTldr>
 
       <ToolByline />
 

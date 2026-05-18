@@ -1,5 +1,6 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
 import { ToolByline } from "@/components/shared/tool-byline";
+import { ToolTldr } from "@/components/shared/tool-tldr";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { SeoContent } from "./_components/seo-content";
 import { SubtitleExtractorLoader } from "./_components/subtitle-extractor-loader";
@@ -98,6 +99,14 @@ export default function SubtitleExtractorPage() {
         Extract embedded subtitle tracks from MKV, MP4, and other video files —
         a free alternative to HandBrake. No sign-up required.
       </p>
+
+      <ToolTldr>
+        Extract embedded subtitle tracks from MP4, MKV, MOV, and WebM video
+        files — save as SRT, VTT, or ASS — directly in your browser via
+        ffmpeg.wasm. Pulls all tracks (multi-language) so you can pick the one
+        you need. No upload, no account. A free alternative to Subtitle
+        Edit&apos;s import workflow and Premiere Pro&apos;s subtitle export.
+      </ToolTldr>
 
       <ToolByline />
 

@@ -1,5 +1,6 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
 import { ToolByline } from "@/components/shared/tool-byline";
+import { ToolTldr } from "@/components/shared/tool-tldr";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { SeoContent } from "./_components/seo-content";
 import { VideoTrimmerLoader } from "./_components/video-trimmer-loader";
@@ -98,6 +99,14 @@ export default function VideoTrimmerPage() {
         Trim videos to a time range or split into segments — a free alternative
         to Adobe Premiere Pro. No sign-up, no re-encoding, no watermarks.
       </p>
+
+      <ToolTldr>
+        Trim a video to a specific range — drag the in/out handles on a
+        thumbnail timeline and export. Works on MP4, MOV, MKV, WebM, and AVI
+        inputs, all in your browser via ffmpeg.wasm. A free alternative to Adobe
+        Premiere&apos;s bin-and-trim workflow for quick one-off cuts without a
+        timeline-editor learning curve.
+      </ToolTldr>
 
       <ToolByline />
 

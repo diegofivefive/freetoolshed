@@ -1,5 +1,6 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
 import { ToolByline } from "@/components/shared/tool-byline";
+import { ToolTldr } from "@/components/shared/tool-tldr";
 import { SeoContent } from "./_components/seo-content";
 import { PeriodicTableLoader } from "./_components/periodic-table-loader";
 import { AdSlot } from "@/components/layout/ad-slot";
@@ -114,6 +115,16 @@ export default function PeriodicTablePage() {
         property heatmaps, and a molar mass calculator — a free alternative to
         Merck PTE and Periodic Table Pro. No sign-up required.
       </p>
+
+      <ToolTldr>
+        Explore all 118 elements with property heatmaps, temperature-driven
+        phase-change animations, electron configuration breakdowns, and a built-in
+        molar mass calculator that parses chemical formulas like H2SO4 or
+        Ca(OH)2. Filter by category — alkali metal, halogen, lanthanide — and
+        export element data as CSV or JSON. A free interactive reference for
+        chemistry students, science teachers, and anyone who needs a cleaner
+        Ptable or Merck PTE replacement.
+      </ToolTldr>
 
       <ToolByline />
 

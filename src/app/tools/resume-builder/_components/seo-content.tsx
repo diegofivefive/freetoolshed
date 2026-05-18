@@ -1,4 +1,26 @@
 import { Separator } from "@/components/ui/separator";
+import { ToolInsights } from "@/components/shared/tool-insights";
+
+const TIPS = [
+  "Save a separate version to history for each role type instead of overwriting a single 'main' resume — recruiters reward tailoring.",
+  "Pick an ATS-friendly template (single column, no tables) when submitting through online portals — multi-column designs often confuse parsers.",
+  "Reorder sections per role — engineering hires usually skim Experience first; new-grad applications often start with Education.",
+  "Match the paper size to the destination — A4 for most non-US markets, US Letter for North America. The preview reflects what you'll export.",
+  "Export JSON of your resume history before clearing browser data or switching machines — local storage doesn't sync.",
+];
+
+const MISTAKES = [
+  "Treating browser drafts as backed up — they live in local storage only, not the cloud.",
+  "Using a heavily designed template for an ATS submission — visual polish loses to plain-text parseability there.",
+  "Leaving placeholder text inside custom blocks — the export doesn't validate or warn you.",
+  "Forgetting to update the date header on tailored versions — recruiters do notice stale dates.",
+];
+
+const TAKEAWAYS = [
+  "Resume data stays client-side — no recruiter pipeline, no third-party analytics, nothing sent to a server.",
+  "Twelve PDF templates span minimal/ATS-friendly to fully designed — pick by destination, not by what looks best.",
+  "Authoring + PDF export only — no LinkedIn import, no built-in cover-letter editor, no recruiter messaging.",
+];
 
 export function SeoContent() {
   return (
@@ -82,7 +104,7 @@ export function SeoContent() {
       {/* ── Comparison Table ──────────────────────────────── */}
       <section>
         <h2 className="text-xl font-semibold">
-          Free Tool Shed vs Paid Resume Builders
+          Free Resume.io Alternative
         </h2>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full min-w-[600px] border-collapse text-sm">
@@ -125,6 +147,8 @@ export function SeoContent() {
           </table>
         </div>
       </section>
+
+      <ToolInsights tips={TIPS} mistakes={MISTAKES} takeaways={TAKEAWAYS} />
 
       {/* ── FAQ ───────────────────────────────────────────── */}
       <section>

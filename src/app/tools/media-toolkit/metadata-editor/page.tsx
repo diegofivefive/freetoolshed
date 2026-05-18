@@ -1,5 +1,6 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
 import { ToolByline } from "@/components/shared/tool-byline";
+import { ToolTldr } from "@/components/shared/tool-tldr";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { SeoContent } from "./_components/seo-content";
 import { MetadataEditorLoader } from "./_components/metadata-editor-loader";
@@ -98,6 +99,14 @@ export default function MetadataEditorPage() {
         View, edit, and strip metadata from audio and video files — a free
         alternative to Mp3tag. No sign-up, no re-encoding.
       </p>
+
+      <ToolTldr>
+        Edit ID3 tags on MP3 files and metadata on M4A, FLAC, OGG, and WAV —
+        title, artist, album, year, genre, track number, embedded cover art —
+        all in your browser. No upload, no account, no per-file fee. A free
+        alternative to Mp3tag and MusicBrainz Picard for one-off metadata
+        cleanup without installing a desktop tagger.
+      </ToolTldr>
 
       <ToolByline />
 

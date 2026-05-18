@@ -1,4 +1,24 @@
 import { Separator } from "@/components/ui/separator";
+import { ToolInsights } from "@/components/shared/tool-insights";
+
+const TIPS = [
+  "Start with the 'medium' preset — targets roughly 50% size reduction with negligible visible quality loss on most footage.",
+  "Custom CRF: 18 is visually lossless, 23 is the default, 28+ shows compression artifacts on motion-heavy footage.",
+  "For Slack or Discord uploads, target 8 MB and let the encoder pick the CRF accordingly.",
+  "Compress to MP4 (H.264) for maximum compatibility; WebM (VP9/AV1) for smaller files when the destination accepts it.",
+];
+
+const MISTAKES = [
+  "Compressing an already heavily-compressed source — additional compression stacks artifacts. Start from the highest-quality master you have.",
+  "Picking a preset much smaller than the source resolution warrants — 4K → 480p loses detail you can't recover later.",
+  "Walking away from the tab during encoding — most browsers throttle background tabs and encoding slows dramatically.",
+];
+
+const TAKEAWAYS = [
+  "Quality-targeted compression via CRF or preset, in-browser, with no upload.",
+  "ffmpeg.wasm is slower than native ffmpeg but produces bit-identical output for the same settings.",
+  "Focused on the formats people actually share — not a transcoder for every esoteric codec.",
+];
 
 export function SeoContent() {
   return (
@@ -139,6 +159,10 @@ export function SeoContent() {
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <div className="not-prose">
+        <ToolInsights tips={TIPS} mistakes={MISTAKES} takeaways={TAKEAWAYS} />
       </div>
 
       <h2 className="mt-10 text-2xl font-semibold tracking-tight">

@@ -1,4 +1,26 @@
 import { Separator } from "@/components/ui/separator";
+import { ToolInsights } from "@/components/shared/tool-insights";
+
+const TIPS = [
+  "Save your business name, address, logo, and accent color once via 'Save as Defaults' — every new invoice starts pre-populated.",
+  "Switch the date format to YYYY-MM-DD when invoicing internationally — it removes US-vs-EU ambiguity entirely.",
+  "Use the Status field (Draft → Sent → Paid → Overdue) as a workflow tracker — it doubles as a triage view in your invoice history.",
+  "Set per-item tax rates instead of a single global rate when only some line items are taxable.",
+  "Export your full invoice history as JSON before clearing browser data — local storage is your only backup.",
+];
+
+const MISTAKES = [
+  "Forgetting that drafts live in your browser's local storage only — clearing site data or switching browsers wipes them.",
+  "Uploading a low-resolution logo — PDFs render at print quality, so a 72-DPI logo looks fuzzy when printed.",
+  "Skipping per-currency decimal precision on fractional unit prices — some currencies round to 2 places, others differ.",
+  "Treating the invoice number as automatic on a standalone draft — auto-increment only kicks in once you save to history.",
+];
+
+const TAKEAWAYS = [
+  "All invoice data is client-side only — your business info, client list, and amounts never leave the browser.",
+  "PDF output is print-ready with selectable text — works in any PDF viewer, mail client, or print pipeline.",
+  "Designed for one-off and low-volume invoicing — no recurring billing, payment processing, or multi-user accounts.",
+];
 
 export function SeoContent() {
   return (
@@ -95,7 +117,7 @@ export function SeoContent() {
       {/* Comparison Table */}
       <section>
         <h2 className="text-2xl font-semibold tracking-tight">
-          Free Invoice Generator vs Paid Alternatives
+          Free FreshBooks Alternative
         </h2>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full max-w-3xl text-sm">
@@ -142,6 +164,8 @@ export function SeoContent() {
           </p>
         </div>
       </section>
+
+      <ToolInsights tips={TIPS} mistakes={MISTAKES} takeaways={TAKEAWAYS} />
 
       {/* FAQ */}
       <section>

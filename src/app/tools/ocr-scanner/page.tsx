@@ -1,5 +1,6 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
 import { ToolByline } from "@/components/shared/tool-byline";
+import { ToolTldr } from "@/components/shared/tool-tldr";
 import { SeoContent } from "./_components/seo-content";
 import { OcrScannerLoader } from "./_components/ocr-scanner-loader";
 import { AdSlot } from "@/components/layout/ad-slot";
@@ -105,6 +106,15 @@ export default function OcrScannerPage() {
         Extract text from images and scanned PDFs instantly — a free alternative
         to Adobe Acrobat OCR and ABBYY FineReader. No sign-up required.
       </p>
+
+      <ToolTldr>
+        Extract text from images and scanned PDFs directly in your browser using
+        Tesseract.js — no upload, no server processing. Drop in a PNG, JPG, or
+        PDF and download the result as plain .txt, editable .docx, or a
+        searchable PDF where the original page layout is preserved with an
+        invisible text layer on top. A free alternative to Adobe Acrobat OCR and
+        ABBYY FineReader for one-off document conversions.
+      </ToolTldr>
 
       <ToolByline />
 

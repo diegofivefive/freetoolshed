@@ -1,4 +1,26 @@
 import { Separator } from "@/components/ui/separator";
+import { ToolInsights } from "@/components/shared/tool-insights";
+
+const TIPS = [
+  "Use the time cursor display with zoom to trim at frame-accurate positions instead of dragging by eye.",
+  "Apply short fade-in/fade-out at every cut boundary — abrupt edits produce audible clicks at the splice point.",
+  "Export to WAV when you'll keep editing; only encode to MP3 at the final step to avoid stacking compression artifacts.",
+  "Normalize tracks before merging clips with different source volumes — otherwise the join is jarringly loud or quiet.",
+  "Split very long files (over an hour) into halves before processing — browser memory, not the editor, is the bottleneck.",
+];
+
+const MISTAKES = [
+  "Editing MP3 → MP3 in a chain — re-encoding compounds compression artifacts. Stay lossless until the final export.",
+  "Forgetting to download — your edits live in the browser only until you click Export.",
+  "Trying to mix multiple tracks — this is a single-track editor, not a DAW.",
+  "Loading an entire podcast episode at once on a low-memory device — the tab can crash before the waveform renders.",
+];
+
+const TAKEAWAYS = [
+  "Audio data stays in the browser — no upload to a transcoding server.",
+  "Single-track waveform editing: trims, cuts, joins, fades, normalization, format conversion.",
+  "Not a DAW — no MIDI, no virtual instruments, no multi-track mixing or effects rack.",
+];
 
 export function SeoContent() {
   return (
@@ -97,7 +119,7 @@ export function SeoContent() {
       {/* ── Comparison Table ──────────────────────────────── */}
       <section>
         <h2 className="text-xl font-semibold">
-          Free Tool Shed vs Paid Audio Editors
+          Free Adobe Audition Alternative
         </h2>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full min-w-[600px] border-collapse text-sm">
@@ -145,6 +167,8 @@ export function SeoContent() {
           </table>
         </div>
       </section>
+
+      <ToolInsights tips={TIPS} mistakes={MISTAKES} takeaways={TAKEAWAYS} />
 
       {/* ── FAQ ───────────────────────────────────────────── */}
       <section>

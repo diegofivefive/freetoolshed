@@ -1,4 +1,24 @@
 import { Separator } from "@/components/ui/separator";
+import { ToolInsights } from "@/components/shared/tool-insights";
+
+const TIPS = [
+  "Embed cover art at 600×600 or higher — most music apps display covers at that resolution.",
+  "Use consistent capitalization across an album (Artist, Album, Genre) — players sort and group on these fields exactly.",
+  "Set the track number as 'N/Total' (e.g., 3/12) so players know the album length.",
+  "Save originals as a backup before bulk-editing — the tool overwrites tags in place.",
+];
+
+const MISTAKES = [
+  "Embedding huge cover art (5+ MB) — bloats every file unnecessarily. Resize first.",
+  "Mixing tag versions (ID3v1 vs ID3v2.3 vs v2.4) across an album — some players read one and not the other.",
+  "Editing metadata on a corrupted or DRM-protected file — the writeback fails silently in some cases.",
+];
+
+const TAKEAWAYS = [
+  "ID3 and Vorbis-comment tagging across major audio formats, with embedded cover art support.",
+  "Browser-only — files stay on your device, never uploaded.",
+  "Tagging only — no audio re-encoding, no waveform editing.",
+];
 
 export function SeoContent() {
   return (
@@ -124,6 +144,10 @@ export function SeoContent() {
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <div className="not-prose">
+        <ToolInsights tips={TIPS} mistakes={MISTAKES} takeaways={TAKEAWAYS} />
       </div>
 
       <h2 className="mt-10 text-2xl font-semibold tracking-tight">

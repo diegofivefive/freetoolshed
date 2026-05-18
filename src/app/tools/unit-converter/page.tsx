@@ -1,5 +1,6 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
 import { ToolByline } from "@/components/shared/tool-byline";
+import { ToolTldr } from "@/components/shared/tool-tldr";
 import { SeoContent } from "./_components/seo-content";
 import { UnitConverterLoader } from "./_components/unit-converter-loader";
 import { AdSlot } from "@/components/layout/ad-slot";
@@ -106,6 +107,16 @@ export default function UnitConverterPage() {
         formula display — a free alternative to Wolfram Alpha. No sign-up
         required.
       </p>
+
+      <ToolTldr>
+        Convert between 800+ units across 23 categories — length, weight,
+        temperature, time, plus engineering and scientific units like viscosity,
+        thermal conductivity, and torque. Features animated scale
+        visualizations, the underlying conversion formula displayed inline,
+        batch conversion of multiple values, and a keyboard-first command
+        palette. A free alternative to Wolfram Alpha and ConvertWorld for
+        everyday and specialist conversions.
+      </ToolTldr>
 
       <ToolByline />
 

@@ -1,5 +1,6 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
 import { ToolByline } from "@/components/shared/tool-byline";
+import { ToolTldr } from "@/components/shared/tool-tldr";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { SeoContent } from "./_components/seo-content";
 import { AudioTrimmerLoader } from "./_components/audio-trimmer-loader";
@@ -98,6 +99,14 @@ export default function AudioTrimmerPage() {
         Trim audio to a time range or split into segments — a free alternative
         to Adobe Audition. No sign-up, no re-encoding.
       </p>
+
+      <ToolTldr>
+        Trim audio files to a specific range or split them at precise time
+        markers — drag the in/out handles on a visual waveform and export the
+        result. Works on MP3, M4A, WAV, OGG, and FLAC, all in your browser via
+        ffmpeg.wasm. A free alternative to Audacity and Adobe Audition for
+        one-off trims without a desktop install.
+      </ToolTldr>
 
       <ToolByline />
 

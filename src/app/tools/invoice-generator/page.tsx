@@ -1,5 +1,6 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
 import { ToolByline } from "@/components/shared/tool-byline";
+import { ToolTldr } from "@/components/shared/tool-tldr";
 import { SeoContent } from "./_components/seo-content";
 import { InvoiceGeneratorLoader } from "./_components/invoice-generator-loader";
 import { AdSlot } from "@/components/layout/ad-slot";
@@ -114,6 +115,15 @@ export default function InvoiceGeneratorPage() {
         calculations, and instant PDF download — a free alternative to
         FreshBooks, QuickBooks, and Wave. No sign-up required.
       </p>
+
+      <ToolTldr>
+        Generate professional invoices entirely in your browser — pick from three
+        PDF templates, add line items with per-item tax rates, work in 20
+        currencies, and download a print-ready PDF or save to a local-only
+        invoice history. Drafts auto-save as you type. No sign-up, no upload to a
+        server, no recurring fee — a free alternative to FreshBooks, QuickBooks,
+        and Wave for one-off and low-volume invoicing.
+      </ToolTldr>
 
       <ToolByline />
 

@@ -1,4 +1,26 @@
 import { Separator } from "@/components/ui/separator";
+import { ToolInsights } from "@/components/shared/tool-insights";
+
+const TIPS = [
+  "Scan or photograph documents at 300 DPI or higher — Tesseract accuracy drops sharply below that.",
+  "Crop the image to just the text region before running OCR — backgrounds and graphics confuse the recognition pass.",
+  "Pick the right language pack — running English OCR on a French document produces nonsense, not a translation.",
+  "Use searchable PDF export for archived documents where you need both visual fidelity and text search.",
+  "Choose .docx export when you'll need to edit the recognized text further; .txt when you'll process it programmatically.",
+];
+
+const MISTAKES = [
+  "Running OCR on heavily skewed or low-contrast photos and expecting clean output — pre-process (de-skew, increase contrast) first.",
+  "Trusting recognized text as perfect — proof-read before relying on it for anything high-stakes.",
+  "Loading huge multi-page PDFs in a single pass — browser memory limits make per-page processing more reliable.",
+  "Mixing two languages in one document without splitting — single-language OCR runs over the wrong portion.",
+];
+
+const TAKEAWAYS = [
+  "OCR runs locally via Tesseract.js — your documents never leave the browser.",
+  "Three output formats: plain .txt, editable .docx, or searchable PDF with an invisible text layer.",
+  "Accuracy is bounded by source quality — clean scans of clear print work well; photos of receipts in dim light don't.",
+];
 
 export function SeoContent() {
   return (
@@ -90,7 +112,7 @@ export function SeoContent() {
       {/* ── Comparison Table ──────────────────────────────── */}
       <section>
         <h2 className="text-xl font-semibold">
-          Free Tool Shed vs Paid OCR Software
+          Free Adobe Acrobat OCR Alternative
         </h2>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full min-w-[600px] border-collapse text-sm">
@@ -137,6 +159,8 @@ export function SeoContent() {
           </table>
         </div>
       </section>
+
+      <ToolInsights tips={TIPS} mistakes={MISTAKES} takeaways={TAKEAWAYS} />
 
       {/* ── FAQ ───────────────────────────────────────────── */}
       <section>

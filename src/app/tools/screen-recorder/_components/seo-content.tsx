@@ -1,4 +1,26 @@
 import { Separator } from "@/components/ui/separator";
+import { ToolInsights } from "@/components/shared/tool-insights";
+
+const TIPS = [
+  "Record the tab (not the whole screen) for crisp UI captures — DPI scales correctly and you avoid leaking other windows.",
+  "Enable system audio in the browser's share dialog if you need app sounds, not just your mic.",
+  "Trim the dead frames at the start and end before exporting — most of your file size sits there.",
+  "Export to WebM for the smallest file; switch to MP4 only when uploading to a service that doesn't accept WebM.",
+  "Keep GIF clips under ~10 seconds — GIFs are pixel-stream encodings and balloon fast at any duration beyond that.",
+];
+
+const MISTAKES = [
+  "Choosing 'entire screen' for a recording that captures private chat windows or password prompts — pick 'tab' or 'window' instead.",
+  "Forgetting to enable system audio in the share dialog — you'll get silent video and have to re-record.",
+  "Recording at 4K for a clip embedded at 720p — burns CPU and produces a larger file for no perceived gain.",
+  "Closing the tab mid-recording — the in-progress capture is lost.",
+];
+
+const TAKEAWAYS = [
+  "Recording happens via the browser's MediaRecorder API — nothing is uploaded to a server.",
+  "No watermark, no time limit, no account, no team dashboard.",
+  "Designed for solo capture-and-share workflows, not organizational video libraries.",
+];
 
 export function SeoContent() {
   return (
@@ -104,7 +126,7 @@ export function SeoContent() {
       {/* ── Comparison Table ──────────────────────────────── */}
       <section>
         <h2 className="text-xl font-semibold">
-          Free Tool Shed vs Paid Screen Recorders
+          Free Loom Alternative
         </h2>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full min-w-[640px] border-collapse text-sm">
@@ -202,6 +224,8 @@ export function SeoContent() {
           </table>
         </div>
       </section>
+
+      <ToolInsights tips={TIPS} mistakes={MISTAKES} takeaways={TAKEAWAYS} />
 
       {/* ── FAQ ───────────────────────────────────────────── */}
       <section>

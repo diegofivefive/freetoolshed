@@ -1,4 +1,24 @@
 import { Separator } from "@/components/ui/separator";
+import { ToolInsights } from "@/components/shared/tool-insights";
+
+const TIPS = [
+  "Use the temperature slider to watch phase transitions — melting, boiling, and sublimation are color-coded per element.",
+  "Filter by category (halogen, noble gas, lanthanide) before exporting — the CSV/JSON reflects the active filter.",
+  "Feed the molar mass calculator parenthesized formulas like Ca(OH)2 — it parses nested groups, not just flat chains.",
+  "Switch between heatmap and absolute views to see periodic trends (electronegativity, atomic radius) visually.",
+];
+
+const MISTAKES = [
+  "Reading heatmap shading as exact — it's tuned for visual trend spotting, not precise numerical comparison.",
+  "Comparing exported values across property views without noting the unit — some properties have multiple conventions.",
+  "Expecting compounds, reactions, or thermochemistry — this is an element-by-element reference, not a chemistry engine.",
+];
+
+const TAKEAWAYS = [
+  "All element data ships with the page — no API calls, no rate limits, works offline once cached.",
+  "Built for chemistry students, teachers, and casual reference — not for research-grade citations.",
+  "Export to CSV or JSON for homework, spreadsheets, or downstream tools.",
+];
 
 export function SeoContent() {
   return (
@@ -104,7 +124,7 @@ export function SeoContent() {
       {/* Comparison Table */}
       <section>
         <h2 className="text-2xl font-semibold tracking-tight">
-          Free Tool Shed vs. Paid Periodic Table Apps
+          Free Ptable &amp; Merck PTE Alternative
         </h2>
         <div className="mt-4 max-w-3xl overflow-x-auto">
           <table className="w-full text-sm">
@@ -153,6 +173,8 @@ export function SeoContent() {
           </table>
         </div>
       </section>
+
+      <ToolInsights tips={TIPS} mistakes={MISTAKES} takeaways={TAKEAWAYS} />
 
       {/* FAQ */}
       <section>

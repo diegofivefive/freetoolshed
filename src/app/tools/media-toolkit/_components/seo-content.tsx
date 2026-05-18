@@ -1,4 +1,24 @@
 import { Separator } from "@/components/ui/separator";
+import { ToolInsights } from "@/components/shared/tool-insights";
+
+const TIPS = [
+  "Pick the dedicated sub-tool over an all-in-one mental model — each one is tuned for its specific job and runs faster than a general-purpose transcoder.",
+  "Total input file size caps around 1–2 GB in most desktop browsers — split large jobs into batches when you hit the warning.",
+  "Use Chrome, Edge, or Firefox for best ffmpeg.wasm performance. Safari support is partial and some tools won't work reliably.",
+  "Keep the tab focused for long encodes — most browsers throttle CPU on background tabs.",
+];
+
+const MISTAKES = [
+  "Loading a 4 GB video into video-compressor on a low-memory device — the tab will OOM-crash before processing starts.",
+  "Switching tabs mid-encode and assuming full speed continues — background-tab throttling can multiply encode time several-fold.",
+  "Treating ffmpeg.wasm as identical to native ffmpeg — WASM is slower and a few esoteric codecs are unavailable.",
+];
+
+const TAKEAWAYS = [
+  "All processing is local via ffmpeg.wasm — your media never reaches a server.",
+  "Dedicated single-purpose sub-tools instead of one all-in-one editor.",
+  "Browser-bound by design — not a substitute for native ffmpeg on production batch jobs.",
+];
 
 export function SeoContent() {
   return (
@@ -78,6 +98,10 @@ export function SeoContent() {
             browser&apos;s available memory (typically 1-2 GB on desktop).
           </li>
         </ul>
+      </div>
+
+      <div className="not-prose">
+        <ToolInsights tips={TIPS} mistakes={MISTAKES} takeaways={TAKEAWAYS} />
       </div>
 
       <h2 className="mt-10 text-2xl font-semibold tracking-tight">

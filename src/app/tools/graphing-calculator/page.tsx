@@ -1,5 +1,6 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
 import { ToolByline } from "@/components/shared/tool-byline";
+import { ToolTldr } from "@/components/shared/tool-tldr";
 import { SeoContent } from "./_components/seo-content";
 import { GraphingCalculatorLoader } from "./_components/graphing-calculator-loader";
 import { AdSlot } from "@/components/layout/ad-slot";
@@ -106,6 +107,15 @@ export default function GraphingCalculatorPage() {
         and distributions — a free alternative to TI-84 online emulators. No
         sign-up required.
       </p>
+
+      <ToolTldr>
+        Plot up to ten functions, run linear and quadratic regressions, solve
+        matrices, evaluate distributions, and step through tables — with a TI-84
+        keypad workflow rendered in HD. Supports angle modes, scientific
+        notation, and store-to-variable (sto→). No download, no calculator
+        price tag, no proctored-exam mode. A free alternative to the TI-84 Plus
+        CE and Desmos for homework, quick checks, and classroom demos.
+      </ToolTldr>
 
       <ToolByline />
 

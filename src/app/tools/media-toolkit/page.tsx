@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { ToolByline } from "@/components/shared/tool-byline";
+import { ToolTldr } from "@/components/shared/tool-tldr";
 import { SeoContent } from "./_components/seo-content";
 
 export const metadata = generatePageMetadata({
@@ -76,6 +77,15 @@ export default function MediaToolkitPage() {
         Merge, convert, compress, and trim audio and video files — a free
         alternative to Adobe Media Encoder. Everything runs in your browser.
       </p>
+
+      <ToolTldr>
+        A collection of browser-based tools for audio and video work: merge
+        audiobook chapters into a single M4A, convert between formats, compress
+        video, trim clips, extract audio from video, edit metadata, pull
+        subtitles. Every tool runs on ffmpeg.wasm in your browser tab — no
+        upload, no install, no account. A free alternative to Adobe Media
+        Encoder, HandBrake, and similar paid or install-heavy desktop suites.
+      </ToolTldr>
 
       <ToolByline />
 

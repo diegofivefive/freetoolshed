@@ -1,4 +1,24 @@
 import { Separator } from "@/components/ui/separator";
+import { ToolInsights } from "@/components/shared/tool-insights";
+
+const TIPS = [
+  "Use the time-display readout for frame-accurate trim positions — the thumbnail timeline is approximate.",
+  "Trim to the same container as the source (MP4 in, MP4 out) to skip a full re-encode — much faster.",
+  "Plan your cuts before starting — single-range trim per export means multi-cut workflows need multi-export.",
+  "Preview the trim before exporting — the in-browser player respects the selected range.",
+];
+
+const MISTAKES = [
+  "Trimming a 4K source to a 480p output for no reason — the trim itself doesn't change resolution; that's a separate downscale step.",
+  "Closing the tab before downloading — the trimmed output exists only until you click export.",
+  "Trusting thumbnail timestamps as exact — at coarse zoom, two visible frames may be seconds apart.",
+];
+
+const TAKEAWAYS = [
+  "Time-range trim for any common video format, with optional re-encode or stream copy.",
+  "Local-only via ffmpeg.wasm — your footage never reaches a server.",
+  "Single-range trim per export — for multi-cut workflows, run multiple passes.",
+];
 
 export function SeoContent() {
   return (
@@ -141,6 +161,10 @@ export function SeoContent() {
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <div className="not-prose">
+        <ToolInsights tips={TIPS} mistakes={MISTAKES} takeaways={TAKEAWAYS} />
       </div>
 
       <h2 className="mt-10 text-2xl font-semibold tracking-tight">

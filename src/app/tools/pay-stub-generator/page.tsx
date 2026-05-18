@@ -1,5 +1,6 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
 import { ToolByline } from "@/components/shared/tool-byline";
+import { ToolTldr } from "@/components/shared/tool-tldr";
 import { SeoContent } from "./_components/seo-content";
 import { PayStubGeneratorLoader } from "./_components/pay-stub-generator-loader";
 import { AdSlot } from "@/components/layout/ad-slot";
@@ -106,6 +107,16 @@ export default function PayStubGeneratorPage() {
         tracking — a free alternative to PayStubCreator and ThePayStubs. No
         sign-up required.
       </p>
+
+      <ToolTldr>
+        Generate professional pay stubs with itemized earnings, deductions, and
+        year-to-date tracking, then export a print-ready PDF — all in your
+        browser. Supports hourly and salary pay periods, federal/state/FICA
+        deduction breakdowns, and standard US pay stub layouts. No sign-up, no
+        upload, no per-stub fee. A free alternative to PayStubCreator and Real
+        Check Stubs for legitimate use cases: replacing a lost stub, contractor
+        pay, or household employer records.
+      </ToolTldr>
 
       <ToolByline />
 

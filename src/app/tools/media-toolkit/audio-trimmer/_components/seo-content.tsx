@@ -1,4 +1,24 @@
 import { Separator } from "@/components/ui/separator";
+import { ToolInsights } from "@/components/shared/tool-insights";
+
+const TIPS = [
+  "Use the time-display readout (not the visual handle) for frame-accurate trim points.",
+  "When splitting at multiple markers, plan your filenames first — auto-generated names use the source name plus an index.",
+  "Export to the same format as the source to avoid an unnecessary re-encode pass — much faster.",
+  "Apply a short fade at trim boundaries if cutting mid-track — abrupt cuts produce audible clicks.",
+];
+
+const MISTAKES = [
+  "Trusting the waveform display as exact at every zoom level — for sub-second precision, use numeric time entry.",
+  "Trimming a lossless source down to MP3 just to 'save space' — you've now baked compression into the keeper.",
+  "Closing the tab before clicking export — the trimmed audio lives only in memory until you save it.",
+];
+
+const TAKEAWAYS = [
+  "Visual-waveform trim and split for any common audio format.",
+  "All processing happens in your browser — source files stay on your device.",
+  "Not a multi-track editor — single track in, single track or split-set out.",
+];
 
 export function SeoContent() {
   return (
@@ -137,6 +157,10 @@ export function SeoContent() {
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <div className="not-prose">
+        <ToolInsights tips={TIPS} mistakes={MISTAKES} takeaways={TAKEAWAYS} />
       </div>
 
       <h2 className="mt-10 text-2xl font-semibold tracking-tight">

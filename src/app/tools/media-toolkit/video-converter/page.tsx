@@ -1,5 +1,6 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
 import { ToolByline } from "@/components/shared/tool-byline";
+import { ToolTldr } from "@/components/shared/tool-tldr";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { SeoContent } from "./_components/seo-content";
 import { VideoConverterLoader } from "./_components/video-converter-loader";
@@ -98,6 +99,14 @@ export default function VideoConverterPage() {
         Convert videos between formats right in your browser — a free
         alternative to Adobe Media Encoder. No sign-up, no uploads.
       </p>
+
+      <ToolTldr>
+        Convert video between MP4, WebM, MOV, AVI, MKV, and GIF — with
+        configurable container, codec, and quality. Runs entirely in your
+        browser via ffmpeg.wasm with no upload, no account, no time cap. A free
+        alternative to HandBrake and CloudConvert for format conversion without
+        a desktop install or third-party server.
+      </ToolTldr>
 
       <ToolByline />
 

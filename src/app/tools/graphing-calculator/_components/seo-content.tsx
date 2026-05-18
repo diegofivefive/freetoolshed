@@ -1,4 +1,26 @@
 import { Separator } from "@/components/ui/separator";
+import { ToolInsights } from "@/components/shared/tool-insights";
+
+const TIPS = [
+  "Use sto→ to save a value to a variable (A–Z or Theta) — then reuse it across functions without retyping.",
+  "Switch the angle mode (Degree vs Radian) before evaluating trig — the same expression returns different values in each mode.",
+  "Set the viewing window manually with WINDOW when ZoomFit picks something unhelpful.",
+  "Run regressions from the stat editor — enter your data points first, then call LinReg, QuadReg, or ExpReg from the calc menu.",
+  "Use the TABLE view to scan many function values quickly instead of evaluating them one at a time.",
+];
+
+const MISTAKES = [
+  "Plotting a rapidly oscillating function at the default window — you'll see a fuzzy band, not the curve. Zoom in to expose the wave.",
+  "Forgetting the angle mode is global — flipping from Radian to Degree mid-session changes results everywhere.",
+  "Comparing floats with == (sin(π) == 0 almost never is) — check |value| < ε instead.",
+  "Expecting CAS — this is a numeric calculator like the TI-84, not Wolfram Alpha or a TI-Nspire CAS.",
+];
+
+const TAKEAWAYS = [
+  "Numeric graphing, statistics, matrices, and distributions — TI-84 workflow, HD interface.",
+  "Calculator state is in-memory — refreshing the page resets variables and the graph window.",
+  "Not a CAS — no symbolic differentiation, integration, or simplification.",
+];
 
 export function SeoContent() {
   return (
@@ -141,6 +163,8 @@ export function SeoContent() {
           </table>
         </div>
       </section>
+
+      <ToolInsights tips={TIPS} mistakes={MISTAKES} takeaways={TAKEAWAYS} />
 
       {/* FAQ */}
       <section>

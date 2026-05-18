@@ -1,4 +1,24 @@
 import { Separator } from "@/components/ui/separator";
+import { ToolInsights } from "@/components/shared/tool-insights";
+
+const TIPS = [
+  "Extract to FLAC or WAV first if you'll re-edit the audio later — lossless preserves your editing headroom.",
+  "Use M4A (AAC) for the smallest file when you only need playback quality.",
+  "Check the source video's audio sample rate — extracting to a higher rate doesn't add information.",
+  "If the source has multiple audio tracks (multi-language), the extractor takes the first track by default.",
+];
+
+const MISTAKES = [
+  "Extracting MP3 from a video whose audio is already MP3 — that's a re-encode that loses quality without benefit.",
+  "Forgetting that very long videos hit browser-memory caps — split a 2-hour movie if your browser warns you.",
+  "Expecting noise reduction or normalization — extraction is a passthrough, not a clean-up pass.",
+];
+
+const TAKEAWAYS = [
+  "Single-pass audio rip from any common video container into any common audio format.",
+  "Local-only via ffmpeg.wasm — your video never leaves the browser.",
+  "Pure extraction — no audio cleanup, normalization, or denoising included.",
+];
 
 export function SeoContent() {
   return (
@@ -120,6 +140,10 @@ export function SeoContent() {
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <div className="not-prose">
+        <ToolInsights tips={TIPS} mistakes={MISTAKES} takeaways={TAKEAWAYS} />
       </div>
 
       <h2 className="mt-10 text-2xl font-semibold tracking-tight">

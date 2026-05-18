@@ -1,5 +1,6 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
 import { ToolByline } from "@/components/shared/tool-byline";
+import { ToolTldr } from "@/components/shared/tool-tldr";
 import { SeoContent } from "./_components/seo-content";
 import { ScreenRecorderLoader } from "./_components/screen-recorder-loader";
 import { AdSlot } from "@/components/layout/ad-slot";
@@ -137,6 +138,15 @@ export default function ScreenRecorderPage() {
         Record your screen, window, or tab with webcam overlay and microphone —
         a free alternative to Loom. Everything runs in your browser.
       </p>
+
+      <ToolTldr>
+        Record your screen, a single window, or a browser tab — with optional
+        webcam picture-in-picture and microphone audio — entirely in the browser
+        via the MediaRecorder API. Trim before export, then save as WebM, MP4,
+        or animated GIF. No install, no watermark, no time limit, no account. A
+        free alternative to Loom for quick walkthroughs, bug repros, and async
+        demos that don&apos;t need a teammate dashboard or cloud sharing layer.
+      </ToolTldr>
 
       <ToolByline />
 

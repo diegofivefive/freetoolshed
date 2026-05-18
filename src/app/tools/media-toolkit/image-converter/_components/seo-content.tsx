@@ -1,4 +1,24 @@
 import { Separator } from "@/components/ui/separator";
+import { ToolInsights } from "@/components/shared/tool-insights";
+
+const TIPS = [
+  "Pick WebP for web embeds — typically 25–35% smaller than JPG at equivalent quality.",
+  "AVIF beats WebP on size but lacks broad fallback support — only use it where you control the destination.",
+  "PNG is for graphics with transparency or sharp edges; JPG is for photographic content. Choosing the wrong one wastes bytes.",
+  "Drop JPG quality to 75–80 for web — visual difference vs 100 is invisible while the file size halves.",
+];
+
+const MISTAKES = [
+  "Converting JPG → PNG to 'preserve quality' — JPG damage is already baked in; PNG just stores it losslessly at a much larger size.",
+  "Upscaling resolution during conversion — adds size without adding detail.",
+  "Bulk-converting hundreds of large images in one tab — browser memory is the limit. Process in batches of 50.",
+];
+
+const TAKEAWAYS = [
+  "Browser-native image conversion across the formats people actually use on the web.",
+  "Per-image quality controls in bulk mode — not all images need the same setting.",
+  "No upload, no privacy concern, no batch limit beyond browser memory.",
+];
 
 export function SeoContent() {
   return (
@@ -132,6 +152,10 @@ export function SeoContent() {
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <div className="not-prose">
+        <ToolInsights tips={TIPS} mistakes={MISTAKES} takeaways={TAKEAWAYS} />
       </div>
 
       <h2 className="mt-10 text-2xl font-semibold tracking-tight">

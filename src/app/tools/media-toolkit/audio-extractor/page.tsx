@@ -1,5 +1,6 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
 import { ToolByline } from "@/components/shared/tool-byline";
+import { ToolTldr } from "@/components/shared/tool-tldr";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { SeoContent } from "./_components/seo-content";
 import { AudioExtractorLoader } from "./_components/audio-extractor-loader";
@@ -90,6 +91,14 @@ export default function AudioExtractorPage() {
         Extract audio tracks from any video file — a free alternative to Adobe
         Premiere Pro. No sign-up, no watermarks, no limits.
       </p>
+
+      <ToolTldr>
+        Extract the audio track from any video file — MP4, MOV, MKV, WebM, AVI
+        — and save it as MP3, M4A, WAV, OGG, or FLAC. Runs entirely in your
+        browser via ffmpeg.wasm with no upload, no account, and no length limit
+        beyond browser memory. A free alternative to VLC&apos;s convert/save and
+        Adobe Audition&apos;s import-from-video for ripping audio out of a video.
+      </ToolTldr>
 
       <ToolByline />
 

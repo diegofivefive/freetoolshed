@@ -1,4 +1,24 @@
 import { Separator } from "@/components/ui/separator";
+import { ToolInsights } from "@/components/shared/tool-insights";
+
+const TIPS = [
+  "MKV typically embeds multiple subtitle tracks — pick by language code (en, fr, ja) after extraction.",
+  "SRT is the most compatible format for downstream video players; VTT is the web-native choice.",
+  "If a video has burned-in subtitles (rendered into the picture), extraction won't find them — those need OCR, not extraction.",
+  "ASS format preserves styling (font, position, color) — use it when the original styling matters.",
+];
+
+const MISTAKES = [
+  "Looking for subtitles in a video that doesn't have a separate subtitle track — the burned-in case isn't extractable.",
+  "Forgetting to specify the language when the video has multiple tracks — you'll get the first one by default.",
+  "Treating extracted SRT timing as perfect — some sources have slight drift that needs manual sync correction.",
+];
+
+const TAKEAWAYS = [
+  "Pulls all embedded subtitle tracks (multi-language supported) into common subtitle formats.",
+  "Runs locally via ffmpeg.wasm — your video never leaves the browser.",
+  "Embedded subtitles only — burned-in subtitles require OCR, not extraction.",
+];
 
 export function SeoContent() {
   return (
@@ -119,6 +139,10 @@ export function SeoContent() {
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <div className="not-prose">
+        <ToolInsights tips={TIPS} mistakes={MISTAKES} takeaways={TAKEAWAYS} />
       </div>
 
       <h2 className="mt-10 text-2xl font-semibold tracking-tight">

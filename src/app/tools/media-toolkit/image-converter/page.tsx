@@ -1,5 +1,6 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
 import { ToolByline } from "@/components/shared/tool-byline";
+import { ToolTldr } from "@/components/shared/tool-tldr";
 import { SeoContent } from "./_components/seo-content";
 import { ImageConverterLoader } from "./_components/image-converter-loader";
 import { AdSlot } from "@/components/layout/ad-slot";
@@ -106,6 +107,14 @@ export default function ImageConverterPage() {
         Bulk convert images between PNG, JPG, WebP, and AVIF — a free
         alternative to Adobe Photoshop&apos;s batch export. No sign-up required.
       </p>
+
+      <ToolTldr>
+        Bulk-convert images between PNG, JPG, WebP, AVIF, and GIF with per-image
+        quality settings. Runs in your browser using Canvas and the
+        browser&apos;s native encoders — no upload, no account, no batch-size
+        fee. A free alternative to XnConvert and Adobe Photoshop&apos;s Save for
+        Web for the common &quot;convert this folder of images&quot; use case.
+      </ToolTldr>
 
       <ToolByline />
 

@@ -1,5 +1,6 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
 import { ToolByline } from "@/components/shared/tool-byline";
+import { ToolTldr } from "@/components/shared/tool-tldr";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { SeoContent } from "./_components/seo-content";
 import { VideoCompressorLoader } from "./_components/video-compressor-loader";
@@ -98,6 +99,15 @@ export default function VideoCompressorPage() {
         Compress videos with H.264 encoding right in your browser — a free
         alternative to HandBrake. No sign-up, no uploads.
       </p>
+
+      <ToolTldr>
+        Shrink video file size with quality presets — small, medium, large, or
+        custom CRF — while preserving visible quality. Works on MP4, MOV, MKV,
+        WebM, and AVI inputs, all in your browser via ffmpeg.wasm. No upload, no
+        account, no watermark. A free alternative to HandBrake when you
+        don&apos;t want a desktop install, and to Adobe Media Encoder for casual
+        compression.
+      </ToolTldr>
 
       <ToolByline />
 

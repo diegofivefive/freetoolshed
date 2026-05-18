@@ -1,5 +1,6 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
 import { ToolByline } from "@/components/shared/tool-byline";
+import { ToolTldr } from "@/components/shared/tool-tldr";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { SeoContent } from "./_components/seo-content";
 import { AudioConverterLoader } from "./_components/audio-converter-loader";
@@ -98,6 +99,14 @@ export default function AudioConverterPage() {
         Convert audio files between formats — a free alternative to Adobe
         Audition. No sign-up required.
       </p>
+
+      <ToolTldr>
+        Convert audio files between MP3, M4A, WAV, OGG, FLAC, and AAC formats
+        with configurable quality and bitrate — single file or batch, all in
+        your browser via ffmpeg.wasm. No upload, no account, no per-file fee. A
+        free alternative to dBpoweramp and Fre:ac for format conversion without
+        installing a desktop transcoder.
+      </ToolTldr>
 
       <ToolByline />
 

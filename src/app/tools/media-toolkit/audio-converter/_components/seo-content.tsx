@@ -1,4 +1,24 @@
 import { Separator } from "@/components/ui/separator";
+import { ToolInsights } from "@/components/shared/tool-insights";
+
+const TIPS = [
+  "Pick FLAC or WAV for lossless transcoding — quality is preserved through any number of subsequent passes.",
+  "Match the output bitrate to the source — encoding a 96 kbps source to 320 kbps doesn't add information, just file size.",
+  "Use batch mode for whole albums or audiobooks — output naming preserves the original filename.",
+  "For Apple-ecosystem playback, M4A (AAC) is the natural choice; for cross-platform compatibility, MP3 stays universal.",
+];
+
+const MISTAKES = [
+  "Converting MP3 → MP3 to 'clean up' a file — re-encoding strictly degrades quality, never improves it.",
+  "Picking a sample rate higher than the source — upsampling can't recover information that was never recorded.",
+  "Forgetting that .m4a and .mp4 share a container — naming matters for which app recognizes the file.",
+];
+
+const TAKEAWAYS = [
+  "Format conversion across all major audio codecs, single file or batch.",
+  "ffmpeg.wasm runs entirely in your browser tab — files never reach a server.",
+  "Quality is bounded by the source — conversion preserves or downgrades, never improves.",
+];
 
 export function SeoContent() {
   return (
@@ -129,6 +149,10 @@ export function SeoContent() {
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <div className="not-prose">
+        <ToolInsights tips={TIPS} mistakes={MISTAKES} takeaways={TAKEAWAYS} />
       </div>
 
       <h2 className="mt-10 text-2xl font-semibold tracking-tight">

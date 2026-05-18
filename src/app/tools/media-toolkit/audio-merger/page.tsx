@@ -1,5 +1,6 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
 import { ToolByline } from "@/components/shared/tool-byline";
+import { ToolTldr } from "@/components/shared/tool-tldr";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { SeoContent } from "./_components/seo-content";
 import { AudioMergerLoader } from "./_components/audio-merger-loader";
@@ -114,6 +115,15 @@ export default function AudioMergerPage() {
         Merge hundreds of audio files into a single M4A, MP3, or OGG — a free
         alternative to Adobe Audition. No sign-up required.
       </p>
+
+      <ToolTldr>
+        Combine MP3, M4A, WAV, OGG, or FLAC files into a single audio file with
+        optional chapter markers, all in your browser via ffmpeg.wasm. Built for
+        audiobook compilation, podcast stitching, and DJ-set assembly — no
+        upload, no account, no track-count limit beyond your browser&apos;s
+        memory. A free alternative to Adobe Audition&apos;s batch merge and
+        desktop tools like Audacity for one-shot concatenation.
+      </ToolTldr>
 
       <ToolByline />
 

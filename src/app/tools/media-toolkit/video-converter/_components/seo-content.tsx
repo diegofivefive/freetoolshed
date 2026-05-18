@@ -1,4 +1,24 @@
 import { Separator } from "@/components/ui/separator";
+import { ToolInsights } from "@/components/shared/tool-insights";
+
+const TIPS = [
+  "MP4 (H.264) is the most compatible container for general sharing; WebM (VP9) is smaller for web embeds.",
+  "GIF output balloons in size very quickly — keep GIF clips under 10 seconds.",
+  "Match output resolution to source — upscaling 720p to 1080p adds bytes without adding detail.",
+  "If the destination is a phone, MP4 + AAC audio is the safest pairing across iOS and Android.",
+];
+
+const MISTAKES = [
+  "Converting between two lossy formats (MP4 → WebM) without a quality target — defaults can downgrade quality silently.",
+  "Picking AVI for a modern destination — most modern players prefer MP4 or WebM; AVI is mostly legacy.",
+  "Trying to convert a DRM-protected video — the tool can't read those.",
+];
+
+const TAKEAWAYS = [
+  "Container and codec conversion across the formats people actually use.",
+  "ffmpeg.wasm runs in your browser — source video never leaves the device.",
+  "Browser-bound: not a substitute for native ffmpeg on production batch jobs.",
+];
 
 export function SeoContent() {
   return (
@@ -125,6 +145,10 @@ export function SeoContent() {
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <div className="not-prose">
+        <ToolInsights tips={TIPS} mistakes={MISTAKES} takeaways={TAKEAWAYS} />
       </div>
 
       <h2 className="mt-10 text-2xl font-semibold tracking-tight">

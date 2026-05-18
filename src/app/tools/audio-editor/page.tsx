@@ -1,5 +1,6 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
 import { ToolByline } from "@/components/shared/tool-byline";
+import { ToolTldr } from "@/components/shared/tool-tldr";
 import { SeoContent } from "./_components/seo-content";
 import { AudioEditorLoader } from "./_components/audio-editor-loader";
 import { AdSlot } from "@/components/layout/ad-slot";
@@ -106,6 +107,15 @@ export default function AudioEditorPage() {
         here — no downloading Audacity, no Adobe subscription, no sign-up.
         Just drop your file and edit.
       </p>
+
+      <ToolTldr>
+        Trim, cut, fade, merge, and convert audio files directly in your browser
+        with a visual waveform editor — no install, no upload. Supports MP3, WAV,
+        OGG, FLAC, and M4A input; export as WAV, MP3, or OGG. Built for one-off
+        edits — trimming a podcast clip, joining tracks, normalizing volume —
+        without booting up Audacity or paying for a Creative Cloud subscription.
+        A free alternative to Adobe Audition for desktop audio cleanup.
+      </ToolTldr>
 
       <ToolByline />
 

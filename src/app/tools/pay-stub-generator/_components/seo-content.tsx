@@ -1,4 +1,26 @@
 import { Separator } from "@/components/ui/separator";
+import { ToolInsights } from "@/components/shared/tool-insights";
+
+const TIPS = [
+  "Save your employer details (name, address, EIN) once via defaults — every new stub starts pre-populated.",
+  "Track YTD totals across multiple stubs by saving each one to history — the next stub auto-rolls totals forward.",
+  "Pick the right pay frequency (weekly, bi-weekly, semi-monthly, monthly) before entering numbers — deductions calculate per period.",
+  "Use the itemized deduction breakdown (federal, state, FICA, custom) rather than a single 'tax' lump — lenders and landlords verify line items.",
+  "Match pay-period dates exactly to what you'd submit elsewhere — they appear verbatim on the PDF.",
+];
+
+const MISTAKES = [
+  "Generating fictitious pay stubs you don't have records to back up — that's loan or rental fraud, and the tool is not designed for that.",
+  "Forgetting to verify YTD math against your most recent actual paycheck — small per-period rounding can compound noticeably over a year.",
+  "Picking the wrong pay frequency after entering numbers — the calculator won't retroactively re-run the deductions on the existing values.",
+  "Trusting the deduction defaults blindly — federal/state withholding varies by W-4 elections and state of residence.",
+];
+
+const TAKEAWAYS = [
+  "Pay stub data stays client-side — your salary, SSN, and employer info never reach a server.",
+  "Built for legitimate one-off use: replacing a lost stub, paying a contractor, or maintaining household-employer records.",
+  "Not a payroll system — no tax filing, no direct deposit, no employee portal, no W-2 generation.",
+];
 
 export function SeoContent() {
   return (
@@ -98,7 +120,7 @@ export function SeoContent() {
       {/* Comparison Table */}
       <section>
         <h2 className="text-2xl font-semibold tracking-tight">
-          Free Pay Stub Generator vs Paid Alternatives
+          Free PayStubCreator Alternative
         </h2>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full max-w-3xl text-sm">
@@ -147,6 +169,8 @@ export function SeoContent() {
           </p>
         </div>
       </section>
+
+      <ToolInsights tips={TIPS} mistakes={MISTAKES} takeaways={TAKEAWAYS} />
 
       {/* FAQ */}
       <section>

@@ -1,4 +1,25 @@
 import { Separator } from "@/components/ui/separator";
+import { ToolInsights } from "@/components/shared/tool-insights";
+
+const TIPS = [
+  "Order files by filename or drag to reorder — the merge respects the visible order, not the upload order.",
+  "Keep input files in the same format and sample rate when possible — mixing formats forces a re-encode of the mismatched tracks.",
+  "Use chapter markers for audiobook output — iOS Books, VLC, and most M4A players treat them as navigable bookmarks.",
+  "Split very large compilations (300+ files, ~1.5 GB total) into halves and merge the halves at the end.",
+  "Pick M4A as the container when you want chapter markers — MP3 chapter support is much spottier across players.",
+];
+
+const MISTAKES = [
+  "Merging files at wildly different bitrates without normalizing — listeners notice the volume swing at every chapter break.",
+  "Loading the same file twice — there's no dedup; it'll appear twice in the output.",
+  "Refreshing the tab after upload — uploaded files clear and 300 chapters of re-upload is a long wait.",
+];
+
+const TAKEAWAYS = [
+  "Single-file output with optional chapters from any combination of supported audio formats.",
+  "All merge work runs in your browser via ffmpeg.wasm — files stay local.",
+  "Designed for audiobooks, podcast compilations, and DJ sets — not for multi-track mixing.",
+];
 
 export function SeoContent() {
   return (
@@ -134,6 +155,10 @@ export function SeoContent() {
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <div className="not-prose">
+        <ToolInsights tips={TIPS} mistakes={MISTAKES} takeaways={TAKEAWAYS} />
       </div>
 
       <h2 className="mt-10 text-2xl font-semibold tracking-tight">
