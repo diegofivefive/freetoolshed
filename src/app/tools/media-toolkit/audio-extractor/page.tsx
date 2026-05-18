@@ -1,4 +1,5 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
+import { ToolByline } from "@/components/shared/tool-byline";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { SeoContent } from "./_components/seo-content";
 import { AudioExtractorLoader } from "./_components/audio-extractor-loader";
@@ -89,6 +90,8 @@ export default function AudioExtractorPage() {
         Extract audio tracks from any video file — a free alternative to Adobe
         Premiere Pro. No sign-up, no watermarks, no limits.
       </p>
+
+      <ToolByline />
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <div className="rounded-lg border border-border bg-card p-4">

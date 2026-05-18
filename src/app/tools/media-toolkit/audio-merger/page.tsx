@@ -1,4 +1,5 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
+import { ToolByline } from "@/components/shared/tool-byline";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { SeoContent } from "./_components/seo-content";
 import { AudioMergerLoader } from "./_components/audio-merger-loader";
@@ -113,6 +114,8 @@ export default function AudioMergerPage() {
         Merge hundreds of audio files into a single M4A, MP3, or OGG — a free
         alternative to Adobe Audition. No sign-up required.
       </p>
+
+      <ToolByline />
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <div className="rounded-lg border border-border bg-card p-4">

@@ -6,6 +6,7 @@ import { SiteNav } from "@/components/layout/site-nav";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { AdSenseScript } from "@/components/layout/adsense-script";
 import { AdSlot } from "@/components/layout/ad-slot";
+import { generateOrganizationJsonLd, generateWebSiteJsonLd } from "@/lib/author";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -71,6 +72,14 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://www.highperformanceformat.com" />
         <link rel="preconnect" href="https://pl29142630.profitablecpmratenetwork.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://pl29142630.profitablecpmratenetwork.com" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(generateOrganizationJsonLd()) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(generateWebSiteJsonLd()) }}
+        />
       </head>
       <body className="flex min-h-full flex-col antialiased">
         <AdSenseScript />

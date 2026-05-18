@@ -1,4 +1,5 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
+import { ToolByline } from "@/components/shared/tool-byline";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { SeoContent } from "./_components/seo-content";
 import { VideoConverterLoader } from "./_components/video-converter-loader";
@@ -97,6 +98,8 @@ export default function VideoConverterPage() {
         Convert videos between formats right in your browser — a free
         alternative to Adobe Media Encoder. No sign-up, no uploads.
       </p>
+
+      <ToolByline />
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <div className="rounded-lg border border-border bg-card p-4">

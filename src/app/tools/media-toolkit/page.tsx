@@ -22,6 +22,7 @@ import {
   Subtitles,
 } from "lucide-react";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
+import { ToolByline } from "@/components/shared/tool-byline";
 import { SeoContent } from "./_components/seo-content";
 
 export const metadata = generatePageMetadata({
@@ -75,6 +76,8 @@ export default function MediaToolkitPage() {
         Merge, convert, compress, and trim audio and video files — a free
         alternative to Adobe Media Encoder. Everything runs in your browser.
       </p>
+
+      <ToolByline />
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         {TOOLKIT_TOOLS.map((tool) => {

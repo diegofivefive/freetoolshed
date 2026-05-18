@@ -1,4 +1,5 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
+import { ToolByline } from "@/components/shared/tool-byline";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { SeoContent } from "./_components/seo-content";
 import { AudioConverterLoader } from "./_components/audio-converter-loader";
@@ -97,6 +98,8 @@ export default function AudioConverterPage() {
         Convert audio files between formats — a free alternative to Adobe
         Audition. No sign-up required.
       </p>
+
+      <ToolByline />
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <div className="rounded-lg border border-border bg-card p-4">

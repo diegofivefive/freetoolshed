@@ -1,4 +1,5 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
+import { ToolByline } from "@/components/shared/tool-byline";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { SeoContent } from "./_components/seo-content";
 import { MetadataEditorLoader } from "./_components/metadata-editor-loader";
@@ -97,6 +98,8 @@ export default function MetadataEditorPage() {
         View, edit, and strip metadata from audio and video files — a free
         alternative to Mp3tag. No sign-up, no re-encoding.
       </p>
+
+      <ToolByline />
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <div className="rounded-lg border border-border bg-card p-4">

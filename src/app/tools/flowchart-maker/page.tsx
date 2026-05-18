@@ -1,4 +1,5 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
+import { ToolByline } from "@/components/shared/tool-byline";
 import { SeoContent } from "./_components/seo-content";
 import { FlowchartMakerLoader } from "./_components/flowchart-maker-loader";
 import { AdSlot } from "@/components/layout/ad-slot";
@@ -123,6 +124,8 @@ export default function FlowchartMakerPage() {
         Create flowcharts, process diagrams, and decision trees — a free
         alternative to Lucidchart and Visio. No sign-up required.
       </p>
+
+      <ToolByline />
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <div className="rounded-lg border border-border bg-card p-4">

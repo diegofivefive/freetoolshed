@@ -1,4 +1,5 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
+import { ToolByline } from "@/components/shared/tool-byline";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { SeoContent } from "./_components/seo-content";
 import { SubtitleExtractorLoader } from "./_components/subtitle-extractor-loader";
@@ -97,6 +98,8 @@ export default function SubtitleExtractorPage() {
         Extract embedded subtitle tracks from MKV, MP4, and other video files —
         a free alternative to HandBrake. No sign-up required.
       </p>
+
+      <ToolByline />
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <div className="rounded-lg border border-border bg-card p-4">

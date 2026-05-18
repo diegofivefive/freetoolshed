@@ -1,4 +1,5 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
+import { ToolByline } from "@/components/shared/tool-byline";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { SeoContent } from "./_components/seo-content";
 import { AudioTrimmerLoader } from "./_components/audio-trimmer-loader";
@@ -97,6 +98,8 @@ export default function AudioTrimmerPage() {
         Trim audio to a time range or split into segments — a free alternative
         to Adobe Audition. No sign-up, no re-encoding.
       </p>
+
+      <ToolByline />
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <div className="rounded-lg border border-border bg-card p-4">

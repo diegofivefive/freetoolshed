@@ -1,4 +1,5 @@
 import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
+import { ToolByline } from "@/components/shared/tool-byline";
 import { SeoContent } from "./_components/seo-content";
 import { PeriodicTableLoader } from "./_components/periodic-table-loader";
 import { AdSlot } from "@/components/layout/ad-slot";
@@ -113,6 +114,8 @@ export default function PeriodicTablePage() {
         property heatmaps, and a molar mass calculator — a free alternative to
         Merck PTE and Periodic Table Pro. No sign-up required.
       </p>
+
+      <ToolByline />
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <div className="rounded-lg border border-border bg-card p-4">
