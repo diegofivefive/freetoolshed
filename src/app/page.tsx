@@ -88,6 +88,15 @@ const TOOLS: Tool[] = [
     paidAlternative: "Adobe Media Encoder",
   },
   {
+    name: "Unit Converter",
+    slug: "unit-converter",
+    description:
+      "Convert between 800+ units across 23 categories — length, weight, temperature, plus engineering and scientific units like viscosity, torque, and thermal conductivity.",
+    category: "Utility",
+    icon: "Ruler",
+    paidAlternative: "Wolfram Alpha",
+  },
+  {
     name: "Floor Plan Maker",
     slug: "floor-plan-maker",
     description:

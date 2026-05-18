@@ -5,6 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
+      disallow: ["/tools/floor-plan-maker", "/tools/flowchart-maker"],
     },
     sitemap: "https://freetoolshed.com/sitemap.xml",
   };

@@ -11,7 +11,10 @@ const toolConfig = {
   paidAlternative: "Lucidchart",
 };
 
-export const metadata = generateToolMetadata(toolConfig);
+export const metadata = {
+  ...generateToolMetadata(toolConfig),
+  robots: { index: false, follow: true },
+};
 
 export default function FlowchartMakerPage() {
   const jsonLd = generateToolJsonLd(toolConfig);

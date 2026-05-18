@@ -25,19 +25,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
-      url: `${BASE_URL}/tools/floor-plan-maker`,
-      lastModified: new Date(),
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    },
-    {
       url: `${BASE_URL}/tools/audio-editor`,
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.8,
     },
     {
-      url: `${BASE_URL}/tools/flowchart-maker`,
+      url: `${BASE_URL}/tools/unit-converter`,
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.8,
