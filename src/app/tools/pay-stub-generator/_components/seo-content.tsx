@@ -22,6 +22,29 @@ const TAKEAWAYS = [
   "Not a payroll system — no tax filing, no direct deposit, no employee portal, no W-2 generation.",
 ];
 
+export const HOW_TO_STEPS = [
+  {
+    title: "Enter employer and employee details",
+    desc: "Add your company name, address, EIN, and optionally upload a company logo. Then fill in the employee name, ID, department, and SSN last 4 digits.",
+  },
+  {
+    title: "Set the pay period",
+    desc: "Choose a pay frequency (weekly, bi-weekly, semi-monthly, or monthly), set the period start date, and the end date and pay date will auto-fill.",
+  },
+  {
+    title: "Add earnings",
+    desc: "Toggle between hourly or salary mode. For hourly workers, enter hours and rate — the amount calculates automatically. Add overtime, bonuses, commission, or tips as needed.",
+  },
+  {
+    title: "Add deductions",
+    desc: "Click 'Apply Standard US Deductions' to set up Federal tax, State tax, Social Security, Medicare, 401(k), and health insurance. Adjust amounts and add custom deductions.",
+  },
+  {
+    title: "Customize and download",
+    desc: "Choose a PDF template (Standard, Modern, or Compact), pick an accent color, then click Download PDF. Save the stub to your history for future reference.",
+  },
+];
+
 export function SeoContent() {
   return (
     <div className="mt-16 space-y-12">
@@ -80,28 +103,7 @@ export function SeoContent() {
           How to Create a Pay Stub
         </h2>
         <ol className="mt-4 max-w-3xl space-y-4">
-          {[
-            {
-              title: "Enter employer and employee details",
-              desc: "Add your company name, address, EIN, and optionally upload a company logo. Then fill in the employee name, ID, department, and SSN last 4 digits.",
-            },
-            {
-              title: "Set the pay period",
-              desc: "Choose a pay frequency (weekly, bi-weekly, semi-monthly, or monthly), set the period start date, and the end date and pay date will auto-fill.",
-            },
-            {
-              title: "Add earnings",
-              desc: "Toggle between hourly or salary mode. For hourly workers, enter hours and rate — the amount calculates automatically. Add overtime, bonuses, commission, or tips as needed.",
-            },
-            {
-              title: "Add deductions",
-              desc: "Click \"Apply Standard US Deductions\" to set up Federal tax, State tax, Social Security, Medicare, 401(k), and health insurance. Adjust amounts and add custom deductions.",
-            },
-            {
-              title: "Customize and download",
-              desc: "Choose a PDF template (Standard, Modern, or Compact), pick an accent color, then click Download PDF. Save the stub to your history for future reference.",
-            },
-          ].map((step, i) => (
+          {HOW_TO_STEPS.map((step, i) => (
             <li key={step.title} className="flex gap-4">
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand/10 text-sm font-semibold text-brand">
                 {i + 1}

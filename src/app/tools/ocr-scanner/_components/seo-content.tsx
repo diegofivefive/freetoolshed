@@ -22,6 +22,25 @@ const TAKEAWAYS = [
   "Accuracy is bounded by source quality — clean scans of clear print work well; photos of receipts in dim light don't.",
 ];
 
+export const HOW_TO_STEPS = [
+  {
+    title: "1. Upload your file",
+    desc: "Drag and drop an image or scanned PDF onto the upload area, or click to browse. You can add multiple files at once — images and PDFs can be mixed. Each PDF page is automatically rendered as an image for OCR processing.",
+  },
+  {
+    title: "2. Choose your language",
+    desc: "Select the OCR language from the dropdown in the toolbar. The default is English, but you can switch to any of the 15+ supported languages including French, German, Spanish, Chinese, Japanese, Arabic, and Hindi. The OCR engine reinitializes automatically when you change languages.",
+  },
+  {
+    title: "3. Review and edit the text",
+    desc: "Once processing completes, the extracted text appears in the right panel. The text is fully editable — fix any OCR errors, remove headers or footers, or reformat the content. Word and character counts update as you type.",
+  },
+  {
+    title: "4. Export the result",
+    desc: "Choose your export format: Plain Text (.txt) for simple text, Word Document (.docx) for formatted output with page separators, or Searchable PDF to create a PDF with your original scan plus an invisible text layer for search and selection. Click Download or use Copy Text for the clipboard.",
+  },
+];
+
 export function SeoContent() {
   return (
     <div className="mt-16 space-y-12">
@@ -81,24 +100,7 @@ export function SeoContent() {
           How to Extract Text from an Image or PDF (4 Steps)
         </h2>
         <ol className="mt-4 space-y-4">
-          {[
-            {
-              title: "1. Upload your file",
-              desc: "Drag and drop an image or scanned PDF onto the upload area, or click to browse. You can add multiple files at once — images and PDFs can be mixed. Each PDF page is automatically rendered as an image for OCR processing.",
-            },
-            {
-              title: "2. Choose your language",
-              desc: "Select the OCR language from the dropdown in the toolbar. The default is English, but you can switch to any of the 15+ supported languages including French, German, Spanish, Chinese, Japanese, Arabic, and Hindi. The OCR engine reinitializes automatically when you change languages.",
-            },
-            {
-              title: "3. Review and edit the text",
-              desc: "Once processing completes, the extracted text appears in the right panel. The text is fully editable — fix any OCR errors, remove headers or footers, or reformat the content. Word and character counts update as you type.",
-            },
-            {
-              title: "4. Export the result",
-              desc: "Choose your export format: Plain Text (.txt) for simple text, Word Document (.docx) for formatted output with page separators, or Searchable PDF to create a PDF with your original scan plus an invisible text layer for search and selection. Click Download or use Copy Text for the clipboard.",
-            },
-          ].map((step) => (
+          {HOW_TO_STEPS.map((step) => (
             <li key={step.title}>
               <p className="font-medium">{step.title}</p>
               <p className="mt-1 text-sm text-muted-foreground">

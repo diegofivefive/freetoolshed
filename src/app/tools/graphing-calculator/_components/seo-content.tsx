@@ -22,6 +22,29 @@ const TAKEAWAYS = [
   "Not a CAS — no symbolic differentiation, integration, or simplification.",
 ];
 
+export const HOW_TO_STEPS = [
+  {
+    title: "Graph a function",
+    desc: "In Graph mode, type an expression like sin(x) or x^2 - 4 into a Y= slot and see it plotted instantly.",
+  },
+  {
+    title: "Run a regression",
+    desc: "Switch to Stat mode, enter x-values in L1 and y-values in L2, then choose LinReg, QuadReg, ExpReg, or PwrReg from the regression menu.",
+  },
+  {
+    title: "Solve a system with RREF",
+    desc: "In Matrix mode, enter the augmented matrix and click RREF. The reduced row echelon form gives you the solution directly.",
+  },
+  {
+    title: "Compute a normal probability",
+    desc: "In Dist mode, select normalcdf, enter lower bound, upper bound, mean, and standard deviation — just like the TI-84 DISTR menu.",
+  },
+  {
+    title: "Generate a table",
+    desc: "Switch to Table mode, set your start value and step size, and view computed y-values for all active functions.",
+  },
+];
+
 export function SeoContent() {
   return (
     <div className="mt-16 space-y-12">

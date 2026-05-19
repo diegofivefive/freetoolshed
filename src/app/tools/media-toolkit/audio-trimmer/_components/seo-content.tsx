@@ -20,6 +20,14 @@ const TAKEAWAYS = [
   "Not a multi-track editor — single track in, single track or split-set out.",
 ];
 
+export const HOW_TO_STEPS = [
+  { title: "1. Add a file", desc: "Drag and drop an audio file into the upload area, or click to browse. MP3, M4A, WAV, OGG, FLAC, AAC, and WebM are supported." },
+  { title: "2. Choose mode", desc: "Click Trim to extract a single segment, or Split to cut at multiple markers." },
+  { title: "3. Enter times", desc: "For Trim mode, set the start and end time. For Split mode, add one or more time markers where you want to cut." },
+  { title: "4. Process", desc: "Click the action button. Stream copy mode makes this nearly instant regardless of file length." },
+  { title: "5. Download", desc: "Download your trimmed clip or all split segments." },
+];
+
 export function SeoContent() {
   return (
     <section className="prose prose-sm dark:prose-invert max-w-none">

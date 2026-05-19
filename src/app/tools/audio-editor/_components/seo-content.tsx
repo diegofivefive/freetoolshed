@@ -22,6 +22,29 @@ const TAKEAWAYS = [
   "Not a DAW — no MIDI, no virtual instruments, no multi-track mixing or effects rack.",
 ];
 
+export const HOW_TO_STEPS = [
+  {
+    title: "1. Import your audio file",
+    desc: "Drag and drop an audio file onto the editor, or click to browse. Supported formats include MP3, WAV, OGG, AAC, FLAC, and WebM. Your file is decoded locally in your browser — nothing is uploaded.",
+  },
+  {
+    title: "2. Navigate the waveform",
+    desc: "Use the visual waveform to see your audio. Hold Ctrl (or Cmd on Mac) and scroll to zoom in and out — the view zooms toward your cursor for fast navigation. Scroll without a modifier to pan left and right. Click anywhere to position the playhead, then press Space to play.",
+  },
+  {
+    title: "3. Select a region",
+    desc: "Click and drag on the waveform to highlight a region. The selection is shown in green. Use selection-only playback to preview exactly what you've selected before making edits.",
+  },
+  {
+    title: "4. Edit and apply effects",
+    desc: "Use the toolbar buttons to trim, delete, or silence the selection. Apply effects like fade in, fade out, normalize, reverse, amplify, or noise reduction from the effects bar below the waveform.",
+  },
+  {
+    title: "5. Export your edited audio",
+    desc: "Choose your export format (WAV for lossless, MP3 or OGG for compressed) and bitrate, then click Download. The file is encoded in your browser and saved directly to your device.",
+  },
+];
+
 export function SeoContent() {
   return (
     <div className="mt-16 space-y-12">
@@ -84,28 +107,7 @@ export function SeoContent() {
       <section>
         <h2 className="text-xl font-semibold">How to Trim Audio Online (5 Steps)</h2>
         <ol className="mt-4 space-y-4">
-          {[
-            {
-              title: "1. Import your audio file",
-              desc: "Drag and drop an audio file onto the editor, or click to browse. Supported formats include MP3, WAV, OGG, AAC, FLAC, and WebM. Your file is decoded locally in your browser — nothing is uploaded.",
-            },
-            {
-              title: "2. Navigate the waveform",
-              desc: "Use the visual waveform to see your audio. Hold Ctrl (or Cmd on Mac) and scroll to zoom in and out — the view zooms toward your cursor for fast navigation. Scroll without a modifier to pan left and right. Click anywhere to position the playhead, then press Space to play.",
-            },
-            {
-              title: "3. Select a region",
-              desc: "Click and drag on the waveform to highlight a region. The selection is shown in green. Use selection-only playback to preview exactly what you've selected before making edits.",
-            },
-            {
-              title: "4. Edit and apply effects",
-              desc: "Use the toolbar buttons to trim, delete, or silence the selection. Apply effects like fade in, fade out, normalize, reverse, amplify, or noise reduction from the effects bar below the waveform.",
-            },
-            {
-              title: "5. Export your edited audio",
-              desc: "Choose your export format (WAV for lossless, MP3 or OGG for compressed) and bitrate, then click Download. The file is encoded in your browser and saved directly to your device.",
-            },
-          ].map((step) => (
+          {HOW_TO_STEPS.map((step) => (
             <li key={step.title}>
               <p className="font-medium">{step.title}</p>
               <p className="mt-1 text-sm text-muted-foreground">

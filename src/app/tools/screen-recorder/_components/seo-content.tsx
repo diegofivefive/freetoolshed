@@ -22,6 +22,29 @@ const TAKEAWAYS = [
   "Designed for solo capture-and-share workflows, not organizational video libraries.",
 ];
 
+export const HOW_TO_STEPS = [
+  {
+    title: "1. Set up your recording",
+    desc: "Pick a quality preset (720p for small files, 1080p for the sweet spot, 1440p for crisp walkthroughs). Toggle system audio, your microphone, or both. Optionally enable the webcam overlay and pick a corner, size, and shape — it'll be baked into the final video.",
+  },
+  {
+    title: "2. Start recording",
+    desc: "Click Start Recording. Your browser will open its native share picker where you choose a screen, window, or browser tab to capture. In Chrome, check 'Share tab audio' if you want system sound from a tab. After a 3-second countdown, recording begins.",
+  },
+  {
+    title: "3. Record, pause, and stop",
+    desc: "Click Pause to freeze the recording (the elapsed timer stops too) and Resume to pick it back up. When you're done, click Stop to finalize. There's no time limit beyond a 2-hour safety cap, and nothing is uploaded as you record — everything lives in your browser's memory.",
+  },
+  {
+    title: "4. Review and trim",
+    desc: "Play back your recording with the custom video player. Drag the two green handles on the timeline to cut the start or end. Use ← / → for 0.1s nudges, or hold Shift for 1-second steps. Home and End snap to the boundaries. Hit Reset trim anytime to restore the full range.",
+  },
+  {
+    title: "5. Export your recording",
+    desc: "Choose WebM for an instant download (no transcode, no waiting), MP4 for universal H.264 playback, or GIF for a palette-optimised animation. Give the file a name and click Download. MP4 and GIF lazy-load a ~30 MB ffmpeg core on first use — cached afterwards, so follow-up exports are much faster.",
+  },
+];
+
 export function SeoContent() {
   return (
     <div className="mt-16 space-y-12">
@@ -93,28 +116,7 @@ export function SeoContent() {
           How to Record Your Screen Online (5 Steps)
         </h2>
         <ol className="mt-4 space-y-4">
-          {[
-            {
-              title: "1. Set up your recording",
-              desc: "Pick a quality preset (720p for small files, 1080p for the sweet spot, 1440p for crisp walkthroughs). Toggle system audio, your microphone, or both. Optionally enable the webcam overlay and pick a corner, size, and shape — it'll be baked into the final video.",
-            },
-            {
-              title: "2. Start recording",
-              desc: "Click Start Recording. Your browser will open its native share picker where you choose a screen, window, or browser tab to capture. In Chrome, check 'Share tab audio' if you want system sound from a tab. After a 3-second countdown, recording begins.",
-            },
-            {
-              title: "3. Record, pause, and stop",
-              desc: "Click Pause to freeze the recording (the elapsed timer stops too) and Resume to pick it back up. When you're done, click Stop to finalize. There's no time limit beyond a 2-hour safety cap, and nothing is uploaded as you record — everything lives in your browser's memory.",
-            },
-            {
-              title: "4. Review and trim",
-              desc: "Play back your recording with the custom video player. Drag the two green handles on the timeline to cut the start or end. Use ← / → for 0.1s nudges, or hold Shift for 1-second steps. Home and End snap to the boundaries. Hit Reset trim anytime to restore the full range.",
-            },
-            {
-              title: "5. Export your recording",
-              desc: "Choose WebM for an instant download (no transcode, no waiting), MP4 for universal H.264 playback, or GIF for a palette-optimised animation. Give the file a name and click Download. MP4 and GIF lazy-load a ~30 MB ffmpeg core on first use — cached afterwards, so follow-up exports are much faster.",
-            },
-          ].map((step) => (
+          {HOW_TO_STEPS.map((step) => (
             <li key={step.title}>
               <p className="font-medium">{step.title}</p>
               <p className="mt-1 text-sm text-muted-foreground">{step.desc}</p>

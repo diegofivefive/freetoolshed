@@ -20,6 +20,13 @@ const TAKEAWAYS = [
   "Browser-bound: not a substitute for native ffmpeg on production batch jobs.",
 ];
 
+export const HOW_TO_STEPS = [
+  { title: "1. Add videos", desc: "Drag and drop video files into the upload area, or click to browse. Supports MP4, WebM, MOV, AVI, MKV." },
+  { title: "2. Choose format", desc: "Select your target format: MP4, WebM, AVI, or GIF." },
+  { title: "3. Convert", desc: "Click Convert and wait for processing. Each file shows its own progress bar." },
+  { title: "4. Download", desc: "Click the download icon next to each file, or use Download All to grab everything." },
+];
+
 export function SeoContent() {
   return (
     <section className="prose prose-sm dark:prose-invert max-w-none">

@@ -20,6 +20,14 @@ const TAKEAWAYS = [
   "No upload, no privacy concern, no batch limit beyond browser memory.",
 ];
 
+export const HOW_TO_STEPS = [
+  { title: "1. Add images", desc: "Drag and drop image files into the upload area, or click to browse. Add files in multiple batches if needed." },
+  { title: "2. Choose format", desc: "Select your target format: PNG, JPG, WebP, or AVIF." },
+  { title: "3. Set quality", desc: "For lossy formats, adjust the quality slider (1-100%). Higher values produce better quality but larger files. PNG is always lossless." },
+  { title: "4. Optional resize", desc: "Enter a max dimension in pixels to scale down large images. Leave blank to keep the original size." },
+  { title: "5. Convert & download", desc: "Click Convert and download each file individually, or use Download All for the entire batch." },
+];
+
 export function SeoContent() {
   return (
     <section className="prose prose-sm dark:prose-invert max-w-none">

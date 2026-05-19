@@ -20,6 +20,14 @@ const TAKEAWAYS = [
   "Tagging only — no audio re-encoding, no waveform editing.",
 ];
 
+export const HOW_TO_STEPS = [
+  { title: "1. Add a file", desc: "Drag and drop an audio or video file. MP3, M4A, OGG, FLAC, WAV, MP4, WebM, MKV, MOV, and AVI are supported." },
+  { title: "2. Review", desc: "See file properties, streams, and all existing metadata tags." },
+  { title: "3. Edit", desc: "Click 'Edit Tags' to modify values, add new tags, or remove existing ones." },
+  { title: "4. Save or Strip", desc: "Click 'Save Tags' to write your changes, or 'Strip All Metadata' to remove everything." },
+  { title: "5. Download", desc: "Download the modified file. The original audio/video data is preserved exactly (stream copy)." },
+];
+
 export function SeoContent() {
   return (
     <section className="prose prose-sm dark:prose-invert max-w-none">

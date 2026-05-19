@@ -20,6 +20,14 @@ const TAKEAWAYS = [
   "Quality is bounded by the source — conversion preserves or downgrades, never improves.",
 ];
 
+export const HOW_TO_STEPS = [
+  { title: "1. Add files", desc: "Drag and drop audio files into the upload area, or click to browse. You can add files in multiple batches." },
+  { title: "2. Choose format", desc: "Select your target format from the dropdown: MP3, M4A, WAV, OGG, or FLAC." },
+  { title: "3. Set bitrate", desc: "For lossy formats, choose a bitrate (64-320 kbps). Lossless formats ignore this setting." },
+  { title: "4. Convert", desc: "Click Convert and wait for processing. Each file shows its own progress bar." },
+  { title: "5. Download", desc: "Click the download icon next to each file, or use Download All to grab everything at once." },
+];
+
 export function SeoContent() {
   return (
     <section className="prose prose-sm dark:prose-invert max-w-none">

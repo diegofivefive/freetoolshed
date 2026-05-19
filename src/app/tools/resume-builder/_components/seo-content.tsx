@@ -22,6 +22,29 @@ const TAKEAWAYS = [
   "Authoring + PDF export only — no LinkedIn import, no built-in cover-letter editor, no recruiter messaging.",
 ];
 
+export const HOW_TO_STEPS = [
+  {
+    title: "1. Enter your personal information",
+    desc: "Add your name, job title, email, phone, location, and optionally upload a professional photo.",
+  },
+  {
+    title: "2. Fill in your experience and education",
+    desc: "Add your work history with bullet points for achievements, plus your education details. Use the 'Current role' toggle for your present job.",
+  },
+  {
+    title: "3. Add skills and optional sections",
+    desc: "List your skills with proficiency levels. Add certifications, languages, projects, volunteer work, awards, publications, or references as needed.",
+  },
+  {
+    title: "4. Customize the design",
+    desc: "Choose from 4 professional templates, pick an accent color, select a font family, and adjust the font size to fit your content.",
+  },
+  {
+    title: "5. Download your PDF",
+    desc: "Click 'Download PDF' for an instant, watermark-free resume file. You can also print directly or save to history for later editing.",
+  },
+];
+
 export function SeoContent() {
   return (
     <div className="mt-16 space-y-12">
@@ -69,28 +92,7 @@ export function SeoContent() {
       <section>
         <h2 className="text-xl font-semibold">How to Build Your Resume</h2>
         <ol className="mt-4 space-y-4">
-          {[
-            {
-              title: "1. Enter your personal information",
-              desc: "Add your name, job title, email, phone, location, and optionally upload a professional photo.",
-            },
-            {
-              title: "2. Fill in your experience and education",
-              desc: "Add your work history with bullet points for achievements, plus your education details. Use the 'Current role' toggle for your present job.",
-            },
-            {
-              title: "3. Add skills and optional sections",
-              desc: "List your skills with proficiency levels. Add certifications, languages, projects, volunteer work, awards, publications, or references as needed.",
-            },
-            {
-              title: "4. Customize the design",
-              desc: "Choose from 4 professional templates, pick an accent color, select a font family, and adjust the font size to fit your content.",
-            },
-            {
-              title: "5. Download your PDF",
-              desc: "Click 'Download PDF' for an instant, watermark-free resume file. You can also print directly or save to history for later editing.",
-            },
-          ].map((step) => (
+          {HOW_TO_STEPS.map((step) => (
             <li key={step.title}>
               <p className="font-medium">{step.title}</p>
               <p className="mt-1 text-sm text-muted-foreground">

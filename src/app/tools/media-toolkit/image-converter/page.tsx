@@ -1,7 +1,7 @@
-import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
+import { generateToolMetadata, generateToolJsonLd, generateHowToJsonLd } from "@/lib/seo";
 import { ToolByline } from "@/components/shared/tool-byline";
 import { ToolTldr } from "@/components/shared/tool-tldr";
-import { SeoContent } from "./_components/seo-content";
+import { SeoContent, HOW_TO_STEPS } from "./_components/seo-content";
 import { ImageConverterLoader } from "./_components/image-converter-loader";
 import { AdSlot } from "@/components/layout/ad-slot";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
@@ -18,6 +18,11 @@ export const metadata = generateToolMetadata(toolConfig);
 
 export default function ImageConverterPage() {
   const jsonLd = generateToolJsonLd(toolConfig);
+  const howToJsonLd = generateHowToJsonLd({
+    name: "How to Convert Images",
+    slug: toolConfig.slug,
+    steps: HOW_TO_STEPS,
+  });
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -90,6 +95,10 @@ export default function ImageConverterPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
       />
 
       <Breadcrumbs

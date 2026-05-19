@@ -21,6 +21,14 @@ const TAKEAWAYS = [
   "Designed for audiobooks, podcast compilations, and DJ sets — not for multi-track mixing.",
 ];
 
+export const HOW_TO_STEPS = [
+  { title: "1. Add files", desc: "Drag and drop audio files into the upload area, or click to browse. You can add files in multiple batches." },
+  { title: "2. Arrange order", desc: "Drag files in the queue to reorder, or click Natural Sort to automatically sort by filename." },
+  { title: "3. Choose output settings", desc: "Select your output format (M4A, MP3, or OGG), bitrate, and whether to include chapter markers." },
+  { title: "4. Merge", desc: "Click Merge and wait for processing. The progress bar shows the current status." },
+  { title: "5. Download", desc: "When complete, click Download to save the merged file to your device." },
+];
+
 export function SeoContent() {
   return (
     <section className="prose prose-sm dark:prose-invert max-w-none">

@@ -20,6 +20,29 @@ const TAKEAWAYS = [
   "Export to CSV or JSON for homework, spreadsheets, or downstream tools.",
 ];
 
+export const HOW_TO_STEPS = [
+  {
+    title: "Browse the table",
+    desc: "Hover over any element to see a tooltip with its name, symbol, atomic mass, and electron configuration. Click an element to open its full detail panel.",
+  },
+  {
+    title: "Switch view modes",
+    desc: "Use the toolbar to switch between Categories (color-coded by type), Temperature (phase states at any temp), and Heatmap (gradient by property) views.",
+  },
+  {
+    title: "Explore temperature phase changes",
+    desc: "In Temperature mode, drag the slider from 0 K to 6000 K or use preset buttons (Room Temp, Iron Melts, Sun Surface) to watch elements change between solid, liquid, and gas states.",
+  },
+  {
+    title: "Calculate molar mass",
+    desc: "Click 'Molar Mass' in the toolbar, type a chemical formula like C6H12O6, and instantly see the total mass with a full element breakdown showing each atom's contribution.",
+  },
+  {
+    title: "Compare and export",
+    desc: "Click 'Compare' to select up to 4 elements for side-by-side bar charts. Click 'Export' to download element data as CSV, JSON, PDF, or PNG with your choice of properties.",
+  },
+];
+
 export function SeoContent() {
   return (
     <div className="mt-16 space-y-12">
@@ -79,33 +102,7 @@ export function SeoContent() {
           How to Use the Interactive Periodic Table
         </h2>
         <ol className="mt-4 max-w-3xl space-y-4">
-          {[
-            {
-              title: "Browse the table",
-              description:
-                "Hover over any element to see a tooltip with its name, symbol, atomic mass, and electron configuration. Click an element to open its full detail panel.",
-            },
-            {
-              title: "Switch view modes",
-              description:
-                "Use the toolbar to switch between Categories (color-coded by type), Temperature (phase states at any temp), and Heatmap (gradient by property) views.",
-            },
-            {
-              title: "Explore temperature phase changes",
-              description:
-                "In Temperature mode, drag the slider from 0 K to 6000 K or use preset buttons (Room Temp, Iron Melts, Sun Surface) to watch elements change between solid, liquid, and gas states.",
-            },
-            {
-              title: "Calculate molar mass",
-              description:
-                "Click 'Molar Mass' in the toolbar, type a chemical formula like C6H12O6, and instantly see the total mass with a full element breakdown showing each atom's contribution.",
-            },
-            {
-              title: "Compare and export",
-              description:
-                "Click 'Compare' to select up to 4 elements for side-by-side bar charts. Click 'Export' to download element data as CSV, JSON, PDF, or PNG with your choice of properties.",
-            },
-          ].map((step, i) => (
+          {HOW_TO_STEPS.map((step, i) => (
             <li key={step.title} className="flex gap-4">
               <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand/10 text-sm font-bold text-brand">
                 {i + 1}
@@ -113,7 +110,7 @@ export function SeoContent() {
               <div>
                 <h3 className="font-medium">{step.title}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {step.description}
+                  {step.desc}
                 </p>
               </div>
             </li>

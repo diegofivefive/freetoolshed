@@ -20,6 +20,14 @@ const TAKEAWAYS = [
   "Focused on the formats people actually share — not a transcoder for every esoteric codec.",
 ];
 
+export const HOW_TO_STEPS = [
+  { title: "1. Add a video", desc: "Drag and drop a video file or click to browse. Supports MP4, WebM, MOV, AVI, MKV." },
+  { title: "2. Choose a preset", desc: "Select Small File for maximum compression, Balanced for a good trade-off, or High Quality for minimal loss." },
+  { title: "3. Adjust settings", desc: "Optionally tweak CRF, resolution, and audio settings for precise control." },
+  { title: "4. Compress", desc: "Click Compress and wait. The progress bar shows real-time status. Video encoding is CPU-intensive and may take a few minutes." },
+  { title: "5. Download", desc: "When complete, see the before/after file size and click Download." },
+];
+
 export function SeoContent() {
   return (
     <section className="prose prose-sm dark:prose-invert max-w-none">

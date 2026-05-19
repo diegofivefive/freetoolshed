@@ -20,6 +20,14 @@ const TAKEAWAYS = [
   "Pure extraction — no audio cleanup, normalization, or denoising included.",
 ];
 
+export const HOW_TO_STEPS = [
+  { title: "1. Add a video", desc: "Drag and drop a video file into the upload area, or click to browse. MP4, WebM, MOV, AVI, and MKV are supported." },
+  { title: "2. Choose format", desc: "Select your desired audio format. Use 'Original' for the fastest, lossless extraction." },
+  { title: "3. Set bitrate", desc: "For lossy formats (MP3, M4A, OGG), choose a bitrate. 128 kbps is standard; 320 kbps is maximum quality." },
+  { title: "4. Extract", desc: "Click 'Extract Audio'. Stream copy is nearly instant; re-encoding takes longer depending on file length." },
+  { title: "5. Download", desc: "Download your extracted audio file." },
+];
+
 export function SeoContent() {
   return (
     <section className="prose prose-sm dark:prose-invert max-w-none">

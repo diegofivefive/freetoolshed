@@ -1,7 +1,7 @@
-import { generateToolMetadata, generateToolJsonLd } from "@/lib/seo";
+import { generateToolMetadata, generateToolJsonLd, generateHowToJsonLd } from "@/lib/seo";
 import { ToolByline } from "@/components/shared/tool-byline";
 import { ToolTldr } from "@/components/shared/tool-tldr";
-import { SeoContent } from "./_components/seo-content";
+import { SeoContent, HOW_TO_STEPS } from "./_components/seo-content";
 import { PeriodicTableLoader } from "./_components/periodic-table-loader";
 import { AdSlot } from "@/components/layout/ad-slot";
 
@@ -17,6 +17,11 @@ export const metadata = generateToolMetadata(toolConfig);
 
 export default function PeriodicTablePage() {
   const jsonLd = generateToolJsonLd(toolConfig);
+  const howToJsonLd = generateHowToJsonLd({
+    name: "How to Use the Interactive Periodic Table",
+    slug: toolConfig.slug,
+    steps: HOW_TO_STEPS,
+  });
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -105,6 +110,10 @@ export default function PeriodicTablePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
       />
 
       <h1 className="text-3xl font-bold tracking-tight">

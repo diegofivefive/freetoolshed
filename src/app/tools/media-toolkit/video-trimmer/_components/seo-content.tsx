@@ -20,6 +20,14 @@ const TAKEAWAYS = [
   "Single-range trim per export — for multi-cut workflows, run multiple passes.",
 ];
 
+export const HOW_TO_STEPS = [
+  { title: "1. Add a file", desc: "Drag and drop a video file into the upload area, or click to browse. MP4, WebM, MOV, AVI, and MKV are supported." },
+  { title: "2. Preview", desc: "Use the built-in player to scrub to the exact timestamps you want to cut." },
+  { title: "3. Choose mode", desc: "Click Trim to extract a single clip, or Split to cut at multiple markers." },
+  { title: "4. Enter times", desc: "For Trim mode, set the start and end time. For Split mode, add one or more time markers where you want to cut." },
+  { title: "5. Process & Download", desc: "Click the action button. Stream copy mode makes this fast regardless of file length. Download your clip(s) when done." },
+];
+
 export function SeoContent() {
   return (
     <section className="prose prose-sm dark:prose-invert max-w-none">

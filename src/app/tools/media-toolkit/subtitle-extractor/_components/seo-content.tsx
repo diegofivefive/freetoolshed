@@ -20,6 +20,14 @@ const TAKEAWAYS = [
   "Embedded subtitles only — burned-in subtitles require OCR, not extraction.",
 ];
 
+export const HOW_TO_STEPS = [
+  { title: "1. Add a video", desc: "Drag and drop a video file into the upload area, or click to browse. MKV, MP4, WebM, MOV, and AVI are supported." },
+  { title: "2. Choose format", desc: "Select your desired subtitle format: SRT, ASS, or VTT." },
+  { title: "3. Scan", desc: "Click 'Scan for Subtitles' to probe the video for embedded subtitle tracks." },
+  { title: "4. Extract", desc: "Click 'Extract' on a specific track, or 'Extract All' to get every track at once." },
+  { title: "5. Download", desc: "Download your subtitle file(s)." },
+];
+
 export function SeoContent() {
   return (
     <section className="prose prose-sm dark:prose-invert max-w-none">
