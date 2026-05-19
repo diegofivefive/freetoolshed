@@ -8,12 +8,7 @@ export function ToolTldr({ children }: ToolTldrProps) {
       aria-label="Summary"
       className="mt-6 rounded-lg border border-brand/30 bg-brand/5 p-4"
     >
-      <p className="text-xs font-semibold uppercase tracking-wider text-brand">
-        TL;DR
-      </p>
-      <p className="mt-2 text-sm leading-relaxed text-foreground">
-        {children}
-      </p>
+      <p className="text-sm leading-relaxed text-foreground">{children}</p>
     </section>
   );
 }
