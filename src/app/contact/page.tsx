@@ -12,9 +12,44 @@ export const metadata: Metadata = generatePageMetadata({
   path: "/contact",
 });
 
+const FAQ_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "What's the typical response time?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "We aim to respond within 1–2 business days. Bug reports for broken tools are prioritized.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Is there a community or forum?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Not yet, but it's on our radar. For now, email is the best way to reach us.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "I found a security issue. How do I report it?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Email hello@freetoolshed.com with 'Security' in the subject line. We take these reports seriously and will respond promptly.",
+      },
+    },
+  ],
+};
+
 export default function ContactPage() {
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10 sm:px-6 lg:px-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSON_LD) }}
+      />
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },
