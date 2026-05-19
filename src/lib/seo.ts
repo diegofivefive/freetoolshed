@@ -65,6 +65,29 @@ export function generateToolJsonLd({
   };
 }
 
+export function generateHowToJsonLd({
+  name,
+  slug,
+  steps,
+}: {
+  name: string;
+  slug: string;
+  steps: { title: string; desc: string }[];
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name,
+    url: `${SITE_URL}/tools/${slug}`,
+    step: steps.map((s, i) => ({
+      "@type": "HowToStep",
+      position: i + 1,
+      name: s.title,
+      text: s.desc,
+    })),
+  };
+}
+
 export function generatePageMetadata({
   title,
   description,

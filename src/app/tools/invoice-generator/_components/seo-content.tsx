@@ -22,6 +22,29 @@ const TAKEAWAYS = [
   "Designed for one-off and low-volume invoicing — no recurring billing, payment processing, or multi-user accounts.",
 ];
 
+export const HOW_TO_STEPS = [
+  {
+    title: "Enter your business details",
+    desc: "Add your company name, address, email, and optionally upload your logo.",
+  },
+  {
+    title: "Add your client information",
+    desc: "Fill in the client name, email, and billing address.",
+  },
+  {
+    title: "Add line items",
+    desc: "Enter each product or service with a description, quantity, unit type, and unit price. Enable per-item taxes if needed.",
+  },
+  {
+    title: "Choose a template and customize",
+    desc: "Pick from Modern, Classic, or Compact templates. Set your brand accent color, date format, and invoice status.",
+  },
+  {
+    title: "Download or save your invoice",
+    desc: "Download a print-ready PDF, save to your invoice history for later, or export as JSON for backup.",
+  },
+];
+
 export function SeoContent() {
   return (
     <div className="mt-16 space-y-12">
@@ -77,28 +100,7 @@ export function SeoContent() {
           How to Create a Professional Invoice
         </h2>
         <ol className="mt-4 max-w-3xl space-y-4">
-          {[
-            {
-              title: "Enter your business details",
-              desc: "Add your company name, address, email, and optionally upload your logo.",
-            },
-            {
-              title: "Add your client information",
-              desc: "Fill in the client name, email, and billing address.",
-            },
-            {
-              title: "Add line items",
-              desc: "Enter each product or service with a description, quantity, unit type, and unit price. Enable per-item taxes if needed.",
-            },
-            {
-              title: "Choose a template and customize",
-              desc: "Pick from Modern, Classic, or Compact templates. Set your brand accent color, date format, and invoice status.",
-            },
-            {
-              title: "Download or save your invoice",
-              desc: "Download a print-ready PDF, save to your invoice history for later, or export as JSON for backup.",
-            },
-          ].map((step, i) => (
+          {HOW_TO_STEPS.map((step, i) => (
             <li key={step.title} className="flex gap-4">
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand/10 text-sm font-semibold text-brand">
                 {i + 1}
