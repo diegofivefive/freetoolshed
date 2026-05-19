@@ -1,5 +1,6 @@
 import { generateToolMetadata, generateToolJsonLd, generateHowToJsonLd } from "@/lib/seo";
 import { ToolByline } from "@/components/shared/tool-byline";
+import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { ToolTldr } from "@/components/shared/tool-tldr";
 import { SeoContent, HOW_TO_STEPS } from "./_components/seo-content";
 import { ResumeBuilderLoader } from "./_components/resume-builder-loader";
@@ -122,6 +123,13 @@ export default function ResumeBuilderPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
+      />
+
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Resume Builder" },
+        ]}
       />
 
       <h1 className="text-3xl font-bold tracking-tight">

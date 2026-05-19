@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { generatePageMetadata } from "@/lib/seo";
+import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 
 export const metadata: Metadata = generatePageMetadata({
   title: "Terms of Service",
@@ -10,6 +11,13 @@ export const metadata: Metadata = generatePageMetadata({
 export default function TermsPage() {
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10 sm:px-6 lg:px-8">
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Terms of Service" },
+        ]}
+      />
+
       <h1 className="text-3xl font-bold tracking-tight">Terms of Service</h1>
       <div className="mt-6 space-y-6 text-muted-foreground">
         <section>

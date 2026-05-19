@@ -1,5 +1,6 @@
 import { generateToolMetadata, generateToolJsonLd, generateHowToJsonLd } from "@/lib/seo";
 import { ToolByline } from "@/components/shared/tool-byline";
+import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { ToolTldr } from "@/components/shared/tool-tldr";
 import { SeoContent, HOW_TO_STEPS } from "./_components/seo-content";
 import { PayStubGeneratorLoader } from "./_components/pay-stub-generator-loader";
@@ -106,6 +107,13 @@ export default function PayStubGeneratorPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
+      />
+
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Pay Stub Generator" },
+        ]}
       />
 
       <h1 className="text-3xl font-bold tracking-tight">

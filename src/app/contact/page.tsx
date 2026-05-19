@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { generatePageMetadata } from "@/lib/seo";
+import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { Mail, Bug, Lightbulb, HelpCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -14,6 +15,13 @@ export const metadata: Metadata = generatePageMetadata({
 export default function ContactPage() {
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10 sm:px-6 lg:px-8">
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Contact" },
+        ]}
+      />
+
       <h1 className="text-3xl font-bold tracking-tight">Contact Us</h1>
       <p className="mt-4 text-muted-foreground">
         Have a question, suggestion, or found a bug? We&apos;d love to hear from you.

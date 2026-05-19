@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { generatePageMetadata } from "@/lib/seo";
+import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { generatePersonJsonLd, author, organization } from "@/lib/author";
 
 export const metadata: Metadata = generatePageMetadata({
@@ -32,6 +33,13 @@ export default function AboutPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutPageJsonLd) }}
+      />
+
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "About" },
+        ]}
       />
 
       <h1 className="text-3xl font-bold tracking-tight">About Free Tool Shed</h1>
