@@ -135,7 +135,11 @@ export default function HomePage() {
           <h2 className="mb-4 text-xl font-semibold">All Tools</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {TOOLS.map((tool) => (
-              <Link key={tool.slug} href={`/tools/${tool.slug}`}>
+              <Link
+                key={tool.slug}
+                href={`/tools/${tool.slug}`}
+                rel={tool.badge === "Under Construction" ? "nofollow" : undefined}
+              >
                 <Card className="relative h-full overflow-hidden transition-colors hover:border-brand/50 hover:bg-muted/50">
                   {tool.badge && (
                     <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">

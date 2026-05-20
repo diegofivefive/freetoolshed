@@ -14,16 +14,17 @@ export function generateToolMetadata({
   slug: string;
   paidAlternative?: string;
 }): Metadata {
-  const title = `Free ${name} Online — No Sign Up | ${SITE_NAME}`;
+  const shortTitle = `Free ${name} Online — No Sign Up`;
+  const brandedTitle = `${shortTitle} | ${SITE_NAME}`;
   const metaDescription = paidAlternative
     ? `${description} A free alternative to ${paidAlternative}. No sign up required.`
     : `${description} No sign up required.`;
 
   return {
-    title,
+    title: shortTitle,
     description: metaDescription,
     openGraph: {
-      title,
+      title: brandedTitle,
       description: metaDescription,
       url: `${SITE_URL}/tools/${slug}`,
       siteName: SITE_NAME,
@@ -31,7 +32,7 @@ export function generateToolMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: brandedTitle,
       description: metaDescription,
     },
     alternates: {
@@ -98,7 +99,7 @@ export function generatePageMetadata({
   path: string;
 }): Metadata {
   return {
-    title: `${title} | ${SITE_NAME}`,
+    title,
     description,
     openGraph: {
       title: `${title} | ${SITE_NAME}`,
