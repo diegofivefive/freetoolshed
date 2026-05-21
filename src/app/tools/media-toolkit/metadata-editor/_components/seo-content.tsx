@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { ToolInsights } from "@/components/shared/tool-insights";
 
@@ -41,6 +42,18 @@ export function SeoContent() {
         from audio and video files — directly in your browser. Edit MP3 ID3
         tags, M4A atoms, MKV properties, and more. No sign-up, no uploads,
         no re-encoding.
+      </p>
+      <p className="mt-3 text-muted-foreground">
+        Resizing the cover art before embedding? The{" "}
+        <Link href="/tools/media-toolkit/image-converter">
+          free image converter
+        </Link>{" "}
+        handles batch resize and format conversion. Need to swap the audio
+        format before re-tagging an album? Use the{" "}
+        <Link href="/tools/media-toolkit/audio-converter">
+          free audio converter
+        </Link>{" "}
+        first — it preserves the file structure metadata editors expect.
       </p>
 
       <h2 className="mt-10 text-2xl font-semibold tracking-tight">

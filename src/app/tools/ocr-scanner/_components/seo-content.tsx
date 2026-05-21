@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { ToolInsights } from "@/components/shared/tool-insights";
 
@@ -66,6 +67,25 @@ export function SeoContent() {
           supports 15+ languages, handles multi-page PDFs, and exports to plain
           text, Word documents, or searchable PDFs with an invisible text layer
           over your original scan.
+        </p>
+        <p className="mt-3 max-w-3xl text-muted-foreground">
+          Need to convert the source image to a different format before OCR?
+          Use the{" "}
+          <Link
+            href="/tools/media-toolkit/image-converter"
+            className="text-brand underline-offset-4 hover:underline"
+          >
+            free image converter
+          </Link>{" "}
+          to switch between PNG, JPG, WebP, and TIFF. Digitizing receipts for
+          expense tracking? Run the extracted text through the{" "}
+          <Link
+            href="/tools/invoice-generator"
+            className="text-brand underline-offset-4 hover:underline"
+          >
+            free invoice generator
+          </Link>{" "}
+          to produce a clean billing record.
         </p>
       </section>
 

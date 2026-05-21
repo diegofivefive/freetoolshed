@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { ToolInsights } from "@/components/shared/tool-insights";
 
@@ -41,6 +42,18 @@ export function SeoContent() {
         file — directly in your browser. Convert to MP3, M4A, WAV, OGG, or
         FLAC, or use stream copy to keep the original codec with zero quality
         loss. No sign-up, no uploads, no file size limits.
+      </p>
+      <p className="mt-3 text-muted-foreground">
+        Once you have the audio extracted, trim out the parts you need with
+        the{" "}
+        <Link href="/tools/media-toolkit/audio-trimmer">
+          free audio trimmer
+        </Link>
+        , or re-encode at a different bitrate via the{" "}
+        <Link href="/tools/media-toolkit/audio-converter">
+          free audio converter
+        </Link>
+        .
       </p>
 
       <h2 className="mt-10 text-2xl font-semibold tracking-tight">

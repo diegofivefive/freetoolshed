@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { ToolInsights } from "@/components/shared/tool-insights";
 
@@ -62,6 +63,23 @@ export function SeoContent() {
           $8 or more per stub. Everything runs locally in your browser, so your
           employer and employee information stays completely private. Enter your
           details, choose a template, and download a print-ready PDF.
+        </p>
+        <p className="mt-3 max-w-3xl text-muted-foreground">
+          Paying a 1099 contractor instead of a W-2 employee? Use the{" "}
+          <Link
+            href="/tools/invoice-generator"
+            className="text-brand underline-offset-4 hover:underline"
+          >
+            free invoice generator
+          </Link>{" "}
+          — contractors bill, employees get stubs. Hiring? The{" "}
+          <Link
+            href="/tools/resume-builder"
+            className="text-brand underline-offset-4 hover:underline"
+          >
+            free resume builder
+          </Link>{" "}
+          is a no-paywall option to share with applicants.
         </p>
       </section>
 

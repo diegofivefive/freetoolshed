@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { ToolInsights } from "@/components/shared/tool-insights";
 
@@ -62,6 +63,24 @@ export function SeoContent() {
           gives you instant, watermark-free PDF export at no cost. No sign-up, no
           account, no hidden fees. Your data stays in your browser and is never
           sent to a server.
+        </p>
+        <p className="mt-3 max-w-3xl text-muted-foreground">
+          Already landed the role and need to bill for contract work or issue
+          paychecks? Pair your resume with the{" "}
+          <Link
+            href="/tools/invoice-generator"
+            className="text-brand underline-offset-4 hover:underline"
+          >
+            free invoice generator
+          </Link>{" "}
+          for client billing, or the{" "}
+          <Link
+            href="/tools/pay-stub-generator"
+            className="text-brand underline-offset-4 hover:underline"
+          >
+            free pay stub generator
+          </Link>{" "}
+          if you need proof of income for rentals or loans.
         </p>
       </section>
 

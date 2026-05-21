@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { ToolInsights } from "@/components/shared/tool-insights";
 
@@ -73,6 +74,25 @@ export function SeoContent() {
           as WebM instantly, or convert to MP4 or GIF with an in-browser
           ffmpeg.wasm transcode. The whole thing is free, open, and
           ad-supported so it can stay that way.
+        </p>
+        <p className="mt-3 max-w-3xl text-muted-foreground">
+          Once you&apos;ve captured your recording, the built-in trimmer covers
+          basic cuts — but for frame-accurate edits, the{" "}
+          <Link
+            href="/tools/media-toolkit/video-trimmer"
+            className="text-brand underline-offset-4 hover:underline"
+          >
+            free video trimmer
+          </Link>{" "}
+          is purpose-built for that. Need to shrink the file before sharing?
+          The{" "}
+          <Link
+            href="/tools/media-toolkit/video-compressor"
+            className="text-brand underline-offset-4 hover:underline"
+          >
+            free video compressor
+          </Link>{" "}
+          handles the in-browser re-encode.
         </p>
       </section>
 

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { ToolInsights } from "@/components/shared/tool-insights";
 
@@ -41,6 +42,19 @@ export function SeoContent() {
         from any video file — directly in your browser. Export to SRT, ASS,
         or WebVTT format. Supports multiple tracks and languages. No sign-up,
         no uploads, no file size limits.
+      </p>
+      <p className="mt-3 text-muted-foreground">
+        Working with just a clip rather than the full video? Cut the section
+        with the{" "}
+        <Link href="/tools/media-toolkit/video-trimmer">
+          free video trimmer
+        </Link>{" "}
+        first — subtitle timings re-anchor cleanly after a stream-copy trim.
+        Need to swap container too? The{" "}
+        <Link href="/tools/media-toolkit/video-converter">
+          free video converter
+        </Link>{" "}
+        handles MKV → MP4 without dropping subtitle tracks.
       </p>
 
       <h2 className="mt-10 text-2xl font-semibold tracking-tight">

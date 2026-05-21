@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { ToolInsights } from "@/components/shared/tool-insights";
 
@@ -42,6 +43,18 @@ export function SeoContent() {
         of images, adjust quality, and optionally resize — all without
         sign-ups, uploads, or file size limits. Your images never leave your
         device.
+      </p>
+      <p className="mt-3 text-muted-foreground">
+        Need to extract text from an image instead of converting it? The{" "}
+        <Link href="/tools/ocr-scanner">
+          free OCR scanner
+        </Link>{" "}
+        pulls text from PNGs, JPGs, and scanned PDFs into editable .txt or
+        .docx. Working with video frames instead? The{" "}
+        <Link href="/tools/media-toolkit/video-converter">
+          free video converter
+        </Link>{" "}
+        handles MP4, WebM, MOV, and GIF.
       </p>
 
       <h2 className="mt-10 text-2xl font-semibold tracking-tight">

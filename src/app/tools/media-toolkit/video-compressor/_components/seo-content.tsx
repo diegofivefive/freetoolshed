@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { ToolInsights } from "@/components/shared/tool-insights";
 
@@ -42,6 +43,18 @@ export function SeoContent() {
         quality preset or fine-tune with custom CRF and resolution settings.
         Your video never leaves your device — no uploads, no sign-up, no file
         size limits.
+      </p>
+      <p className="mt-3 text-muted-foreground">
+        Need to switch container or codec instead of just shrinking? The{" "}
+        <Link href="/tools/media-toolkit/video-converter">
+          free video converter
+        </Link>{" "}
+        handles format swaps. Cropping out the boring intro before compressing
+        is the easiest way to shave megabytes — the{" "}
+        <Link href="/tools/media-toolkit/video-trimmer">
+          free video trimmer
+        </Link>{" "}
+        does that with stream copy and zero quality loss.
       </p>
 
       <h2 className="mt-10 text-2xl font-semibold tracking-tight">

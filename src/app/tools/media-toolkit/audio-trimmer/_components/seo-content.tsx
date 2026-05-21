@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { ToolInsights } from "@/components/shared/tool-insights";
 
@@ -42,6 +43,18 @@ export function SeoContent() {
         all directly in your browser. No sign-up, no uploads, no file size
         limits. Powered by ffmpeg.wasm with stream copy mode for instant cuts
         and zero quality loss.
+      </p>
+      <p className="mt-3 text-muted-foreground">
+        Stitching multiple trimmed clips back into one file? The{" "}
+        <Link href="/tools/media-toolkit/audio-merger">
+          free audio merger
+        </Link>{" "}
+        joins them in any order with optional chapter markers. Need to swap
+        formats while you&apos;re at it? Use the{" "}
+        <Link href="/tools/media-toolkit/audio-converter">
+          free audio converter
+        </Link>{" "}
+        to batch-convert between MP3, M4A, WAV, OGG, and FLAC.
       </p>
 
       <h2 className="mt-10 text-2xl font-semibold tracking-tight">

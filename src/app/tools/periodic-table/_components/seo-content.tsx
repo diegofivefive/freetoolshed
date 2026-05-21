@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { ToolInsights } from "@/components/shared/tool-insights";
 
@@ -63,6 +64,24 @@ export function SeoContent() {
           transitions in real time with the temperature slider. Calculate molar
           masses, build electron configurations, compare elements side by side,
           and export data in four formats.
+        </p>
+        <p className="mt-3 max-w-3xl text-muted-foreground">
+          Working through a chemistry or physics problem? Convert between mass,
+          volume, energy, and temperature units with the{" "}
+          <Link
+            href="/tools/unit-converter"
+            className="text-brand underline-offset-4 hover:underline"
+          >
+            free unit converter
+          </Link>
+          , or plot reaction rates and equations with the{" "}
+          <Link
+            href="/tools/graphing-calculator"
+            className="text-brand underline-offset-4 hover:underline"
+          >
+            free graphing calculator
+          </Link>
+          .
         </p>
       </section>
 

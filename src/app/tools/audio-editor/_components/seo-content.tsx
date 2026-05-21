@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { ToolInsights } from "@/components/shared/tool-insights";
 
@@ -70,6 +71,25 @@ export function SeoContent() {
           Apply fade in/out, normalize volume, reduce noise, reverse audio, or
           convert WAV to MP3 — all processed locally. Your files never leave
           your device.
+        </p>
+        <p className="mt-3 max-w-3xl text-muted-foreground">
+          Just need to chop a quick clip without opening a full waveform
+          editor? Try the{" "}
+          <Link
+            href="/tools/media-toolkit/audio-trimmer"
+            className="text-brand underline-offset-4 hover:underline"
+          >
+            free audio trimmer
+          </Link>
+          . Stitching multiple files into one track? Use the{" "}
+          <Link
+            href="/tools/media-toolkit/audio-merger"
+            className="text-brand underline-offset-4 hover:underline"
+          >
+            free audio merger
+          </Link>{" "}
+          — both are part of the Media Toolkit and run entirely in your
+          browser.
         </p>
       </section>
 

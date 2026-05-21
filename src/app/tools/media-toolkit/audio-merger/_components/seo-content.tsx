@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { ToolInsights } from "@/components/shared/tool-insights";
 
@@ -43,6 +44,18 @@ export function SeoContent() {
         episodes or 300 audiobook chapters, drag them in, arrange the order,
         pick your output format, and hit merge. No sign-up, no uploads, no
         file count limits.
+      </p>
+      <p className="mt-3 text-muted-foreground">
+        Need to cut a clip before merging? The{" "}
+        <Link href="/tools/media-toolkit/audio-trimmer">
+          free audio trimmer
+        </Link>{" "}
+        handles selection-based trims. Mixing input formats and want to
+        normalize them first? Run them through the{" "}
+        <Link href="/tools/media-toolkit/audio-converter">
+          free audio converter
+        </Link>{" "}
+        to match bitrates and avoid mid-file re-encodes.
       </p>
 
       <h2 className="mt-10 text-2xl font-semibold tracking-tight">

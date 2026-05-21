@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { ToolInsights } from "@/components/shared/tool-insights";
 
@@ -42,6 +43,17 @@ export function SeoContent() {
         all directly in your browser. No sign-up, no uploads, no watermarks,
         no file size limits. Powered by ffmpeg.wasm with stream copy mode for
         near-instant cuts and zero quality loss.
+      </p>
+      <p className="mt-3 text-muted-foreground">
+        Once trimmed, shrink the clip further with the{" "}
+        <Link href="/tools/media-toolkit/video-compressor">
+          free video compressor
+        </Link>{" "}
+        for upload-friendly file sizes, or swap container with the{" "}
+        <Link href="/tools/media-toolkit/video-converter">
+          free video converter
+        </Link>{" "}
+        to convert MP4 to WebM, MOV, or GIF.
       </p>
 
       <h2 className="mt-10 text-2xl font-semibold tracking-tight">

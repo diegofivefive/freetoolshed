@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { ToolInsights } from "@/components/shared/tool-insights";
 
@@ -42,6 +43,18 @@ export function SeoContent() {
         you need to convert a single podcast episode or batch-convert an entire
         music library, drop your files in and download the results. No sign-up,
         no uploads, no file size limits.
+      </p>
+      <p className="mt-3 text-muted-foreground">
+        Combining the converted files into one track? The{" "}
+        <Link href="/tools/media-toolkit/audio-merger">
+          free audio merger
+        </Link>{" "}
+        stitches them together with optional chapter markers. Need to crop
+        each file before converting? Use the{" "}
+        <Link href="/tools/media-toolkit/audio-trimmer">
+          free audio trimmer
+        </Link>{" "}
+        first — both run entirely in your browser.
       </p>
 
       <h2 className="mt-10 text-2xl font-semibold tracking-tight">

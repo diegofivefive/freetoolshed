@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { ToolInsights } from "@/components/shared/tool-insights";
 
@@ -64,6 +65,24 @@ export function SeoContent() {
           downloading a sketchy ROM emulator. Every calculation is verified
           against TI-84 reference outputs with over 200 automated tests,
           so you can trust the results for homework, exams, and research.
+        </p>
+        <p className="mt-3 max-w-3xl text-muted-foreground">
+          Need to convert units inside your problem set? The{" "}
+          <Link
+            href="/tools/unit-converter"
+            className="text-brand underline-offset-4 hover:underline"
+          >
+            free unit converter
+          </Link>{" "}
+          covers 800+ units across 23 categories. Working on a chemistry
+          assignment? The{" "}
+          <Link
+            href="/tools/periodic-table"
+            className="text-brand underline-offset-4 hover:underline"
+          >
+            free interactive periodic table
+          </Link>{" "}
+          handles molar mass, electron configurations, and trend heatmaps.
         </p>
       </section>
 

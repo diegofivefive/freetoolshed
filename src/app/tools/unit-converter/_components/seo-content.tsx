@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ToolInsights } from "@/components/shared/tool-insights";
 
 const TIPS = [
@@ -32,6 +33,17 @@ export function SeoContent() {
           viscosity, thermal conductivity, and torque. Unlike basic converters,
           it features animated scale visualizations, real-time formula display,
           batch conversion, and a keyboard-first command palette.
+        </p>
+        <p>
+          Solving STEM problems? Pair this with the{" "}
+          <Link href="/tools/graphing-calculator">
+            free graphing calculator
+          </Link>{" "}
+          for equations and the{" "}
+          <Link href="/tools/periodic-table">
+            free interactive periodic table
+          </Link>{" "}
+          for molar mass, electron configurations, and element properties.
         </p>
       </section>
 

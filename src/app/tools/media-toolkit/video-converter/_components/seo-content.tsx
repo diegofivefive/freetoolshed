@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { ToolInsights } from "@/components/shared/tool-insights";
 
@@ -41,6 +42,18 @@ export function SeoContent() {
         MOV from your iPhone to MP4, create a GIF from a video clip, or batch
         convert files for web compatibility, drop your files in and download
         the results. No sign-up, no uploads, no file size limits.
+      </p>
+      <p className="mt-3 text-muted-foreground">
+        If the goal is a smaller file (not a different format), use the{" "}
+        <Link href="/tools/media-toolkit/video-compressor">
+          free video compressor
+        </Link>{" "}
+        — quality-targeted CRF encoding shrinks files without touching the
+        container. Need to cut a clip down before converting? The{" "}
+        <Link href="/tools/media-toolkit/video-trimmer">
+          free video trimmer
+        </Link>{" "}
+        does instant stream-copy trims first.
       </p>
 
       <h2 className="mt-10 text-2xl font-semibold tracking-tight">

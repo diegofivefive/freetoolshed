@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { ToolInsights } from "@/components/shared/tool-insights";
 
@@ -61,6 +62,24 @@ export function SeoContent() {
           alternative to FreshBooks, QuickBooks, and Wave. Your data never leaves
           your browser, so your business information stays private. Just fill in
           your details, pick a template, and download a print-ready PDF.
+        </p>
+        <p className="mt-3 max-w-3xl text-muted-foreground">
+          Paying employees or contractors instead of billing clients? Use the{" "}
+          <Link
+            href="/tools/pay-stub-generator"
+            className="text-brand underline-offset-4 hover:underline"
+          >
+            free pay stub generator
+          </Link>
+          . Applying for jobs and need a polished CV to go with your invoices?
+          The{" "}
+          <Link
+            href="/tools/resume-builder"
+            className="text-brand underline-offset-4 hover:underline"
+          >
+            free resume builder
+          </Link>{" "}
+          uses the same client-side, no-account workflow.
         </p>
       </section>
 
