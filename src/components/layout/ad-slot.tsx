@@ -1,27 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { SLOT_DIMENSIONS, SLOT_FORMAT, type AdSlotName } from "@/lib/ad-slots";
+import { HouseAdSlot } from "@/components/layout/house-ad";
 
 interface AdSlotProps {
-  slot: "leaderboard" | "sidebar" | "in-feed" | "mid-content";
+  slot: AdSlotName;
   className?: string;
 }
 
-const SLOT_DIMENSIONS: Record<AdSlotProps["slot"], { width: number; height: number }> = {
-  leaderboard: { width: 728, height: 90 },
-  sidebar: { width: 300, height: 250 },
-  "in-feed": { width: 728, height: 90 },
-  "mid-content": { width: 728, height: 90 },
-};
-
-const SLOT_FORMAT: Record<AdSlotProps["slot"], string> = {
-  leaderboard: "horizontal",
-  sidebar: "rectangle",
-  "in-feed": "horizontal",
-  "mid-content": "horizontal",
-};
-
-const AD_PROVIDER = process.env.NEXT_PUBLIC_AD_PROVIDER || "adsterra";
+const AD_PROVIDER = process.env.NEXT_PUBLIC_AD_PROVIDER || "house";
 const ADSENSE_CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || "ca-pub-7700405385978151";
 
 const ADSTERRA_KEYS: Record<string, string> = {
@@ -162,6 +150,10 @@ function AdSenseSlot({ slot, className }: AdSlotProps) {
 }
 
 export function AdSlot({ slot, className }: AdSlotProps) {
+  if (AD_PROVIDER === "house") {
+    return <HouseAdSlot slot={slot} className={className} />;
+  }
+
   if (AD_PROVIDER === "adsterra") {
     return <AdsterraSlot slot={slot} className={className} />;
   }

@@ -52,24 +52,44 @@ export function SeoContent() {
           for audiobooks and podcast compilations.
         </li>
         <li>
-          <strong>Audio Converter</strong> (coming soon) — Convert between audio
-          formats with configurable quality. Single file or batch mode.
+          <strong>Audio Converter</strong> — Convert between MP3, M4A, WAV, OGG,
+          and FLAC with configurable bitrate. Single file or batch mode.
         </li>
         <li>
-          <strong>Video Compressor</strong> (coming soon) — Reduce video file
-          size with quality presets while maintaining visual clarity.
+          <strong>Video Compressor</strong> — Reduce video file size with H.264
+          quality presets and optional resolution scaling while keeping visual
+          clarity.
         </li>
         <li>
-          <strong>Video Converter</strong> (coming soon) — Convert between MP4,
-          WebM, MOV, AVI, and GIF formats.
+          <strong>Video Converter</strong> — Convert between MP4, WebM, AVI, and
+          GIF, including optimized two-pass GIF export with a custom color
+          palette.
         </li>
         <li>
-          <strong>Audio Trimmer</strong> (coming soon) — Trim audio files or
-          split them at precise time markers.
+          <strong>Audio Trimmer</strong> — Trim audio to a start and end point
+          or split it at multiple time markers, with instant lossless
+          stream-copy cuts.
         </li>
         <li>
-          <strong>Image Converter</strong> (coming soon) — Bulk convert images
-          between PNG, JPG, WebP, and AVIF.
+          <strong>Image Converter</strong> — Bulk convert images between PNG,
+          JPG, WebP, and AVIF with quality and optional resize controls.
+        </li>
+        <li>
+          <strong>Video Trimmer</strong> — Quick-cut or split video clips
+          without re-encoding the whole file, using fast stream-copy mode.
+        </li>
+        <li>
+          <strong>Audio Extractor</strong> — Pull the audio track out of any
+          video file and save it as MP3, M4A, WAV, OGG, FLAC, or the original
+          stream.
+        </li>
+        <li>
+          <strong>Subtitle Extractor</strong> — Extract embedded subtitle tracks
+          from MKV, MP4, and other containers, exported to SRT, ASS, or VTT.
+        </li>
+        <li>
+          <strong>Metadata Editor</strong> — View, edit, and strip metadata tags
+          from audio and video files for privacy or organization.
         </li>
       </ul>
 

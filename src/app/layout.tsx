@@ -5,7 +5,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { SiteNav } from "@/components/layout/site-nav";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { AdSenseScript } from "@/components/layout/adsense-script";
-import { AdSlot } from "@/components/layout/ad-slot";
 import { generateOrganizationJsonLd, generateWebSiteJsonLd } from "@/lib/author";
 import "./globals.css";
 
@@ -68,10 +67,6 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full`}
     >
       <head>
-        <link rel="preconnect" href="https://www.highperformanceformat.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://www.highperformanceformat.com" />
-        <link rel="preconnect" href="https://pl29142630.profitablecpmratenetwork.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://pl29142630.profitablecpmratenetwork.com" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(generateOrganizationJsonLd()) }}

@@ -1,6 +1,6 @@
 import Script from "next/script";
 
-const AD_PROVIDER = process.env.NEXT_PUBLIC_AD_PROVIDER || "adsterra";
+const AD_PROVIDER = process.env.NEXT_PUBLIC_AD_PROVIDER || "house";
 const CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || "ca-pub-7700405385978151";
 
 export function AdSenseScript() {
