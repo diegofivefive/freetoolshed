@@ -1,27 +1,41 @@
 "use client";
 
-import type { TI84ButtonDef, TI84ButtonColor } from "./ti84-button-definitions";
-
-// ─── Color Style Map ────────────────────────────────────────────────────────
-
-const COLOR_STYLES: Record<TI84ButtonColor, string> = {
-  darkblue:
-    "bg-blue-900 text-white hover:bg-blue-800 active:bg-blue-950 border-blue-800",
-  darkgray:
-    "bg-zinc-700 text-zinc-100 hover:bg-zinc-600 active:bg-zinc-800 border-zinc-600",
-  lightgray:
-    "bg-zinc-400 text-zinc-900 hover:bg-zinc-300 active:bg-zinc-500 border-zinc-300 dark:bg-zinc-500 dark:text-zinc-100 dark:hover:bg-zinc-400 dark:active:bg-zinc-600 dark:border-zinc-400",
-  yellow:
-    "bg-amber-500 text-zinc-900 hover:bg-amber-400 active:bg-amber-600 border-amber-400 font-bold",
-  green:
-    "bg-emerald-600 text-white hover:bg-emerald-500 active:bg-emerald-700 border-emerald-500",
-  enter:
-    "bg-blue-700 text-white hover:bg-blue-600 active:bg-blue-800 border-blue-600 font-bold",
-};
+import type {
+  TI84ButtonDef,
+  TI84ButtonColor,
+  TI84Action,
+} from "./ti84-button-definitions";
 
 // ─── Modifier State ─────────────────────────────────────────────────────────
 
 export type ModifierState = "none" | "second" | "alpha";
+
+// ─── Keycap color variants ──────────────────────────────────────────────────
+
+const COLOR_STYLES: Record<TI84ButtonColor, string> = {
+  fn: "border-zinc-950/90 bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-zinc-100",
+  body: "border-zinc-950/90 bg-zinc-800 text-zinc-100 hover:bg-zinc-700",
+  num: "border-zinc-950/90 bg-zinc-700 text-white hover:bg-zinc-600",
+  second: "border-amber-600 bg-amber-400 text-zinc-950 hover:bg-amber-300",
+  alpha: "border-sky-600 bg-sky-400 text-zinc-950 hover:bg-sky-300",
+  enter: "border-emerald-700 bg-emerald-500 text-zinc-950 hover:bg-emerald-400",
+};
+
+// Tinted styles when a key participates in the active 2nd/alpha layer
+const ACCENT_STYLES = {
+  second:
+    "border-amber-500/60 bg-amber-400/15 text-amber-300 hover:bg-amber-400/25",
+  alpha: "border-sky-500/60 bg-sky-400/15 text-sky-300 hover:bg-sky-400/25",
+};
+
+const LATCHED_STYLES = {
+  second: "ring-2 ring-amber-300 ring-offset-2 ring-offset-zinc-900",
+  alpha: "ring-2 ring-sky-300 ring-offset-2 ring-offset-zinc-900",
+};
+
+function isLive(action?: TI84Action): boolean {
+  return !!action && action.type !== "noop";
+}
 
 // ─── Component ──────────────────────────────────────────────────────────────
 
@@ -32,59 +46,90 @@ interface TI84KeyProps {
 }
 
 export function TI84Key({ button, modifier, onPress }: TI84KeyProps) {
-  // Determine which label to show
-  const showSecond = modifier === "second" && button.secondLabel;
-  const showAlpha = modifier === "alpha" && button.alphaLabel;
+  const isModifierKey = button.action.type === "modifier";
+  const latched =
+    (modifier === "second" && button.id === "2nd") ||
+    (modifier === "alpha" && button.id === "alpha");
 
-  const displayLabel = showSecond
-    ? button.secondLabel
-    : showAlpha
-      ? button.alphaLabel
-      : button.label;
+  // A layer function only counts if it's actually wired up — unimplemented
+  // (noop) functions are never printed on the keycap.
+  const hasSecond = isLive(button.secondAction) && !!button.secondLabel;
+  const hasAlpha = isLive(button.alphaAction) && !!button.alphaLabel;
 
-  // Text color override for modifier labels
-  const labelColorClass = showSecond
-    ? "text-amber-300"
-    : showAlpha
-      ? "text-emerald-300"
-      : "";
+  // In a shifted layer, participating keys light up and show their layer
+  // label as the main legend; the rest fade back (but still fall through
+  // to their base action if pressed).
+  const accent =
+    modifier === "second" && hasSecond
+      ? ("second" as const)
+      : modifier === "alpha" && hasAlpha
+        ? ("alpha" as const)
+        : null;
+  const dimmed = modifier !== "none" && !accent && !isModifierKey;
 
-  // Annotations shown above the key in normal state
-  const hasAnnotations =
-    modifier === "none" && (button.secondLabel || button.alphaLabel);
+  const displayLabel = accent
+    ? (accent === "second" ? button.secondLabel : button.alphaLabel)
+    : button.label;
+
+  // Keys whose base action isn't implemented yet read as muted
+  const baseDead = !isModifierKey && !isLive(button.action);
+
+  // Printed layer legends only appear on neutral keycaps in the base layer
+  const showLegends =
+    modifier === "none" &&
+    (button.color === "body" ||
+      button.color === "fn" ||
+      button.color === "num");
+
+  const isNum = button.color === "num";
 
   return (
-    <div className="flex flex-col items-center">
-      {/* Annotations: 2nd label (amber, left) + alpha label (green, right) */}
-      {hasAnnotations ? (
-        <div className="mb-0.5 flex w-full items-center justify-between gap-0.5 px-0.5">
-          <span className="truncate text-[7px] leading-none text-blue-400">
-            {button.secondLabel ?? ""}
-          </span>
-          <span className="text-[7px] leading-none text-emerald-400">
-            {button.alphaLabel ?? ""}
-          </span>
-        </div>
-      ) : (
-        <div className="mb-0.5 h-[9px]" />
-      )}
-
-      <button
-        onMouseDown={(e) => {
+    <button
+      type="button"
+      aria-pressed={isModifierKey ? latched : undefined}
+      onMouseDown={(e) => {
+        e.preventDefault();
+        onPress(button);
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           onPress(button);
-        }}
-        className={`flex w-full cursor-pointer items-center justify-center rounded-md border px-1 py-2 text-[11px] leading-tight transition-colors select-none ${COLOR_STYLES[button.color]} ${labelColorClass}`}
-        title={
-          showSecond
-            ? `2nd: ${button.secondLabel}`
-            : showAlpha
-              ? `Alpha: ${button.alphaLabel}`
-              : button.label
         }
-      >
-        {displayLabel}
-      </button>
-    </div>
+      }}
+      title={
+        accent === "second"
+          ? `2nd: ${button.secondLabel}`
+          : accent === "alpha"
+            ? `Alpha: ${button.alphaLabel}`
+            : button.label
+      }
+      className={`flex h-12 w-full min-w-0 cursor-pointer flex-col rounded-lg border border-b-[3px] px-1 pt-1 pb-1.5 transition-all duration-75 select-none active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/80 ${
+        accent ? ACCENT_STYLES[accent] : COLOR_STYLES[button.color]
+      } ${latched ? LATCHED_STYLES[modifier === "second" ? "second" : "alpha"] : ""} ${
+        dimmed ? "opacity-35" : ""
+      }`}
+    >
+      {/* Layer legends: 2nd (amber, left) and alpha (sky, right) */}
+      <span className="flex h-[10px] w-full items-start justify-between gap-1 leading-none">
+        <span className="min-w-0 truncate text-left text-[9px] font-medium text-amber-300/90">
+          {showLegends && hasSecond ? button.secondLabel : ""}
+        </span>
+        <span className="shrink-0 text-[9px] font-medium text-sky-300/90">
+          {showLegends && hasAlpha ? button.alphaLabel : ""}
+        </span>
+      </span>
+
+      {/* Main legend */}
+      <span className="flex w-full min-w-0 flex-1 items-center justify-center">
+        <span
+          className={`truncate font-mono leading-none ${
+            isNum ? "text-[15px] font-semibold" : "text-[13px] font-medium"
+          } ${baseDead && !accent ? "opacity-50" : ""}`}
+        >
+          {displayLabel}
+        </span>
+      </span>
+    </button>
   );
 }

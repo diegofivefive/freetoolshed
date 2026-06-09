@@ -12,7 +12,7 @@ import {
   Crosshair,
   Square,
 } from "lucide-react";
-import type { GraphFunction, AngleMode, Viewport } from "@/lib/graphing-calculator/types";
+import type { GraphFunction, Viewport } from "@/lib/graphing-calculator/types";
 import { validateExpression } from "@/lib/graphing-calculator/engine";
 import type { FunctionType } from "@/lib/graphing-calculator/types";
 import {
@@ -27,28 +27,24 @@ import {
 
 interface FunctionInputPanelProps {
   functions: GraphFunction[];
-  angleMode: AngleMode;
   viewport: Viewport;
   traceEnabled: boolean;
   canvasAspectRatio?: number; // width / height of the canvas
   onAddFunction: (fn: GraphFunction) => void;
   onUpdateFunction: (id: string, updates: Partial<GraphFunction>) => void;
   onRemoveFunction: (id: string) => void;
-  onAngleModeToggle: () => void;
   onViewportChange: (viewport: Viewport) => void;
   onTraceToggle: () => void;
 }
 
 export function FunctionInputPanel({
   functions,
-  angleMode,
   viewport,
   traceEnabled,
   canvasAspectRatio,
   onAddFunction,
   onUpdateFunction,
   onRemoveFunction,
-  onAngleModeToggle,
   onViewportChange,
   onTraceToggle,
 }: FunctionInputPanelProps) {
@@ -177,15 +173,6 @@ export function FunctionInputPanel({
         >
           <Crosshair className="h-3.5 w-3.5" />
           Trace
-        </button>
-
-        {/* Angle Mode */}
-        <button
-          onClick={onAngleModeToggle}
-          className="ml-auto rounded-md border border-border px-2.5 py-1 text-xs font-bold tracking-wide transition-colors hover:bg-muted"
-          title={`Switch to ${angleMode === "radian" ? "degree" : "radian"} mode`}
-        >
-          {angleMode === "radian" ? "RAD" : "DEG"}
         </button>
       </div>
     </div>

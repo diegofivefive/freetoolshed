@@ -17,12 +17,12 @@ export type TI84Action =
 // ─── Button Color Variants ──────────────────────────────────────────────────
 
 export type TI84ButtonColor =
-  | "darkblue"   // top row mode keys (Y=, WINDOW, etc.)
-  | "darkgray"   // standard body keys
-  | "lightgray"  // number pad keys
-  | "yellow"     // 2nd modifier
-  | "green"      // ALPHA modifier
-  | "enter";     // ENTER key accent
+  | "fn"      // top row mode keys (y=, window, zoom, trace, graph)
+  | "body"    // standard function keys
+  | "num"     // number pad keys
+  | "second"  // 2nd modifier key (amber)
+  | "alpha"   // alpha modifier key (sky)
+  | "enter";  // enter key accent (emerald)
 
 // ─── Button Definition ──────────────────────────────────────────────────────
 
@@ -46,7 +46,7 @@ export const ROW_1: TI84ButtonDef[] = [
     secondLabel: "stat plot",
     action: { type: "mode", mode: "graph" },
     secondAction: { type: "mode", mode: "stat" },
-    color: "darkblue",
+    color: "fn",
   },
   {
     id: "window",
@@ -54,7 +54,7 @@ export const ROW_1: TI84ButtonDef[] = [
     secondLabel: "tblset",
     action: { type: "callback", key: "zoomStandard" },
     secondAction: { type: "mode", mode: "table" },
-    color: "darkblue",
+    color: "fn",
   },
   {
     id: "zoom",
@@ -62,7 +62,7 @@ export const ROW_1: TI84ButtonDef[] = [
     secondLabel: "format",
     action: { type: "callback", key: "openPalette" },
     secondAction: { type: "noop" },
-    color: "darkblue",
+    color: "fn",
   },
   {
     id: "trace",
@@ -70,7 +70,7 @@ export const ROW_1: TI84ButtonDef[] = [
     secondLabel: "calc",
     action: { type: "callback", key: "toggleTrace" },
     secondAction: { type: "callback", key: "openPalette" },
-    color: "darkblue",
+    color: "fn",
   },
   {
     id: "graph",
@@ -78,7 +78,7 @@ export const ROW_1: TI84ButtonDef[] = [
     secondLabel: "table",
     action: { type: "mode", mode: "graph" },
     secondAction: { type: "mode", mode: "table" },
-    color: "darkblue",
+    color: "fn",
   },
 ];
 
@@ -89,7 +89,7 @@ export const ROW_2: (TI84ButtonDef | null)[] = [
     id: "2nd",
     label: "2nd",
     action: { type: "modifier", mod: "second" },
-    color: "yellow",
+    color: "second",
   },
   {
     id: "mode",
@@ -97,7 +97,7 @@ export const ROW_2: (TI84ButtonDef | null)[] = [
     secondLabel: "quit",
     action: { type: "angleToggle" },
     secondAction: { type: "callback", key: "resetState" },
-    color: "darkgray",
+    color: "body",
   },
   {
     id: "del",
@@ -105,14 +105,14 @@ export const ROW_2: (TI84ButtonDef | null)[] = [
     secondLabel: "ins",
     action: { type: "delete" },
     secondAction: { type: "noop" },
-    color: "darkgray",
+    color: "body",
   },
   null, // gap
   {
     id: "clear",
     label: "clear",
     action: { type: "clear" },
-    color: "darkgray",
+    color: "body",
   },
 ];
 
@@ -125,7 +125,7 @@ export const ROW_3: TI84ButtonDef[] = [
     secondLabel: "A-lock",
     action: { type: "modifier", mod: "alpha" },
     secondAction: { type: "modifier", mod: "alpha" },
-    color: "green",
+    color: "alpha",
   },
   {
     id: "vars-x",
@@ -133,7 +133,7 @@ export const ROW_3: TI84ButtonDef[] = [
     secondLabel: "link",
     action: { type: "insert", text: "x" },
     secondAction: { type: "noop" },
-    color: "darkgray",
+    color: "body",
   },
   {
     id: "stat",
@@ -141,7 +141,7 @@ export const ROW_3: TI84ButtonDef[] = [
     secondLabel: "list",
     action: { type: "mode", mode: "stat" },
     secondAction: { type: "noop" },
-    color: "darkgray",
+    color: "body",
   },
 ];
 
@@ -156,7 +156,7 @@ export const ROW_4: TI84ButtonDef[] = [
     action: { type: "callback", key: "openPalette" },
     secondAction: { type: "noop" },
     alphaAction: { type: "insert", text: "A" },
-    color: "darkgray",
+    color: "body",
   },
   {
     id: "apps",
@@ -166,7 +166,7 @@ export const ROW_4: TI84ButtonDef[] = [
     action: { type: "noop" },
     secondAction: { type: "noop" },
     alphaAction: { type: "insert", text: "B" },
-    color: "darkgray",
+    color: "body",
   },
   {
     id: "prgm",
@@ -176,7 +176,7 @@ export const ROW_4: TI84ButtonDef[] = [
     action: { type: "noop" },
     secondAction: { type: "noop" },
     alphaAction: { type: "insert", text: "C" },
-    color: "darkgray",
+    color: "body",
   },
   {
     id: "vars",
@@ -184,7 +184,7 @@ export const ROW_4: TI84ButtonDef[] = [
     secondLabel: "distr",
     action: { type: "noop" },
     secondAction: { type: "mode", mode: "distribution" },
-    color: "darkgray",
+    color: "body",
   },
 ];
 
@@ -194,35 +194,35 @@ export const DPAD_UP: TI84ButtonDef = {
   id: "dpad-up",
   label: "\u25B2",
   action: { type: "arrow", direction: "up" },
-  color: "darkgray",
+  color: "body",
 };
 
 export const DPAD_DOWN: TI84ButtonDef = {
   id: "dpad-down",
   label: "\u25BC",
   action: { type: "arrow", direction: "down" },
-  color: "darkgray",
+  color: "body",
 };
 
 export const DPAD_LEFT: TI84ButtonDef = {
   id: "dpad-left",
   label: "\u25C4",
   action: { type: "arrow", direction: "left" },
-  color: "darkgray",
+  color: "body",
 };
 
 export const DPAD_RIGHT: TI84ButtonDef = {
   id: "dpad-right",
   label: "\u25BA",
   action: { type: "arrow", direction: "right" },
-  color: "darkgray",
+  color: "body",
 };
 
 export const DPAD_CENTER: TI84ButtonDef = {
   id: "dpad-enter",
   label: "OK",
   action: { type: "enter" },
-  color: "darkgray",
+  color: "body",
 };
 
 // ─── Row 5: Inverse / Trig / Power ─────────────────────────────────────────
@@ -236,7 +236,7 @@ export const ROW_5: TI84ButtonDef[] = [
     action: { type: "insert", text: "^(-1)" },
     secondAction: { type: "mode", mode: "matrix" },
     alphaAction: { type: "insert", text: "D" },
-    color: "darkgray",
+    color: "body",
   },
   {
     id: "sin",
@@ -246,7 +246,7 @@ export const ROW_5: TI84ButtonDef[] = [
     action: { type: "insert", text: "sin(" },
     secondAction: { type: "insert", text: "asin(" },
     alphaAction: { type: "insert", text: "E" },
-    color: "darkgray",
+    color: "body",
   },
   {
     id: "cos",
@@ -256,7 +256,7 @@ export const ROW_5: TI84ButtonDef[] = [
     action: { type: "insert", text: "cos(" },
     secondAction: { type: "insert", text: "acos(" },
     alphaAction: { type: "insert", text: "F" },
-    color: "darkgray",
+    color: "body",
   },
   {
     id: "tan",
@@ -266,7 +266,7 @@ export const ROW_5: TI84ButtonDef[] = [
     action: { type: "insert", text: "tan(" },
     secondAction: { type: "insert", text: "atan(" },
     alphaAction: { type: "insert", text: "G" },
-    color: "darkgray",
+    color: "body",
   },
   {
     id: "power",
@@ -276,7 +276,7 @@ export const ROW_5: TI84ButtonDef[] = [
     action: { type: "insert", text: "^" },
     secondAction: { type: "insert", text: "pi" },
     alphaAction: { type: "insert", text: "H" },
-    color: "darkgray",
+    color: "body",
   },
 ];
 
@@ -291,7 +291,7 @@ export const ROW_6: TI84ButtonDef[] = [
     action: { type: "insert", text: "^2" },
     secondAction: { type: "insert", text: "sqrt(" },
     alphaAction: { type: "insert", text: "I" },
-    color: "darkgray",
+    color: "body",
   },
   {
     id: "comma",
@@ -301,7 +301,7 @@ export const ROW_6: TI84ButtonDef[] = [
     action: { type: "insert", text: "," },
     secondAction: { type: "insert", text: "E" },
     alphaAction: { type: "insert", text: "J" },
-    color: "darkgray",
+    color: "body",
   },
   {
     id: "lparen",
@@ -311,7 +311,7 @@ export const ROW_6: TI84ButtonDef[] = [
     action: { type: "insert", text: "(" },
     secondAction: { type: "insert", text: "{" },
     alphaAction: { type: "insert", text: "K" },
-    color: "darkgray",
+    color: "body",
   },
   {
     id: "rparen",
@@ -321,7 +321,7 @@ export const ROW_6: TI84ButtonDef[] = [
     action: { type: "insert", text: ")" },
     secondAction: { type: "insert", text: "}" },
     alphaAction: { type: "insert", text: "L" },
-    color: "darkgray",
+    color: "body",
   },
   {
     id: "divide",
@@ -331,7 +331,7 @@ export const ROW_6: TI84ButtonDef[] = [
     action: { type: "insert", text: "/" },
     secondAction: { type: "insert", text: "e" },
     alphaAction: { type: "insert", text: "M" },
-    color: "darkgray",
+    color: "body",
   },
 ];
 
@@ -346,7 +346,7 @@ export const ROW_7: TI84ButtonDef[] = [
     action: { type: "insert", text: "log(" },
     secondAction: { type: "insert", text: "10^(" },
     alphaAction: { type: "insert", text: "N" },
-    color: "darkgray",
+    color: "body",
   },
   {
     id: "7",
@@ -354,7 +354,7 @@ export const ROW_7: TI84ButtonDef[] = [
     alphaLabel: "O",
     action: { type: "insert", text: "7" },
     alphaAction: { type: "insert", text: "O" },
-    color: "lightgray",
+    color: "num",
   },
   {
     id: "8",
@@ -362,7 +362,7 @@ export const ROW_7: TI84ButtonDef[] = [
     alphaLabel: "P",
     action: { type: "insert", text: "8" },
     alphaAction: { type: "insert", text: "P" },
-    color: "lightgray",
+    color: "num",
   },
   {
     id: "9",
@@ -370,7 +370,7 @@ export const ROW_7: TI84ButtonDef[] = [
     alphaLabel: "Q",
     action: { type: "insert", text: "9" },
     alphaAction: { type: "insert", text: "Q" },
-    color: "lightgray",
+    color: "num",
   },
   {
     id: "multiply",
@@ -378,7 +378,7 @@ export const ROW_7: TI84ButtonDef[] = [
     alphaLabel: "R",
     action: { type: "insert", text: "*" },
     alphaAction: { type: "insert", text: "R" },
-    color: "darkgray",
+    color: "body",
   },
 ];
 
@@ -393,7 +393,7 @@ export const ROW_8: TI84ButtonDef[] = [
     action: { type: "insert", text: "ln(" },
     secondAction: { type: "insert", text: "exp(" },
     alphaAction: { type: "insert", text: "S" },
-    color: "darkgray",
+    color: "body",
   },
   {
     id: "4",
@@ -401,7 +401,7 @@ export const ROW_8: TI84ButtonDef[] = [
     alphaLabel: "T",
     action: { type: "insert", text: "4" },
     alphaAction: { type: "insert", text: "T" },
-    color: "lightgray",
+    color: "num",
   },
   {
     id: "5",
@@ -409,7 +409,7 @@ export const ROW_8: TI84ButtonDef[] = [
     alphaLabel: "U",
     action: { type: "insert", text: "5" },
     alphaAction: { type: "insert", text: "U" },
-    color: "lightgray",
+    color: "num",
   },
   {
     id: "6",
@@ -417,7 +417,7 @@ export const ROW_8: TI84ButtonDef[] = [
     alphaLabel: "V",
     action: { type: "insert", text: "6" },
     alphaAction: { type: "insert", text: "V" },
-    color: "lightgray",
+    color: "num",
   },
   {
     id: "subtract",
@@ -425,7 +425,7 @@ export const ROW_8: TI84ButtonDef[] = [
     alphaLabel: "W",
     action: { type: "insert", text: "-" },
     alphaAction: { type: "insert", text: "W" },
-    color: "darkgray",
+    color: "body",
   },
 ];
 
@@ -440,7 +440,7 @@ export const ROW_9: TI84ButtonDef[] = [
     action: { type: "noop" },
     secondAction: { type: "noop" },
     alphaAction: { type: "insert", text: "X" },
-    color: "darkgray",
+    color: "body",
   },
   {
     id: "1",
@@ -448,7 +448,7 @@ export const ROW_9: TI84ButtonDef[] = [
     alphaLabel: "Y",
     action: { type: "insert", text: "1" },
     alphaAction: { type: "insert", text: "Y" },
-    color: "lightgray",
+    color: "num",
   },
   {
     id: "2",
@@ -456,7 +456,7 @@ export const ROW_9: TI84ButtonDef[] = [
     alphaLabel: "Z",
     action: { type: "insert", text: "2" },
     alphaAction: { type: "insert", text: "Z" },
-    color: "lightgray",
+    color: "num",
   },
   {
     id: "3",
@@ -464,7 +464,7 @@ export const ROW_9: TI84ButtonDef[] = [
     alphaLabel: "\u03B8",
     action: { type: "insert", text: "3" },
     alphaAction: { type: "insert", text: "theta" },
-    color: "lightgray",
+    color: "num",
   },
   {
     id: "add",
@@ -474,7 +474,7 @@ export const ROW_9: TI84ButtonDef[] = [
     action: { type: "insert", text: "+" },
     secondAction: { type: "noop" },
     alphaAction: { type: "insert", text: "\"" },
-    color: "darkgray",
+    color: "body",
   },
 ];
 
@@ -486,8 +486,8 @@ export const ROW_10: TI84ButtonDef[] = [
     label: "on",
     secondLabel: "off",
     action: { type: "noop" },
-    secondAction: { type: "noop" },
-    color: "darkgray",
+    secondAction: { type: "callback", key: "closePanel" },
+    color: "body",
   },
   {
     id: "0",
@@ -495,7 +495,7 @@ export const ROW_10: TI84ButtonDef[] = [
     secondLabel: "catalog",
     action: { type: "insert", text: "0" },
     secondAction: { type: "callback", key: "openPalette" },
-    color: "lightgray",
+    color: "num",
   },
   {
     id: "decimal",
@@ -503,7 +503,7 @@ export const ROW_10: TI84ButtonDef[] = [
     secondLabel: ":",
     action: { type: "insert", text: "." },
     secondAction: { type: "insert", text: ":" },
-    color: "lightgray",
+    color: "num",
   },
   {
     id: "negate",
@@ -513,7 +513,7 @@ export const ROW_10: TI84ButtonDef[] = [
     action: { type: "insert", text: "-" },
     secondAction: { type: "insert", text: "ans" },
     alphaAction: { type: "insert", text: "?" },
-    color: "darkgray",
+    color: "body",
   },
   {
     id: "enter",

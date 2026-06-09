@@ -33,7 +33,7 @@ import { ToolGuide } from "@/components/shared/tool-guide";
 import type { ToolGuideSection } from "@/components/shared/tool-guide";
 import { useActiveInput } from "@/hooks/use-active-input";
 import { CommandPalette } from "./command-palette";
-import { TI84Sheet } from "./ti84-sheet";
+import { KeypadPanel } from "./keypad-panel";
 import { GraphCanvas } from "./graph-canvas";
 import { FunctionInputPanel } from "./function-input-panel";
 import { TableView } from "./table-view";
@@ -102,9 +102,19 @@ const TOOL_GUIDE_SECTIONS: ToolGuideSection[] = [
     ],
   },
   {
+    title: "On-Screen Keypad",
+    content:
+      "Click Keypad in the toolbar to slide out a calculator-style keypad. It types into whichever input you last clicked, and the page stays fully usable while it's open.",
+    steps: [
+      "Tap 2nd (amber) or alpha (blue) to switch key layers",
+      "Highlighted keys show what the active layer can do",
+      "Close it with the X, Esc, or 2nd + off",
+    ],
+  },
+  {
     title: "Angle Mode",
     content:
-      "Toggle between Radian and Degree mode using the RAD/DEG button in the toolbar. This affects all trig function evaluation.",
+      "Toggle between Radian and Degree mode with the RAD/DEG button in the toolbar — visible in every mode. This affects all trig evaluation, including Table mode.",
   },
   {
     title: "Keyboard Shortcuts",
@@ -112,7 +122,7 @@ const TOOL_GUIDE_SECTIONS: ToolGuideSection[] = [
     steps: [
       "Ctrl/⌘ + K — Open command palette",
       "Escape — Close panels and dialogs",
-      "R / D — Toggle Radian / Degree mode",
+      "R / D — Set Radian / Degree mode",
     ],
   },
 ];
@@ -207,8 +217,8 @@ export function GraphingCalculator() {
     setCanvasAspectRatio(ratio);
   }, []);
 
-  // ── TI-84 Sheet ────────────────────────────────────────────────────
-  const [ti84Open, setTi84Open] = useState(false);
+  // ── Keypad panel ───────────────────────────────────────────────────
+  const [keypadOpen, setKeypadOpen] = useState(false);
 
   // ── Command Palette ─────────────────────────────────────────────────
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -218,6 +228,20 @@ export function GraphingCalculator() {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         setPaletteOpen((prev) => !prev);
+        return;
+      }
+      // R / D set the angle mode when not typing in a field
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const target = e.target;
+      const isTyping =
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        (target instanceof HTMLElement && target.isContentEditable);
+      if (isTyping) return;
+      if (e.key === "r" || e.key === "R") {
+        dispatch({ type: "SET_ANGLE_MODE", angleMode: "radian" });
+      } else if (e.key === "d" || e.key === "D") {
+        dispatch({ type: "SET_ANGLE_MODE", angleMode: "degree" });
       }
     }
     window.addEventListener("keydown", handleGlobalKeyDown);
@@ -378,12 +402,25 @@ export function GraphingCalculator() {
           ))}
 
           <button
-            onClick={() => setTi84Open(true)}
-            className="ml-auto flex shrink-0 items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            title="Open TI-84 calculator"
+            onClick={toggleAngleMode}
+            className="ml-auto shrink-0 rounded-md border border-border px-2.5 py-1 text-xs font-bold tracking-wide text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            title={`Angle mode: ${state.angleMode}. Switch to ${state.angleMode === "radian" ? "degree" : "radian"} (R / D)`}
+          >
+            {state.angleMode === "radian" ? "RAD" : "DEG"}
+          </button>
+
+          <button
+            onClick={() => setKeypadOpen((prev) => !prev)}
+            aria-pressed={keypadOpen}
+            className={`flex shrink-0 items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs transition-colors ${
+              keypadOpen
+                ? "border-brand/50 bg-brand/10 text-brand"
+                : "border-border text-muted-foreground hover:bg-muted hover:text-foreground"
+            }`}
+            title={keypadOpen ? "Close keypad" : "Open keypad"}
           >
             <Calculator className="h-3 w-3" />
-            <span className="hidden sm:inline">TI-84</span>
+            <span className="hidden sm:inline">Keypad</span>
           </button>
 
           <button
@@ -405,14 +442,12 @@ export function GraphingCalculator() {
             <div className="space-y-4">
               <FunctionInputPanel
                 functions={state.functions}
-                angleMode={state.angleMode}
                 viewport={state.viewport}
                 traceEnabled={state.traceEnabled}
                 canvasAspectRatio={canvasAspectRatio}
                 onAddFunction={handleAddFunction}
                 onUpdateFunction={handleUpdateFunction}
                 onRemoveFunction={handleRemoveFunction}
-                onAngleModeToggle={toggleAngleMode}
                 onViewportChange={handleViewportChange}
                 onTraceToggle={handleTraceToggle}
               />
@@ -487,9 +522,9 @@ export function GraphingCalculator() {
 
       <ToolGuide sections={TOOL_GUIDE_SECTIONS} />
 
-      <TI84Sheet
-        open={ti84Open}
-        onOpenChange={setTi84Open}
+      <KeypadPanel
+        open={keypadOpen}
+        onOpenChange={setKeypadOpen}
         onSetMode={setMode}
         onToggleAngleMode={toggleAngleMode}
         onZoomIn={handleZoomIn}
