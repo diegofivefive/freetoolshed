@@ -27,12 +27,16 @@ import {
   Music,
   Subtitles,
   ArrowRight,
+  Info,
   Wrench,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { SLOT_DIMENSIONS, type AdSlotName } from "@/lib/ad-slots";
-import { pickHouseAds, type HouseAdCreative } from "@/lib/house-ads";
+import {
+  hashString,
+  pickHouseAds,
+  type HouseAdCreative,
+} from "@/lib/house-ads";
 
 /** Resolve the icon-name strings stored on the inventory to components. */
 const ICON_MAP: Record<string, ComponentType<{ className?: string }>> = {
@@ -68,6 +72,87 @@ const SLOT_OFFSET: Record<AdSlotName, number> = {
   "in-feed": 3,
 };
 
+/**
+ * DELIBERATE design-system exception: house ads must read as third-party
+ * display ads, not site content. They use fixed hex palettes (never the site's
+ * oklch tokens), ignore dark/light mode (real ad networks do), use Arial
+ * instead of Geist, and square corners instead of the site's rounded-lg —
+ * all so visitors never confuse an ad with the page they're on.
+ */
+interface AdTheme {
+  /** CSS background — bold gradients or flat white, never the site palette. */
+  background: string;
+  headline: string;
+  body: string;
+  /** Display-URL line color (classic ad green on the white theme). */
+  url: string;
+  ctaBg: string;
+  ctaText: string;
+  iconBg: string;
+  iconText: string;
+  /** Only the white "classic text ad" theme needs a visible edge. */
+  border?: string;
+}
+
+const AD_THEMES: AdTheme[] = [
+  {
+    background: "linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)",
+    headline: "#ffffff",
+    body: "#bfdbfe",
+    url: "#93c5fd",
+    ctaBg: "#facc15",
+    ctaText: "#1f2937",
+    iconBg: "rgba(255, 255, 255, 0.94)",
+    iconText: "#2563eb",
+  },
+  {
+    background: "linear-gradient(135deg, #4c1d95 0%, #8b5cf6 100%)",
+    headline: "#ffffff",
+    body: "#ddd6fe",
+    url: "#c4b5fd",
+    ctaBg: "#ffffff",
+    ctaText: "#6d28d9",
+    iconBg: "rgba(255, 255, 255, 0.94)",
+    iconText: "#7c3aed",
+  },
+  {
+    background: "linear-gradient(135deg, #c2410c 0%, #f59e0b 100%)",
+    headline: "#ffffff",
+    body: "#ffedd5",
+    url: "#fed7aa",
+    ctaBg: "#1f2937",
+    ctaText: "#ffffff",
+    iconBg: "rgba(255, 255, 255, 0.94)",
+    iconText: "#ea580c",
+  },
+  {
+    background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
+    headline: "#ffffff",
+    body: "#cbd5e1",
+    url: "#7dd3fc",
+    ctaBg: "#38bdf8",
+    ctaText: "#0c4a6e",
+    iconBg: "rgba(255, 255, 255, 0.94)",
+    iconText: "#0ea5e9",
+  },
+  {
+    // Classic white "search ad" look — stays white even in dark mode.
+    background: "#ffffff",
+    headline: "#1558d6",
+    body: "#545454",
+    url: "#006621",
+    ctaBg: "#1a73e8",
+    ctaText: "#ffffff",
+    iconBg: "#f1f3f4",
+    iconText: "#1a73e8",
+    border: "#dadce0",
+  },
+];
+
+const CTA_LABELS = ["Try It Free", "Open Now", "Start Free", "Get Started"];
+
+const AD_FONT = "Arial, Helvetica, sans-serif";
+
 interface HouseAdSlotProps {
   slot: AdSlotName;
   className?: string;
@@ -81,50 +166,81 @@ interface AdLayoutProps {
   className?: string;
 }
 
-/**
- * Shared container styling. Brand-tinted fill + solid brand border keeps house
- * ads visually distinct from the neutral `bg-card`/`border-border` content cards,
- * so they read as ads rather than page content.
- */
-const CONTAINER_CLASSES =
-  "group relative overflow-hidden rounded-lg border border-brand/40 bg-brand/5 transition-colors hover:border-brand/70 hover:bg-brand/10";
+/** Deterministic theme + CTA per creative, so server and client render alike. */
+function getAdStyle(creative: HouseAdCreative): { theme: AdTheme; cta: string } {
+  const hash = hashString(creative.href);
+  return {
+    theme: AD_THEMES[hash % AD_THEMES.length],
+    cta: CTA_LABELS[(hash >>> 8) % CTA_LABELS.length],
+  };
+}
 
-const CTA_CLASSES =
-  "inline-flex shrink-0 items-center justify-center gap-1 rounded-md bg-brand px-3 py-1.5 text-xs font-semibold text-brand-foreground transition-transform group-hover:translate-x-0.5";
-
-const AD_LABEL =
-  "pointer-events-none text-[9px] font-medium uppercase tracking-wider text-muted-foreground/50";
+/** AdSense-style "Ad ⓘ" chip pinned to the top-right corner. */
+function AdChip() {
+  return (
+    <span
+      className="pointer-events-none absolute right-0 top-0 z-10 flex items-center gap-0.5 rounded-bl border-b border-l border-[#dadce0] bg-white/95 py-0.5 pl-1.5 pr-1 text-[9px] font-medium leading-none text-[#5f6368]"
+      style={{ fontFamily: AD_FONT }}
+    >
+      Ad
+      <Info className="size-2.5" />
+    </span>
+  );
+}
 
 /** 728×90 horizontal layout — leaderboard, mid-content, in-feed. */
 function BannerAd({ creative, slot, width, height, className }: AdLayoutProps) {
   const Icon = ICON_MAP[creative.icon] ?? Wrench;
+  const { theme, cta } = getAdStyle(creative);
   return (
     <Link
       href={creative.href}
       data-ad-slot={slot}
       data-house-ad={creative.href}
-      className={cn(CONTAINER_CLASSES, "flex items-center gap-4 px-4", className)}
-      style={{ width, height, maxWidth: "100%" }}
+      className={cn(
+        "group relative flex items-center gap-4 overflow-hidden pl-4 pr-5 transition-shadow hover:shadow-lg",
+        className,
+      )}
+      style={{
+        width,
+        height,
+        maxWidth: "100%",
+        background: theme.background,
+        border: theme.border ? `1px solid ${theme.border}` : undefined,
+        fontFamily: AD_FONT,
+      }}
     >
-      <span className={cn(AD_LABEL, "absolute left-2 top-1")}>Advertisement</span>
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-brand/10 text-brand">
+      <AdChip />
+      <span
+        className="flex size-11 shrink-0 items-center justify-center rounded-full"
+        style={{ background: theme.iconBg, color: theme.iconText }}
+      >
         <Icon className="size-5" />
       </span>
-      <span className="flex min-w-0 flex-1 flex-col">
-        <span className="truncate text-sm font-semibold text-foreground">
-          {creative.name}
-          {creative.replaces ? (
-            <span className="ml-2 text-xs font-normal text-muted-foreground">
-              Free {creative.replaces} alternative
-            </span>
-          ) : null}
+      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span
+          className="truncate text-[15px] font-bold leading-tight"
+          style={{ color: theme.headline }}
+        >
+          Free {creative.name} — No Sign-Up!
         </span>
-        <span className="truncate text-xs text-muted-foreground">
-          {creative.description}
+        <span className="truncate text-xs" style={{ color: theme.body }}>
+          {creative.replaces
+            ? `The 100% free ${creative.replaces} alternative. ${creative.description}`
+            : creative.description}
+        </span>
+        <span
+          className="text-[10px] leading-none"
+          style={{ color: theme.url }}
+        >
+          freetoolshed.com
         </span>
       </span>
-      <span className={cn(CTA_CLASSES, "ml-auto")}>
-        Open free tool
+      <span
+        className="inline-flex shrink-0 items-center gap-1 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wide shadow-sm transition-transform group-hover:translate-x-0.5"
+        style={{ background: theme.ctaBg, color: theme.ctaText }}
+      >
+        {cta}
         <ArrowRight className="size-3.5" />
       </span>
     </Link>
@@ -134,32 +250,64 @@ function BannerAd({ creative, slot, width, height, className }: AdLayoutProps) {
 /** 300×250 vertical layout — sidebar. */
 function RectangleAd({ creative, slot, width, height, className }: AdLayoutProps) {
   const Icon = ICON_MAP[creative.icon] ?? Wrench;
+  const { theme, cta } = getAdStyle(creative);
   return (
     <Link
       href={creative.href}
       data-ad-slot={slot}
       data-house-ad={creative.href}
-      className={cn(CONTAINER_CLASSES, "flex flex-col p-4", className)}
-      style={{ width, height, maxWidth: "100%" }}
+      className={cn(
+        "group relative flex flex-col items-center overflow-hidden p-4 text-center transition-shadow hover:shadow-lg",
+        className,
+      )}
+      style={{
+        width,
+        height,
+        maxWidth: "100%",
+        background: theme.background,
+        border: theme.border ? `1px solid ${theme.border}` : undefined,
+        fontFamily: AD_FONT,
+      }}
     >
-      <span className={AD_LABEL}>Advertisement</span>
-      <span className="mt-2 flex size-10 items-center justify-center rounded-md bg-brand/10 text-brand">
-        <Icon className="size-5" />
+      <AdChip />
+      <span
+        className="mt-2 flex size-12 shrink-0 items-center justify-center rounded-full"
+        style={{ background: theme.iconBg, color: theme.iconText }}
+      >
+        <Icon className="size-6" />
       </span>
-      <span className="mt-3 text-sm font-semibold text-foreground">
-        {creative.name}
+      <span
+        className="mt-2.5 text-base font-bold leading-tight"
+        style={{ color: theme.headline }}
+      >
+        Free {creative.name}
       </span>
-      <span className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
-        {creative.description}
+      <span
+        className="mt-1 line-clamp-2 text-xs leading-snug"
+        style={{ color: theme.body }}
+      >
+        {creative.replaces
+          ? `The 100% free alternative to ${creative.replaces}`
+          : creative.description}
       </span>
-      {creative.replaces ? (
-        <Badge variant="secondary" className="mt-2 w-fit text-[10px]">
-          Replaces {creative.replaces}
-        </Badge>
-      ) : null}
-      <span className={cn(CTA_CLASSES, "mt-auto w-full py-2")}>
-        Open free tool
+      <span
+        className="mt-1.5 text-[11px] font-medium"
+        style={{ color: theme.headline }}
+      >
+        ✓ Free&ensp;✓ No Sign-Up&ensp;✓ Unlimited
+      </span>
+      <span
+        className="mt-auto inline-flex w-full items-center justify-center gap-1 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wide shadow-sm transition-transform group-hover:scale-[1.02]"
+        style={{ background: theme.ctaBg, color: theme.ctaText }}
+      >
+        {cta}
         <ArrowRight className="size-3.5" />
+      </span>
+      <span
+        className="mt-1.5 text-[10px] leading-none"
+        style={{ color: theme.url }}
+      >
+        freetoolshed.com
       </span>
     </Link>
   );

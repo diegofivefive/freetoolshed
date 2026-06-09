@@ -46,7 +46,7 @@ function normalizePath(path: string): string {
 }
 
 /** djb2 string hash → stable, non-negative 32-bit integer. */
-function hashString(value: string): number {
+export function hashString(value: string): number {
   let hash = 5381;
   for (let i = 0; i < value.length; i++) {
     hash = ((hash << 5) + hash + value.charCodeAt(i)) >>> 0;
